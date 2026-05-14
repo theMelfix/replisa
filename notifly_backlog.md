@@ -108,9 +108,9 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 | 1.2.1 | Creare Meta Business App su developers.facebook.com | `P0` | 1 | ⬜ | Serve account Business verificato |
 | 1.2.2 | Attivare prodotto "WhatsApp" nella dashboard Meta | `P0` | 1 | ⬜ | |
 | 1.2.3 | Ottenere numero test sandbox + token temporaneo | `P0` | 1 | ⬜ | Token scade ogni 24h in sandbox |
-| 1.2.4 | Generare System User Token (permanente) | `P0` | 2 | ⬜ | Business Settings → System Users |
+| 1.2.4 | Generare System User Token (permanente) | `P0` | 2 | ⬜ | Business Settings → System Users. Per MVP: token per tenant sandbox in DB, non `.env` (ADR-003) |
 | 1.2.5 | Testare primo invio messaggio via cURL/Postman | `P0` | 1 | ⬜ | Validazione end-to-end |
-| 1.2.6 | Documentare tutti gli ID e i token in modo sicuro | `P1` | 1 | ⬜ | Password manager, non file di testo |
+| 1.2.6 | Documentare tutti gli ID e i token in modo sicuro | `P1` | 1 | ⬜ | App-level (APP_ID/SECRET) in password manager + `.env` locale. Tenant-level (WABA, phone_id, access_token) finiranno in tabella `tenants` criptati |
 
 ---
 
@@ -289,6 +289,7 @@ Task importanti ma non necessari per il lancio. Da rivalutare dopo il primo clie
 | ICE-8 | Template gallery: libreria di template pre-approvati per settore | E3 | Riduce tempo onboarding |
 | ICE-9 | Notifiche via email all'owner quando un cliente disdice | E3 | Alert in tempo reale |
 | ICE-10 | App mobile nativa per il cliente (React Native) | E4 | Long-term, quando il prodotto è maturo |
+| ICE-11 | Embedded Signup per onboarding self-service WABA | E1/E4 | Onboarding cliente in ~5 min via JS SDK Meta. Richiede App Review (advanced access su `whatsapp_business_management` + `whatsapp_business_messaging`). Lead time 2-4 settimane. Necessario quando >5 clienti — vedi ADR-003 |
 
 ---
 
