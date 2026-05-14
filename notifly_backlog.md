@@ -5,8 +5,8 @@
 > **Brand:** theMelfix / giovannimelfi.com
 > **Pricing:** Starter €14 | Base €39 | Pro €79 | Business €149 /mese
 > **PM / Scrum Master:** Claude (AI) · **Dev / Product Owner:** Giovanni Melfi
-> **Data inizio progetto:** ___/___/2026
-> **Ultimo aggiornamento:** 04/05/2026
+> **Data inizio progetto:** 14/05/2026
+> **Ultimo aggiornamento:** 14/05/2026
 
 ---
 
@@ -94,9 +94,9 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 1.1.1 | Creare progetto Laravel (ultima versione stabile) | `P0` | 1 | ⬜ | `laravel new notifly` |
-| 1.1.2 | Configurare Git repo + `.gitignore` + primo commit | `P0` | 1 | ⬜ | GitHub/GitLab privato |
-| 1.1.3 | Setup `.env` con variabili Meta API (token, phone_id, app_secret) | `P0` | 1 | ⬜ | Mai committare `.env` |
+| 1.1.1 | Creare progetto Laravel (ultima versione stabile) | `P0` | 1 | ✅ | Fatto 2026-05-14, commit `ea35082` |
+| 1.1.2 | Configurare Git repo + `.gitignore` + primo commit | `P0` | 1 | ✅ | Repo `theMelfix/notifly` privato, branch main/develop |
+| 1.1.3 | Setup `.env` con variabili Meta API (token, phone_id, app_secret) | `P0` | 1 | ✅ | Placeholder pronti in `.env.example` |
 | 1.1.4 | Configurare database MySQL sul VPS | `P0` | 2 | ⬜ | Charset `utf8mb4_unicode_ci` |
 | 1.1.5 | Setup dominio/sottodominio per API (es. `api.notifly.it` o `app.notifly.it`) | `P1` | 2 | ⬜ | Registrare notifly.it + certificato SSL obbligatorio per webhook |
 | 1.1.6 | Configurare deploy pipeline (Git pull + composer + migrate su VPS) | `P2` | 2 | ⬜ | Anche uno script bash semplice va bene |
