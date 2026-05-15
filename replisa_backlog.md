@@ -100,7 +100,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 | 1.1.2 | Configurare Git repo + `.gitignore` + primo commit | `P0` | 1 | ✅ | Repo `theMelfix/notifly` privato (da rinominare → `replisa`), branch main/develop |
 | 1.1.3 | Setup `.env` con variabili Meta API (token, phone_id, app_secret) | `P0` | 1 | ✅ | Placeholder pronti in `.env.example` |
 | 1.1.4 | Configurare database MySQL sul VPS | `P0` | 2 | ⬜ | Charset `utf8mb4_unicode_ci` |
-| 1.1.5 | Setup dominio/sottodominio per API (es. `api.replisa.com`) | `P1` | 2 | 🔵 | Dominio `replisa.com` + `replisa.it` acquistati 2026-05-15. Mancano: DNS A/AAAA → VPS, SSL Let's Encrypt, redirect `.it`→`.com` |
+| 1.1.5 | Setup dominio/sottodominio per API (es. `api.replisa.com`) | `P1` | 2 | ✅ | DNS A per `@`/`www`/`app`/`api` → VPS IONOS. SSL Let's Encrypt attivo via CloudPanel su `replisa.com` + `www`. `replisa.it` con redirect 301 → `.com` (SSL incluso). 2026-05-15 |
 | 1.1.6 | Configurare deploy pipeline (Git pull + composer + migrate su VPS) | `P2` | 2 | ⬜ | Anche uno script bash semplice va bene |
 
 ### E1.2 — Configurazione Meta Cloud API
@@ -112,7 +112,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 | 1.2.3 | Ottenere numero test sandbox + token temporaneo | `P0` | 1 | ✅ | PHONE_NUMBER_ID e WABA_ID raccolti |
 | 1.2.4 | Generare System User Token (permanente) | `P0` | 2 | ✅ | Token System User generato (scope `whatsapp_business_messaging` + `_management`), salvato in `.env` come SANDBOX_ACCESS_TOKEN |
 | 1.2.5 | Testare primo invio messaggio via cURL/Postman | `P0` | 1 | ✅ | Template `hello_world` consegnato. Script in `scripts/whatsapp-test-send.sh` |
-| 1.2.6 | Documentare tutti gli ID e i token in modo sicuro | `P1` | 1 | ⬜ | App-level (APP_ID/SECRET) in password manager + `.env` locale. Tenant-level (WABA, phone_id, access_token) finiranno in tabella `tenants` criptati |
+| 1.2.6 | Documentare tutti gli ID e i token in modo sicuro | `P1` | 1 | ✅ | Bitwarden cloud (free) attivato. Credenziali Meta (App, WABA, System User, Webhook verify) salvate. Migrazione futura a Vaultwarden self-hosted prevista (no lock-in) |
 
 ---
 

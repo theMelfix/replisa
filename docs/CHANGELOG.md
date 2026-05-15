@@ -1,4 +1,4 @@
-# Changelog Notifly
+d# Changelog Replisa
 
 Log cronologico (append-only) di tutto il lavoro completato. Una riga per task del backlog.
 
@@ -19,3 +19,6 @@ Formato: `YYYY-MM-DD · <task-code> · <commit-sha> · <descrizione breve>`
 - 2026-05-15 · sec · — · App Secret resettato (era stato esposto in chat). Grace period 0h
 - 2026-05-15 · 1.2.5 · — · Primo invio template `hello_world` riuscito (HTTP 200, message_status=accepted). Script bash riusabile in `scripts/whatsapp-test-send.sh`
 - 2026-05-15 · ADR-004 · — · Rename prodotto **Notifly → Replisa** (notifly.it/.com/.app non disponibili a prezzo standard; 18 alternative valutate). Acquistati `replisa.com` (primario) + `replisa.it` (difensivo 301→.com). Backlog rinominato in `replisa_backlog.md`. Repo GitHub e Meta App da rinominare manualmente
+- 2026-05-15 · infra · — · Cartella locale rinominata `/home/gmelfi/notifly/` → `/home/gmelfi/replisa/`
+- 2026-05-15 · 1.1.5 · — · VPS IONOS con CloudPanel: site PHP `replisa.com` (PHP 8.4, Laravel template). DNS IONOS: A `@`/`www`/`app`/`api` → VPS IP. SSL Let's Encrypt attivo su `replisa.com` + `www`. Site secondario `replisa.it` come Static Site con redirect 301 NGINX → `replisa.com` + SSL incluso
+- 2026-05-15 · 1.2.6 · — · Bitwarden cloud (free tier) attivato. Credenziali Meta App, WABA, System User Token, Webhook Verify Token salvate. Sprint 1 chiuso
