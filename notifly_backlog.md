@@ -105,11 +105,11 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 1.2.1 | Creare Meta Business App su developers.facebook.com | `P0` | 1 | ⬜ | Serve account Business verificato |
-| 1.2.2 | Attivare prodotto "WhatsApp" nella dashboard Meta | `P0` | 1 | ⬜ | |
-| 1.2.3 | Ottenere numero test sandbox + token temporaneo | `P0` | 1 | ⬜ | Token scade ogni 24h in sandbox |
-| 1.2.4 | Generare System User Token (permanente) | `P0` | 2 | ⬜ | Business Settings → System Users. Per MVP: token per tenant sandbox in DB, non `.env` (ADR-003) |
-| 1.2.5 | Testare primo invio messaggio via cURL/Postman | `P0` | 1 | ⬜ | Validazione end-to-end |
+| 1.2.1 | Creare Meta Business App su developers.facebook.com | `P0` | 1 | ✅ | App `Notifly` creata 2026-05-15 |
+| 1.2.2 | Attivare prodotto "WhatsApp" nella dashboard Meta | `P0` | 1 | ✅ | WABA Test + numero sandbox attivi |
+| 1.2.3 | Ottenere numero test sandbox + token temporaneo | `P0` | 1 | ✅ | PHONE_NUMBER_ID e WABA_ID raccolti |
+| 1.2.4 | Generare System User Token (permanente) | `P0` | 2 | ✅ | Token System User generato (scope `whatsapp_business_messaging` + `_management`), salvato in `.env` come SANDBOX_ACCESS_TOKEN |
+| 1.2.5 | Testare primo invio messaggio via cURL/Postman | `P0` | 1 | ✅ | Template `hello_world` consegnato. Script in `scripts/whatsapp-test-send.sh` |
 | 1.2.6 | Documentare tutti gli ID e i token in modo sicuro | `P1` | 1 | ⬜ | App-level (APP_ID/SECRET) in password manager + `.env` locale. Tenant-level (WABA, phone_id, access_token) finiranno in tabella `tenants` criptati |
 
 ---
