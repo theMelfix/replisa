@@ -1,12 +1,14 @@
-# 🟢 Notifly — Project Backlog & Sprint Plan
+# 🟢 Replisa — Project Backlog & Sprint Plan
 
-> **Prodotto:** Notifly — Automazione WhatsApp per PMI via Meta Cloud API
-> **Stack:** Laravel (PHP) · MySQL · VPS personale · Meta Cloud API v18+
+> **Prodotto:** Replisa — Automazione WhatsApp per PMI via Meta Cloud API
+> *(progetto noto in fase preliminare come "Notifly", rinominato il 2026-05-15 — vedi ADR-004)*
+> **Stack:** Laravel (PHP) · MySQL · VPS personale · Meta Cloud API v25.0+
+> **Domini:** `replisa.com` (primario) · `replisa.it` (difensivo, 301→.com)
 > **Brand:** theMelfix / giovannimelfi.com
 > **Pricing:** Starter €14 | Base €39 | Pro €79 | Business €149 /mese
 > **PM / Scrum Master:** Claude (AI) · **Dev / Product Owner:** Giovanni Melfi
 > **Data inizio progetto:** 14/05/2026
-> **Ultimo aggiornamento:** 14/05/2026
+> **Ultimo aggiornamento:** 15/05/2026
 
 ---
 
@@ -95,17 +97,17 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
 | 1.1.1 | Creare progetto Laravel (ultima versione stabile) | `P0` | 1 | ✅ | Fatto 2026-05-14, commit `ea35082` |
-| 1.1.2 | Configurare Git repo + `.gitignore` + primo commit | `P0` | 1 | ✅ | Repo `theMelfix/notifly` privato, branch main/develop |
+| 1.1.2 | Configurare Git repo + `.gitignore` + primo commit | `P0` | 1 | ✅ | Repo `theMelfix/notifly` privato (da rinominare → `replisa`), branch main/develop |
 | 1.1.3 | Setup `.env` con variabili Meta API (token, phone_id, app_secret) | `P0` | 1 | ✅ | Placeholder pronti in `.env.example` |
 | 1.1.4 | Configurare database MySQL sul VPS | `P0` | 2 | ⬜ | Charset `utf8mb4_unicode_ci` |
-| 1.1.5 | Setup dominio/sottodominio per API (es. `api.notifly.it` o `app.notifly.it`) | `P1` | 2 | ⬜ | Registrare notifly.it + certificato SSL obbligatorio per webhook |
+| 1.1.5 | Setup dominio/sottodominio per API (es. `api.replisa.com`) | `P1` | 2 | 🔵 | Dominio `replisa.com` + `replisa.it` acquistati 2026-05-15. Mancano: DNS A/AAAA → VPS, SSL Let's Encrypt, redirect `.it`→`.com` |
 | 1.1.6 | Configurare deploy pipeline (Git pull + composer + migrate su VPS) | `P2` | 2 | ⬜ | Anche uno script bash semplice va bene |
 
 ### E1.2 — Configurazione Meta Cloud API
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 1.2.1 | Creare Meta Business App su developers.facebook.com | `P0` | 1 | ✅ | App `Notifly` creata 2026-05-15 |
+| 1.2.1 | Creare Meta Business App su developers.facebook.com | `P0` | 1 | ✅ | App creata 2026-05-15 con working name "Notifly" — da rinominare in "Replisa" via dashboard Meta |
 | 1.2.2 | Attivare prodotto "WhatsApp" nella dashboard Meta | `P0` | 1 | ✅ | WABA Test + numero sandbox attivi |
 | 1.2.3 | Ottenere numero test sandbox + token temporaneo | `P0` | 1 | ✅ | PHONE_NUMBER_ID e WABA_ID raccolti |
 | 1.2.4 | Generare System User Token (permanente) | `P0` | 2 | ✅ | Token System User generato (scope `whatsapp_business_messaging` + `_management`), salvato in `.env` come SANDBOX_ACCESS_TOKEN |
@@ -232,7 +234,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 5.1.1 | Pagina su notifly.it (dominio dedicato) | `P0` | 3 | ⬜ | Hero + problema/soluzione + pricing + CTA |
+| 5.1.1 | Pagina su replisa.com (dominio dedicato) | `P0` | 3 | ⬜ | Hero + problema/soluzione + pricing + CTA |
 | 5.1.2 | Form contatto / Calendly embed per prenotare chiamata | `P0` | 1 | ⬜ | |
 | 5.1.3 | SEO base: meta tags, Open Graph, structured data | `P1` | 1 | ⬜ | |
 | 5.1.4 | Cookie banner GDPR | `P1` | 1 | ⬜ | Hai già esperienza da giovannimelfi.com |

@@ -62,3 +62,46 @@ Formato breve: una sezione per decisione. Append-only (le decisioni superate ven
 **Alternative scartate:**
 - **Una Meta App per cliente (BYOA):** maggiore complessità operativa, ogni cliente dovrebbe creare e mantenere la sua app Meta. Inadatto a un SaaS B2B per PMI che non hanno competenze tecniche.
 - **Tutto nel `.env`:** funziona per 1 tenant, rompe a 2.
+
+---
+
+## ADR-004 · Rename prodotto: Notifly → Replisa
+
+**Data:** 2026-05-15
+**Stato:** Accepted (supersedes prior "Notifly" naming in backlog v1)
+
+**Contesto:** Il working name "Notifly" non è registrabile come dominio a costo standard:
+- `notifly.it` non disponibile
+- `notifly.com` non disponibile
+- `notifly.app` registrato da terzi durante la conversazione del 2026-05-15
+
+Esplorati 18 nomi alternativi (Pulsana, Cadensa, Sequora, Pingify, Notivox, Echolane, Promptia, Nudgify, Voxima, Tempolo, Mittora, Sendora, Pingora, Annuncia, Conferma, Klypsia, Vellatra, Replisa). Quasi tutti i candidati italianizzanti in `.com` risultano premium-priced ($5k-$42k), indice di squatting massiccio sul pattern "Italian-sounding SaaS names".
+
+**Decisione:** rinomina prodotto in **Replisa**.
+
+**Domini acquistati:**
+- `replisa.com` (primario, ~$10/anno)
+- `replisa.it` (difensivo, redirect 301 → `.com`, ~$8/anno)
+
+Subdomini pianificati:
+- `replisa.com` → landing marketing
+- `app.replisa.com` → dashboard cliente (Sprint 4)
+- `api.replisa.com` → webhook Meta + REST API (Sprint 2)
+
+**Razionale a favore di Replisa:**
+- "Reply" semantica chiara per il flusso welcome (E3.1) e bottoni interattivi (E2.1.4)
+- Pronunciabile in italiano (re-PLI-sa) ed inglese (re-PLY-suh)
+- Brandable, registrabile come marchio
+- Disponibile a prezzo standard in `.com` + `.it`
+
+**Limiti accettati:**
+- "Reply" non copre 1:1 i reminder appuntamento (E3.2) e le richieste recensione (E3.3) → mitigato con tagline che enfatizza "conversazioni" piuttosto che solo "risposte"
+- Suono che ricorda "replica" (in italiano: anche "copia fake"): valutato non penalizzante per il target B2B
+
+**Action items conseguenti (in questa stessa sessione):**
+- Rinominare `notifly_backlog.md` → `replisa_backlog.md`
+- Aggiornare `APP_NAME` in `.env`/`.env.example`
+- Aggiornare memorie di sessione
+- Sbloccare tasks 1.1.5 e 5.1.1
+- (Manuale) rinominare repo GitHub `theMelfix/notifly` → `theMelfix/replisa`
+- (Opzionale) rinominare l'app Meta da "Notifly" a "Replisa" via developers.facebook.com
