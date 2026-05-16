@@ -1,12 +1,14 @@
-# 🟢 Notifly — Project Backlog & Sprint Plan
+# 🟢 Replisa — Project Backlog & Sprint Plan
 
-> **Prodotto:** Notifly — Automazione WhatsApp per PMI via Meta Cloud API
-> **Stack:** Laravel (PHP) · MySQL · VPS personale · Meta Cloud API v18+
+> **Prodotto:** Replisa — Automazione WhatsApp per PMI via Meta Cloud API
+> *(progetto noto in fase preliminare come "Notifly", rinominato il 2026-05-15 — vedi ADR-004)*
+> **Stack:** Laravel (PHP) · MySQL · VPS personale · Meta Cloud API v25.0+
+> **Domini:** `replisa.com` (primario) · `replisa.it` (difensivo, 301→.com)
 > **Brand:** theMelfix / giovannimelfi.com
 > **Pricing:** Starter €14 | Base €39 | Pro €79 | Business €149 /mese
 > **PM / Scrum Master:** Claude (AI) · **Dev / Product Owner:** Giovanni Melfi
-> **Data inizio progetto:** ___/___/2026
-> **Ultimo aggiornamento:** 04/05/2026
+> **Data inizio progetto:** 14/05/2026
+> **Ultimo aggiornamento:** 15/05/2026
 
 ---
 
@@ -94,23 +96,23 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 1.1.1 | Creare progetto Laravel (ultima versione stabile) | `P0` | 1 | ⬜ | `laravel new notifly` |
-| 1.1.2 | Configurare Git repo + `.gitignore` + primo commit | `P0` | 1 | ⬜ | GitHub/GitLab privato |
-| 1.1.3 | Setup `.env` con variabili Meta API (token, phone_id, app_secret) | `P0` | 1 | ⬜ | Mai committare `.env` |
-| 1.1.4 | Configurare database MySQL sul VPS | `P0` | 2 | ⬜ | Charset `utf8mb4_unicode_ci` |
-| 1.1.5 | Setup dominio/sottodominio per API (es. `api.notifly.it` o `app.notifly.it`) | `P1` | 2 | ⬜ | Registrare notifly.it + certificato SSL obbligatorio per webhook |
+| 1.1.1 | Creare progetto Laravel (ultima versione stabile) | `P0` | 1 | ✅ | Fatto 2026-05-14, commit `ea35082` |
+| 1.1.2 | Configurare Git repo + `.gitignore` + primo commit | `P0` | 1 | ✅ | Repo `theMelfix/notifly` privato (da rinominare → `replisa`), branch main/develop |
+| 1.1.3 | Setup `.env` con variabili Meta API (token, phone_id, app_secret) | `P0` | 1 | ✅ | Placeholder pronti in `.env.example` |
+| 1.1.4 | Configurare database MySQL sul VPS | `P0` | 2 | ✅ | MariaDB su VPS IONOS. DB `replisa` (utf8mb4) + user `replisa_app` (localhost only) creati via CloudPanel UI 2026-05-15. Credenziali in Bitwarden |
+| 1.1.5 | Setup dominio/sottodominio per API (es. `api.replisa.com`) | `P1` | 2 | ✅ | DNS A per `@`/`www`/`app`/`api` → VPS IONOS. SSL Let's Encrypt attivo via CloudPanel su `replisa.com` + `www`. `replisa.it` con redirect 301 → `.com` (SSL incluso). 2026-05-15 |
 | 1.1.6 | Configurare deploy pipeline (Git pull + composer + migrate su VPS) | `P2` | 2 | ⬜ | Anche uno script bash semplice va bene |
 
 ### E1.2 — Configurazione Meta Cloud API
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 1.2.1 | Creare Meta Business App su developers.facebook.com | `P0` | 1 | ⬜ | Serve account Business verificato |
-| 1.2.2 | Attivare prodotto "WhatsApp" nella dashboard Meta | `P0` | 1 | ⬜ | |
-| 1.2.3 | Ottenere numero test sandbox + token temporaneo | `P0` | 1 | ⬜ | Token scade ogni 24h in sandbox |
-| 1.2.4 | Generare System User Token (permanente) | `P0` | 2 | ⬜ | Business Settings → System Users |
-| 1.2.5 | Testare primo invio messaggio via cURL/Postman | `P0` | 1 | ⬜ | Validazione end-to-end |
-| 1.2.6 | Documentare tutti gli ID e i token in modo sicuro | `P1` | 1 | ⬜ | Password manager, non file di testo |
+| 1.2.1 | Creare Meta Business App su developers.facebook.com | `P0` | 1 | ✅ | App creata 2026-05-15 con working name "Notifly" — da rinominare in "Replisa" via dashboard Meta |
+| 1.2.2 | Attivare prodotto "WhatsApp" nella dashboard Meta | `P0` | 1 | ✅ | WABA Test + numero sandbox attivi |
+| 1.2.3 | Ottenere numero test sandbox + token temporaneo | `P0` | 1 | ✅ | PHONE_NUMBER_ID e WABA_ID raccolti |
+| 1.2.4 | Generare System User Token (permanente) | `P0` | 2 | ✅ | Token System User generato (scope `whatsapp_business_messaging` + `_management`), salvato in `.env` come SANDBOX_ACCESS_TOKEN |
+| 1.2.5 | Testare primo invio messaggio via cURL/Postman | `P0` | 1 | ✅ | Template `hello_world` consegnato. Script in `scripts/whatsapp-test-send.sh` |
+| 1.2.6 | Documentare tutti gli ID e i token in modo sicuro | `P1` | 1 | ✅ | Bitwarden cloud (free) attivato. Credenziali Meta (App, WABA, System User, Webhook verify) salvate. Migrazione futura a Vaultwarden self-hosted prevista (no lock-in) |
 
 ---
 
@@ -232,7 +234,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 5.1.1 | Pagina su notifly.it (dominio dedicato) | `P0` | 3 | ⬜ | Hero + problema/soluzione + pricing + CTA |
+| 5.1.1 | Pagina su replisa.com (dominio dedicato) | `P0` | 3 | ⬜ | Hero + problema/soluzione + pricing + CTA |
 | 5.1.2 | Form contatto / Calendly embed per prenotare chiamata | `P0` | 1 | ⬜ | |
 | 5.1.3 | SEO base: meta tags, Open Graph, structured data | `P1` | 1 | ⬜ | |
 | 5.1.4 | Cookie banner GDPR | `P1` | 1 | ⬜ | Hai già esperienza da giovannimelfi.com |
@@ -289,6 +291,7 @@ Task importanti ma non necessari per il lancio. Da rivalutare dopo il primo clie
 | ICE-8 | Template gallery: libreria di template pre-approvati per settore | E3 | Riduce tempo onboarding |
 | ICE-9 | Notifiche via email all'owner quando un cliente disdice | E3 | Alert in tempo reale |
 | ICE-10 | App mobile nativa per il cliente (React Native) | E4 | Long-term, quando il prodotto è maturo |
+| ICE-11 | Embedded Signup per onboarding self-service WABA | E1/E4 | Onboarding cliente in ~5 min via JS SDK Meta. Richiede App Review (advanced access su `whatsapp_business_management` + `whatsapp_business_messaging`). Lead time 2-4 settimane. Necessario quando >5 clienti — vedi ADR-003 |
 
 ---
 
