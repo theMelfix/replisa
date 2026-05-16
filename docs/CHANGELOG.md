@@ -21,4 +21,5 @@ Formato: `YYYY-MM-DD · <task-code> · <commit-sha> · <descrizione breve>`
 - 2026-05-15 · ADR-004 · — · Rename prodotto **Notifly → Replisa** (notifly.it/.com/.app non disponibili a prezzo standard; 18 alternative valutate). Acquistati `replisa.com` (primario) + `replisa.it` (difensivo 301→.com). Backlog rinominato in `replisa_backlog.md`. Repo GitHub e Meta App da rinominare manualmente
 - 2026-05-15 · infra · — · Cartella locale rinominata `/home/gmelfi/notifly/` → `/home/gmelfi/replisa/`
 - 2026-05-15 · 1.1.5 · — · VPS IONOS con CloudPanel: site PHP `replisa.com` (PHP 8.4, Laravel template). DNS IONOS: A `@`/`www`/`app`/`api` → VPS IP. SSL Let's Encrypt attivo su `replisa.com` + `www`. Site secondario `replisa.it` come Static Site con redirect 301 NGINX → `replisa.com` + SSL incluso
-- 2026-05-15 · 1.2.6 · — · Bitwarden cloud (free tier) attivato. Credenziali Meta App, WABA, System User Token, Webhook Verify Token salvate. Sprint 1 chiuso
+- 2026-05-15 · 1.2.6 · — · Bitwarden cloud (free tier) attivato. Credenziali Meta App, WABA, System User Token, Webhook Verify Token salvate
+- 2026-05-15 · 1.1.4 · — · MariaDB su VPS IONOS. DB `replisa` (charset utf8mb4) + user `replisa_app` con privilegi solo sul DB, bind localhost. Creati via CloudPanel UI. Credenziali in Bitwarden

@@ -99,7 +99,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 | 1.1.1 | Creare progetto Laravel (ultima versione stabile) | `P0` | 1 | ✅ | Fatto 2026-05-14, commit `ea35082` |
 | 1.1.2 | Configurare Git repo + `.gitignore` + primo commit | `P0` | 1 | ✅ | Repo `theMelfix/notifly` privato (da rinominare → `replisa`), branch main/develop |
 | 1.1.3 | Setup `.env` con variabili Meta API (token, phone_id, app_secret) | `P0` | 1 | ✅ | Placeholder pronti in `.env.example` |
-| 1.1.4 | Configurare database MySQL sul VPS | `P0` | 2 | ⬜ | Charset `utf8mb4_unicode_ci` |
+| 1.1.4 | Configurare database MySQL sul VPS | `P0` | 2 | ✅ | MariaDB su VPS IONOS. DB `replisa` (utf8mb4) + user `replisa_app` (localhost only) creati via CloudPanel UI 2026-05-15. Credenziali in Bitwarden |
 | 1.1.5 | Setup dominio/sottodominio per API (es. `api.replisa.com`) | `P1` | 2 | ✅ | DNS A per `@`/`www`/`app`/`api` → VPS IONOS. SSL Let's Encrypt attivo via CloudPanel su `replisa.com` + `www`. `replisa.it` con redirect 301 → `.com` (SSL incluso). 2026-05-15 |
 | 1.1.6 | Configurare deploy pipeline (Git pull + composer + migrate su VPS) | `P2` | 2 | ⬜ | Anche uno script bash semplice va bene |
 
