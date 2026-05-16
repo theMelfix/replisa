@@ -101,7 +101,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 | 1.1.3 | Setup `.env` con variabili Meta API (token, phone_id, app_secret) | `P0` | 1 | ✅ | Placeholder pronti in `.env.example` |
 | 1.1.4 | Configurare database MySQL sul VPS | `P0` | 2 | ✅ | MariaDB su VPS IONOS. DB `replisa` (utf8mb4) + user `replisa_app` (localhost only) creati via CloudPanel UI 2026-05-15. Credenziali in Bitwarden |
 | 1.1.5 | Setup dominio/sottodominio per API (es. `api.replisa.com`) | `P1` | 2 | ✅ | DNS A per `@`/`www`/`app`/`api` → VPS IONOS. SSL Let's Encrypt attivo via CloudPanel su `replisa.com` + `www`. `replisa.it` con redirect 301 → `.com` (SSL incluso). 2026-05-15 |
-| 1.1.6 | Configurare deploy pipeline (Git pull + composer + migrate su VPS) | `P2` | 2 | ⬜ | Anche uno script bash semplice va bene |
+| 1.1.6 | Configurare deploy pipeline (Git pull + composer + migrate su VPS) | `P2` | 2 | ✅ | DPLOY (CloudPanel) con release atomiche stile Capistrano, `.env` in overlays, sudoers per reload php8.4-fpm. Primo deploy 2026-05-16: https://replisa.com live con Laravel 13. Trigger ad oggi manuale (`dploy deploy main`); automazione GH Actions tracciata come task post-Sprint 1 |
 
 ### E1.2 — Configurazione Meta Cloud API
 

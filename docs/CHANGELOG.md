@@ -1,4 +1,4 @@
-d# Changelog Replisa
+# Changelog Replisa
 
 Log cronologico (append-only) di tutto il lavoro completato. Una riga per task del backlog.
 
@@ -23,3 +23,4 @@ Formato: `YYYY-MM-DD · <task-code> · <commit-sha> · <descrizione breve>`
 - 2026-05-15 · 1.1.5 · — · VPS IONOS con CloudPanel: site PHP `replisa.com` (PHP 8.4, Laravel template). DNS IONOS: A `@`/`www`/`app`/`api` → VPS IP. SSL Let's Encrypt attivo su `replisa.com` + `www`. Site secondario `replisa.it` come Static Site con redirect 301 NGINX → `replisa.com` + SSL incluso
 - 2026-05-15 · 1.2.6 · — · Bitwarden cloud (free tier) attivato. Credenziali Meta App, WABA, System User Token, Webhook Verify Token salvate
 - 2026-05-15 · 1.1.4 · — · MariaDB su VPS IONOS. DB `replisa` (charset utf8mb4) + user `replisa_app` con privilegi solo sul DB, bind localhost. Creati via CloudPanel UI. Credenziali in Bitwarden
+- 2026-05-16 · 1.1.6 · — · Deploy pipeline DPLOY (CloudPanel) configurata. Release atomiche Capistrano-style su `/home/replisa-com/htdocs/replisa.com/{releases,shared,current}`. Shared: `storage/app` + `storage/logs`. Overlays: `.env` produzione (APP_KEY generato con `openssl`). Sudoers: `replisa-com` può `systemctl reload php8.4-fpm` senza password. Vhost NGINX CloudPanel: `{{root}}` sostituito con `current/public` (HTTP 443 + 8080 internal). Primo deploy `main`: **https://replisa.com serve Laravel 13 default page** 🎉 Sprint 1 chiuso definitivamente
