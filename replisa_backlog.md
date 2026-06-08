@@ -124,12 +124,12 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 2.1.1 | Creare `WhatsAppService` (classe PHP per wrappare Meta API) | `P0` | 3 | ⬜ | Metodi: `sendTemplate()`, `sendText()`, `sendInteractive()` |
-| 2.1.2 | Implementare `sendTemplate()` con supporto parametri dinamici | `P0` | 3 | ⬜ | Componenti header/body/button |
-| 2.1.3 | Implementare `sendText()` per messaggi semplici | `P1` | 1 | ⬜ | Solo dentro finestra 24h |
-| 2.1.4 | Implementare `sendInteractive()` (bottoni + liste) | `P1` | 3 | ⬜ | Max 3 bottoni, max 10 righe lista |
-| 2.1.5 | Gestione errori API Meta (rate limit, token scaduto, numero non valido) | `P0` | 2 | ⬜ | Retry con backoff esponenziale |
-| 2.1.6 | Logging di ogni messaggio inviato su tabella `messages` | `P0` | 2 | ⬜ | Campi: to, template, status, meta_id, sent_at |
+| 2.1.1 | Creare `WhatsAppService` (classe PHP per wrappare Meta API) | `P0` | 3 | ✅ | `App\Services\WhatsApp\WhatsAppService`, scoped per-tenant (`::for($tenant)`). Config Meta in `config/services.php`. 2026-06-08 |
+| 2.1.2 | Implementare `sendTemplate()` con supporto parametri dinamici | `P0` | 3 | ✅ | Lingua + array `components` (header/body/button) passati raw. 2026-06-08 |
+| 2.1.3 | Implementare `sendText()` per messaggi semplici | `P1` | 1 | ✅ | `sendText($to,$body,$previewUrl)`. Finestra 24h applicata da Meta (err 131047 → eccezione). 2026-06-08 |
+| 2.1.4 | Implementare `sendInteractive()` (bottoni + liste) | `P1` | 3 | ✅ | `sendButtons()` (1-3 reply button) + `sendList()` (1-10 righe), con validazione limiti. 2026-06-08 |
+| 2.1.5 | Gestione errori API Meta (rate limit, token scaduto, numero non valido) | `P0` | 2 | ✅ | `WhatsAppApiException` con `metaCode`/`httpStatus`. Retry+backoff (250/500ms) **solo** su transitori (429/5xx/connessione). 2026-06-08 |
+| 2.1.6 | Logging di ogni messaggio inviato su tabella `messages` | `P0` | 2 | ✅ | Riga `queued`→`sent`(+`meta_message_id`) o `failed`(+`error` json). Contatto risolto via `firstOrCreate`. 2026-06-08 |
 
 ### E2.2 — Webhook Ricezione Messaggi
 

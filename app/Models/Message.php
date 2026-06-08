@@ -2,17 +2,36 @@
 
 namespace App\Models;
 
+use Database\Factories\MessageFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Message extends Model
 {
-    /** @use HasFactory<\Database\Factories\MessageFactory> */
+    /** @use HasFactory<MessageFactory> */
     use HasFactory;
 
     public const DIRECTION_OUTBOUND = 'outbound';
+
     public const DIRECTION_INBOUND = 'inbound';
+
+    public const TYPE_TEXT = 'text';
+
+    public const TYPE_TEMPLATE = 'template';
+
+    public const TYPE_INTERACTIVE = 'interactive';
+
+    // Stati outbound allineati agli status update del webhook Meta.
+    public const STATUS_QUEUED = 'queued';
+
+    public const STATUS_SENT = 'sent';
+
+    public const STATUS_DELIVERED = 'delivered';
+
+    public const STATUS_READ = 'read';
+
+    public const STATUS_FAILED = 'failed';
 
     protected $fillable = [
         'tenant_id',
