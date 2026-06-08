@@ -8,7 +8,7 @@
 > **Pricing:** Starter €14 | Base €39 | Pro €79 | Business €149 /mese
 > **PM / Scrum Master:** Claude (AI) · **Dev / Product Owner:** Giovanni Melfi
 > **Data inizio progetto:** 14/05/2026
-> **Ultimo aggiornamento:** 15/05/2026
+> **Ultimo aggiornamento:** 08/06/2026
 
 ---
 
@@ -146,9 +146,9 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 2.3.1 | Migration tabella `tenants` (aziende clienti) | `P0` | 1 | ⬜ | name, phone_number_id, waba_id, plan, active |
-| 2.3.2 | Migration tabella `contacts` (contatti dei clienti) | `P0` | 1 | ⬜ | tenant_id, phone, name, opted_in, last_seen |
-| 2.3.3 | Migration tabella `messages` (log messaggi) | `P0` | 1 | ⬜ | tenant_id, contact_id, direction, type, content, status, meta_message_id |
+| 2.3.1 | Migration tabella `tenants` (aziende clienti) | `P0` | 1 | ✅ | name, phone_number_id (unique), waba_id, access_token (cast `encrypted` — ADR-003), plan, active. Model `Tenant` con relazioni. 2026-06-08 |
+| 2.3.2 | Migration tabella `contacts` (contatti dei clienti) | `P0` | 1 | ✅ | tenant_id (FK cascade), phone, name, opted_in + opted_in_at, last_seen_at. Unique `(tenant_id, phone)`. Model `Contact`. 2026-06-08 |
+| 2.3.3 | Migration tabella `messages` (log messaggi) | `P0` | 1 | ✅ | tenant_id + contact_id (FK cascade), direction, type, content (json), status, meta_message_id (index), error (json). Model `Message`. 2026-06-08 |
 | 2.3.4 | Migration tabella `conversations` (sessioni 24h) | `P1` | 1 | ⬜ | tenant_id, contact_id, opened_at, category, billable |
 | 2.3.5 | Migration tabella `automations` (flussi configurati) | `P1` | 1 | ⬜ | tenant_id, type, trigger, config_json, active |
 | 2.3.6 | Migration tabella `appointments` (appuntamenti per reminder) | `P1` | 1 | ⬜ | tenant_id, contact_id, datetime, status, reminded |

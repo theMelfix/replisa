@@ -24,3 +24,9 @@ Formato: `YYYY-MM-DD · <task-code> · <commit-sha> · <descrizione breve>`
 - 2026-05-15 · 1.2.6 · — · Bitwarden cloud (free tier) attivato. Credenziali Meta App, WABA, System User Token, Webhook Verify Token salvate
 - 2026-05-15 · 1.1.4 · — · MariaDB su VPS IONOS. DB `replisa` (charset utf8mb4) + user `replisa_app` con privilegi solo sul DB, bind localhost. Creati via CloudPanel UI. Credenziali in Bitwarden
 - 2026-05-16 · 1.1.6 · — · Deploy pipeline DPLOY (CloudPanel) configurata. Release atomiche Capistrano-style su `/home/replisa-com/htdocs/replisa.com/{releases,shared,current}`. Shared: `storage/app` + `storage/logs`. Overlays: `.env` produzione (APP_KEY generato con `openssl`). Sudoers: `replisa-com` può `systemctl reload php8.4-fpm` senza password. Vhost NGINX CloudPanel: `{{root}}` sostituito con `current/public` (HTTP 443 + 8080 internal). Primo deploy `main`: **https://replisa.com serve Laravel 13 default page** 🎉 Sprint 1 chiuso definitivamente
+
+## Sprint 2 — Motore & Comunicazione (Settimane 3-4)
+
+- 2026-06-08 · 2.3.1 · — · Migration + model `Tenant`: `name`, `phone_number_id` (unique), `waba_id`, `access_token` (cast `encrypted`, `hidden` — ADR-003), `plan`, `active`. Relazioni `contacts()`/`messages()`. Verificato cast encrypted a riposo via tinker
+- 2026-06-08 · 2.3.2 · — · Migration + model `Contact`: FK `tenant_id` (cascade), `phone`, `name`, `opted_in`+`opted_in_at` (GDPR), `last_seen_at`. Unique `(tenant_id, phone)` — numero unico per tenant, non globale
+- 2026-06-08 · 2.3.3 · — · Migration + model `Message`: FK `tenant_id`+`contact_id` (cascade), `direction` (outbound/inbound), `type`, `content` (json), `status`, `meta_message_id` (index per match status webhook), `error` (json)
