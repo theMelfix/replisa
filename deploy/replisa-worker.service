@@ -1,0 +1,28 @@
+# systemd unit per il queue worker Laravel di Replisa.
+# Processa la coda `database` (job ProcessWhatsAppWebhook ed eventuali futuri).
+#
+# Installazione (come root sul VPS):
+#   cp /home/replisa-com/htdocs/replisa.com/current/deploy/replisa-worker.service /etc/systemd/system/
+#   systemctl daemon-reload
+#   systemctl enable --now replisa-worker
+#
+# Dopo ogni deploy va riavviato per caricare il nuovo codice (vedi deploy/README.md).
+
+[Unit]
+Description=Replisa queue worker (Laravel)
+After=network.target mariadb.service
+
+[Service]
+User=replisa-com
+Group=replisa-com
+Restart=always
+RestartSec=5
+# WorkingDirectory punta al symlink atomico `current`: un restart dopo il
+# deploy fa ripartire il worker sull'ultima release.
+WorkingDirectory=/home/replisa-com/htdocs/replisa.com/current
+ExecStart=/usr/bin/php8.4 artisan queue:work --queue=default --sleep=3 --tries=3 --max-time=3600
+# Riavvio pulito: lascia finire il job in corso prima di terminare.
+ExecStop=/usr/bin/php8.4 artisan queue:restart
+
+[Install]
+WantedBy=multi-user.target
