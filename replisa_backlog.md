@@ -149,9 +149,9 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 | 2.3.1 | Migration tabella `tenants` (aziende clienti) | `P0` | 1 | ✅ | name, phone_number_id (unique), waba_id, access_token (cast `encrypted` — ADR-003), plan, active. Model `Tenant` con relazioni. 2026-06-08 |
 | 2.3.2 | Migration tabella `contacts` (contatti dei clienti) | `P0` | 1 | ✅ | tenant_id (FK cascade), phone, name, opted_in + opted_in_at, last_seen_at. Unique `(tenant_id, phone)`. Model `Contact`. 2026-06-08 |
 | 2.3.3 | Migration tabella `messages` (log messaggi) | `P0` | 1 | ✅ | tenant_id + contact_id (FK cascade), direction, type, content (json), status, meta_message_id (index), error (json). Model `Message`. 2026-06-08 |
-| 2.3.4 | Migration tabella `conversations` (sessioni 24h) | `P1` | 1 | ⬜ | tenant_id, contact_id, opened_at, category, billable |
-| 2.3.5 | Migration tabella `automations` (flussi configurati) | `P1` | 1 | ⬜ | tenant_id, type, trigger, config_json, active |
-| 2.3.6 | Migration tabella `appointments` (appuntamenti per reminder) | `P1` | 1 | ⬜ | tenant_id, contact_id, datetime, status, reminded |
+| 2.3.4 | Migration tabella `conversations` (sessioni 24h) | `P1` | 1 | ✅ | FK tenant+contact (cascade), `category`, `billable`, `opened_at`, `expires_at`. Model `Conversation`. 2026-06-09 |
+| 2.3.5 | Migration tabella `automations` (flussi configurati) | `P1` | 1 | ✅ | FK tenant (cascade), `type`, `trigger`, `config` (json), `active`. Unique `(tenant_id, type)`. Costanti `TYPE_*`. 2026-06-09 |
+| 2.3.6 | Migration tabella `appointments` (appuntamenti per reminder) | `P1` | 1 | ✅ | FK tenant+contact (cascade), `scheduled_at`, `status`, `reminded_at`, `review_requested`. Costanti `STATUS_*`. 2026-06-09 |
 
 ---
 
