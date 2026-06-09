@@ -35,4 +35,20 @@ return [
         ],
     ],
 
+    // Meta WhatsApp Cloud API. Credenziali app-level (ADR-003); quelle
+    // per-tenant (phone_number_id, access_token) vivono sulla tabella `tenants`.
+    'meta' => [
+        'graph_version' => env('META_GRAPH_API_VERSION', 'v25.0'),
+        'app_id' => env('META_WHATSAPP_APP_ID'),
+        'app_secret' => env('META_WHATSAPP_APP_SECRET'),
+        'webhook_verify_token' => env('META_WHATSAPP_WEBHOOK_VERIFY_TOKEN'),
+
+        // Fallback sandbox per i test in locale (vedi ADR-003: in prod è un tenant).
+        'sandbox' => [
+            'phone_number_id' => env('META_WHATSAPP_SANDBOX_PHONE_NUMBER_ID'),
+            'waba_id' => env('META_WHATSAPP_SANDBOX_WABA_ID'),
+            'access_token' => env('META_WHATSAPP_SANDBOX_ACCESS_TOKEN'),
+        ],
+    ],
+
 ];

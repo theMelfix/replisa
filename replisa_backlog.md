@@ -8,7 +8,7 @@
 > **Pricing:** Starter €14 | Base €39 | Pro €79 | Business €149 /mese
 > **PM / Scrum Master:** Claude (AI) · **Dev / Product Owner:** Giovanni Melfi
 > **Data inizio progetto:** 14/05/2026
-> **Ultimo aggiornamento:** 15/05/2026
+> **Ultimo aggiornamento:** 08/06/2026
 
 ---
 
@@ -101,7 +101,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 | 1.1.3 | Setup `.env` con variabili Meta API (token, phone_id, app_secret) | `P0` | 1 | ✅ | Placeholder pronti in `.env.example` |
 | 1.1.4 | Configurare database MySQL sul VPS | `P0` | 2 | ✅ | MariaDB su VPS IONOS. DB `replisa` (utf8mb4) + user `replisa_app` (localhost only) creati via CloudPanel UI 2026-05-15. Credenziali in Bitwarden |
 | 1.1.5 | Setup dominio/sottodominio per API (es. `api.replisa.com`) | `P1` | 2 | ✅ | DNS A per `@`/`www`/`app`/`api` → VPS IONOS. SSL Let's Encrypt attivo via CloudPanel su `replisa.com` + `www`. `replisa.it` con redirect 301 → `.com` (SSL incluso). 2026-05-15 |
-| 1.1.6 | Configurare deploy pipeline (Git pull + composer + migrate su VPS) | `P2` | 2 | ⬜ | Anche uno script bash semplice va bene |
+| 1.1.6 | Configurare deploy pipeline (Git pull + composer + migrate su VPS) | `P2` | 2 | ✅ | DPLOY (CloudPanel) con release atomiche stile Capistrano, `.env` in overlays, sudoers per reload php8.4-fpm. Primo deploy 2026-05-16: https://replisa.com live con Laravel 13. Trigger ad oggi manuale (`dploy deploy main`); automazione GH Actions tracciata come task post-Sprint 1 |
 
 ### E1.2 — Configurazione Meta Cloud API
 
@@ -124,34 +124,34 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 2.1.1 | Creare `WhatsAppService` (classe PHP per wrappare Meta API) | `P0` | 3 | ⬜ | Metodi: `sendTemplate()`, `sendText()`, `sendInteractive()` |
-| 2.1.2 | Implementare `sendTemplate()` con supporto parametri dinamici | `P0` | 3 | ⬜ | Componenti header/body/button |
-| 2.1.3 | Implementare `sendText()` per messaggi semplici | `P1` | 1 | ⬜ | Solo dentro finestra 24h |
-| 2.1.4 | Implementare `sendInteractive()` (bottoni + liste) | `P1` | 3 | ⬜ | Max 3 bottoni, max 10 righe lista |
-| 2.1.5 | Gestione errori API Meta (rate limit, token scaduto, numero non valido) | `P0` | 2 | ⬜ | Retry con backoff esponenziale |
-| 2.1.6 | Logging di ogni messaggio inviato su tabella `messages` | `P0` | 2 | ⬜ | Campi: to, template, status, meta_id, sent_at |
+| 2.1.1 | Creare `WhatsAppService` (classe PHP per wrappare Meta API) | `P0` | 3 | ✅ | `App\Services\WhatsApp\WhatsAppService`, scoped per-tenant (`::for($tenant)`). Config Meta in `config/services.php`. 2026-06-08 |
+| 2.1.2 | Implementare `sendTemplate()` con supporto parametri dinamici | `P0` | 3 | ✅ | Lingua + array `components` (header/body/button) passati raw. 2026-06-08 |
+| 2.1.3 | Implementare `sendText()` per messaggi semplici | `P1` | 1 | ✅ | `sendText($to,$body,$previewUrl)`. Finestra 24h applicata da Meta (err 131047 → eccezione). 2026-06-08 |
+| 2.1.4 | Implementare `sendInteractive()` (bottoni + liste) | `P1` | 3 | ✅ | `sendButtons()` (1-3 reply button) + `sendList()` (1-10 righe), con validazione limiti. 2026-06-08 |
+| 2.1.5 | Gestione errori API Meta (rate limit, token scaduto, numero non valido) | `P0` | 2 | ✅ | `WhatsAppApiException` con `metaCode`/`httpStatus`. Retry+backoff (250/500ms) **solo** su transitori (429/5xx/connessione). 2026-06-08 |
+| 2.1.6 | Logging di ogni messaggio inviato su tabella `messages` | `P0` | 2 | ✅ | Riga `queued`→`sent`(+`meta_message_id`) o `failed`(+`error` json). Contatto risolto via `firstOrCreate`. 2026-06-08 |
 
 ### E2.2 — Webhook Ricezione Messaggi
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 2.2.1 | Creare endpoint `GET /webhook` per verifica Meta (challenge) | `P0` | 1 | ⬜ | Risponde con `hub.challenge` |
-| 2.2.2 | Creare endpoint `POST /webhook` per ricezione messaggi | `P0` | 3 | ⬜ | Parsing payload JSON Meta |
-| 2.2.3 | Validare firma webhook (`X-Hub-Signature-256`) | `P0` | 2 | ⬜ | Sicurezza: senza questo chiunque può inviare fake |
-| 2.2.4 | Parsing dei diversi tipi di messaggio (text, interactive reply, button reply) | `P1` | 2 | ⬜ | |
-| 2.2.5 | Gestione status updates (sent, delivered, read, failed) | `P1` | 2 | ⬜ | Aggiornare tabella `messages` |
-| 2.2.6 | Queue processing: webhook salva su coda, job processa async | `P1` | 3 | ⬜ | Laravel Queue + database driver |
+| 2.2.1 | Creare endpoint `GET /webhook` per verifica Meta (challenge) | `P0` | 1 | ✅ | `WebhookController@verify`, risponde `hub.challenge` in text/plain con `hash_equals` sul verify token. 2026-06-09 |
+| 2.2.2 | Creare endpoint `POST /webhook` per ricezione messaggi | `P0` | 3 | ✅ | `WebhookController@handle`. Route in `routes/webhook.php` fuori dal gruppo `web` (no CSRF). 2026-06-09 |
+| 2.2.3 | Validare firma webhook (`X-Hub-Signature-256`) | `P0` | 2 | ✅ | Middleware `meta.signature` (HMAC-SHA256 del body raw con app_secret, fail-closed). 2026-06-09 |
+| 2.2.4 | Parsing dei diversi tipi di messaggio (text, interactive reply, button reply) | `P1` | 2 | ✅ | `extractContent()`: text/interactive (button_reply+list_reply)/button quick-reply. 2026-06-09 |
+| 2.2.5 | Gestione status updates (sent, delivered, read, failed) | `P1` | 2 | ✅ | Match per `meta_message_id`, aggiorna `status` (+`error` su failed). 2026-06-09 |
+| 2.2.6 | Queue processing: webhook salva su coda, job processa async | `P1` | 3 | ✅ | `ProcessWhatsAppWebhook` (ShouldQueue, idempotente su `meta_message_id`). Endpoint risponde 200 subito. ⚠️ Serve queue worker in prod (vedi nota infra). 2026-06-09 |
 
 ### E2.3 — Database Schema Base
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 2.3.1 | Migration tabella `tenants` (aziende clienti) | `P0` | 1 | ⬜ | name, phone_number_id, waba_id, plan, active |
-| 2.3.2 | Migration tabella `contacts` (contatti dei clienti) | `P0` | 1 | ⬜ | tenant_id, phone, name, opted_in, last_seen |
-| 2.3.3 | Migration tabella `messages` (log messaggi) | `P0` | 1 | ⬜ | tenant_id, contact_id, direction, type, content, status, meta_message_id |
-| 2.3.4 | Migration tabella `conversations` (sessioni 24h) | `P1` | 1 | ⬜ | tenant_id, contact_id, opened_at, category, billable |
-| 2.3.5 | Migration tabella `automations` (flussi configurati) | `P1` | 1 | ⬜ | tenant_id, type, trigger, config_json, active |
-| 2.3.6 | Migration tabella `appointments` (appuntamenti per reminder) | `P1` | 1 | ⬜ | tenant_id, contact_id, datetime, status, reminded |
+| 2.3.1 | Migration tabella `tenants` (aziende clienti) | `P0` | 1 | ✅ | name, phone_number_id (unique), waba_id, access_token (cast `encrypted` — ADR-003), plan, active. Model `Tenant` con relazioni. 2026-06-08 |
+| 2.3.2 | Migration tabella `contacts` (contatti dei clienti) | `P0` | 1 | ✅ | tenant_id (FK cascade), phone, name, opted_in + opted_in_at, last_seen_at. Unique `(tenant_id, phone)`. Model `Contact`. 2026-06-08 |
+| 2.3.3 | Migration tabella `messages` (log messaggi) | `P0` | 1 | ✅ | tenant_id + contact_id (FK cascade), direction, type, content (json), status, meta_message_id (index), error (json). Model `Message`. 2026-06-08 |
+| 2.3.4 | Migration tabella `conversations` (sessioni 24h) | `P1` | 1 | ✅ | FK tenant+contact (cascade), `category`, `billable`, `opened_at`, `expires_at`. Model `Conversation`. 2026-06-09 |
+| 2.3.5 | Migration tabella `automations` (flussi configurati) | `P1` | 1 | ✅ | FK tenant (cascade), `type`, `trigger`, `config` (json), `active`. Unique `(tenant_id, type)`. Costanti `TYPE_*`. 2026-06-09 |
+| 2.3.6 | Migration tabella `appointments` (appuntamenti per reminder) | `P1` | 1 | ✅ | FK tenant+contact (cascade), `scheduled_at`, `status`, `reminded_at`, `review_requested`. Costanti `STATUS_*`. 2026-06-09 |
 
 ---
 
