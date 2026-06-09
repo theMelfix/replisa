@@ -8,7 +8,7 @@
 > **Pricing:** Starter €14 | Base €39 | Pro €79 | Business €149 /mese
 > **PM / Scrum Master:** Claude (AI) · **Dev / Product Owner:** Giovanni Melfi
 > **Data inizio progetto:** 14/05/2026
-> **Ultimo aggiornamento:** 08/06/2026
+> **Ultimo aggiornamento:** 09/06/2026
 
 ---
 
@@ -163,11 +163,11 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 3.1.1 | Creare template Meta "welcome_message" (con bottoni interattivi) | `P0` | 2 | ⬜ | Sottomettere per approvazione Meta (24-48h) |
-| 3.1.2 | Implementare trigger: nuovo messaggio in ingresso → check se primo contatto | `P0` | 3 | ⬜ | Controllare se `contact` esiste già |
-| 3.1.3 | Risposta automatica con messaggio interattivo (menu servizi) | `P0` | 3 | ⬜ | Bottoni: "Info Servizi", "Prenota", "Parla con noi" |
-| 3.1.4 | Gestione risposte ai bottoni (routing verso azione corretta) | `P1` | 3 | ⬜ | Switch su `button_reply.id` |
-| 3.1.5 | Opt-in tracking: salvare consenso esplicito del contatto | `P0` | 1 | ⬜ | GDPR: obbligatorio prima di inviare marketing |
+| 3.1.1 | Creare template Meta "welcome_message" (con bottoni interattivi) | `P0` | 2 | ⬜ | Azione su dashboard Meta (approvazione 24-48h). **Non blocca il flusso**: il menu welcome viaggia come messaggio interattivo free-form dentro la finestra 24h aperta dall'inbound — il template servirebbe solo per ri-aprire la conversazione fuori finestra |
+| 3.1.2 | Implementare trigger: nuovo messaggio in ingresso → check se primo contatto | `P0` | 3 | ✅ | `WelcomeFlow` agganciato a `ProcessWhatsAppWebhook`: trigger su `$contact->wasRecentlyCreated`, solo su messaggi appena loggati (idempotente). 2026-06-09 |
+| 3.1.3 | Risposta automatica con messaggio interattivo (menu servizi) | `P0` | 3 | ✅ | `WelcomeFlow::greet()` invia `sendButtons` (default: Info Servizi / Prenota / Parla con noi). Testo+bottoni personalizzabili per-tenant via `automations.config`. 2026-06-09 |
+| 3.1.4 | Gestione risposte ai bottoni (routing verso azione corretta) | `P1` | 3 | ✅ | `handleButtonReply()`: id namespaced `welcome:<action>`, risposta da `config.replies[action]`. 2026-06-09 |
+| 3.1.5 | Opt-in tracking: salvare consenso esplicito del contatto | `P0` | 1 | ✅ | `recordOptIn()` al primo contatto (`opted_in`+`opted_in_at`, idempotente). Marketing richiederà opt-in dedicato. 2026-06-09 |
 
 ### E3.2 — Reminder Appuntamento
 
