@@ -135,12 +135,12 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 2.2.1 | Creare endpoint `GET /webhook` per verifica Meta (challenge) | `P0` | 1 | ⬜ | Risponde con `hub.challenge` |
-| 2.2.2 | Creare endpoint `POST /webhook` per ricezione messaggi | `P0` | 3 | ⬜ | Parsing payload JSON Meta |
-| 2.2.3 | Validare firma webhook (`X-Hub-Signature-256`) | `P0` | 2 | ⬜ | Sicurezza: senza questo chiunque può inviare fake |
-| 2.2.4 | Parsing dei diversi tipi di messaggio (text, interactive reply, button reply) | `P1` | 2 | ⬜ | |
-| 2.2.5 | Gestione status updates (sent, delivered, read, failed) | `P1` | 2 | ⬜ | Aggiornare tabella `messages` |
-| 2.2.6 | Queue processing: webhook salva su coda, job processa async | `P1` | 3 | ⬜ | Laravel Queue + database driver |
+| 2.2.1 | Creare endpoint `GET /webhook` per verifica Meta (challenge) | `P0` | 1 | ✅ | `WebhookController@verify`, risponde `hub.challenge` in text/plain con `hash_equals` sul verify token. 2026-06-09 |
+| 2.2.2 | Creare endpoint `POST /webhook` per ricezione messaggi | `P0` | 3 | ✅ | `WebhookController@handle`. Route in `routes/webhook.php` fuori dal gruppo `web` (no CSRF). 2026-06-09 |
+| 2.2.3 | Validare firma webhook (`X-Hub-Signature-256`) | `P0` | 2 | ✅ | Middleware `meta.signature` (HMAC-SHA256 del body raw con app_secret, fail-closed). 2026-06-09 |
+| 2.2.4 | Parsing dei diversi tipi di messaggio (text, interactive reply, button reply) | `P1` | 2 | ✅ | `extractContent()`: text/interactive (button_reply+list_reply)/button quick-reply. 2026-06-09 |
+| 2.2.5 | Gestione status updates (sent, delivered, read, failed) | `P1` | 2 | ✅ | Match per `meta_message_id`, aggiorna `status` (+`error` su failed). 2026-06-09 |
+| 2.2.6 | Queue processing: webhook salva su coda, job processa async | `P1` | 3 | ✅ | `ProcessWhatsAppWebhook` (ShouldQueue, idempotente su `meta_message_id`). Endpoint risponde 200 subito. ⚠️ Serve queue worker in prod (vedi nota infra). 2026-06-09 |
 
 ### E2.3 — Database Schema Base
 

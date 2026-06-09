@@ -33,6 +33,9 @@ class Message extends Model
 
     public const STATUS_FAILED = 'failed';
 
+    // Stato dei messaggi inbound ricevuti via webhook.
+    public const STATUS_RECEIVED = 'received';
+
     protected $fillable = [
         'tenant_id',
         'contact_id',
