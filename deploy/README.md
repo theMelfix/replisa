@@ -55,12 +55,16 @@ sudo systemctl restart replisa-worker.service
 
 ---
 
-## Scheduler (futuro — E3.2.2)
+## Scheduler (E3.2 — ⚠️ da attivare sul VPS)
 
-I reminder appuntamento richiederanno il Laravel Scheduler via cron:
+Il reminder appuntamento (`replisa:send-reminders`) gira **ogni ora** via Laravel
+Scheduler. In produzione serve questa entry in crontab (utente del sito), senza la
+quale i reminder non partono:
 
 ```
 * * * * * cd /home/replisa-com/htdocs/replisa.com/current && php8.4 artisan schedule:run >> /dev/null 2>&1
 ```
 
-Da configurare quando si implementa E3.2.
+Verifica con `php8.4 artisan schedule:list`. Lo schedule è definito in
+`routes/console.php` (`->hourly()->withoutOverlapping()`); il job è idempotente,
+quindi run ravvicinati non generano reminder duplicati.

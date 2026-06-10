@@ -8,7 +8,7 @@
 > **Pricing:** Starter €14 | Base €39 | Pro €79 | Business €149 /mese
 > **PM / Scrum Master:** Claude (AI) · **Dev / Product Owner:** Giovanni Melfi
 > **Data inizio progetto:** 14/05/2026
-> **Ultimo aggiornamento:** 09/06/2026
+> **Ultimo aggiornamento:** 10/06/2026
 
 ---
 
@@ -173,11 +173,11 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 3.2.1 | Creare template Meta "appointment_reminder" con parametri (nome, data, ora) | `P0` | 2 | ⬜ | Categoria: UTILITY (costo inferiore) |
-| 3.2.2 | Laravel Scheduler: job che gira ogni ora, trova appuntamenti a -24h e -2h | `P0` | 3 | ⬜ | `php artisan schedule:run` via cron |
-| 3.2.3 | Invio reminder con bottoni "✅ Confermo" / "❌ Disdici" | `P0` | 2 | ⬜ | |
-| 3.2.4 | Gestione risposta: aggiornare stato appuntamento su DB | `P1` | 2 | ⬜ | Notificare l'attività in caso di disdetta |
-| 3.2.5 | Endpoint API per inserimento appuntamenti (da gestionale esterno) | `P1` | 2 | ⬜ | `POST /api/v1/appointments` autenticato |
+| 3.2.1 | Creare template Meta "appointment_reminder" con parametri (nome, data, ora) | `P0` | 2 | ⬜ | Azione su dashboard Meta, categoria UTILITY. **Obbligatorio** (reminder = fuori finestra 24h): nome/lingua/payload bottoni configurabili via `automations.config`. Body params: {{1}} nome, {{2}} data, {{3}} ora; quick-reply payload `CONFIRM`/`CANCEL` |
+| 3.2.2 | Laravel Scheduler: job che gira ogni ora, trova appuntamenti a -24h e -2h | `P0` | 3 | ✅ | Command `replisa:send-reminders` + `AppointmentReminder::dispatchDue()`. Logica due idempotente a due finestre sull'unica colonna `reminded_at`. Schedule `->hourly()` in `routes/console.php`. ⚠️ Serve cron `schedule:run` sul VPS (vedi deploy/README). 2026-06-10 |
+| 3.2.3 | Invio reminder con bottoni "✅ Confermo" / "❌ Disdici" | `P0` | 2 | ✅ | `remind()` invia il template (i bottoni quick-reply fanno parte del template 3.2.1) e segna `reminded_at`. Fallimenti loggati senza marcare reminded_at → retry. 2026-06-10 |
+| 3.2.4 | Gestione risposta: aggiornare stato appuntamento su DB | `P1` | 2 | ✅ | `handleButtonReply()` su messaggi inbound tipo `button`: `CONFIRM`→confirmed / `CANCEL`→cancelled sul prossimo appuntamento scheduled del contatto. Agganciato a `ProcessWhatsAppWebhook`. 2026-06-10 |
+| 3.2.5 | Endpoint API per inserimento appuntamenti (da gestionale esterno) | `P1` | 2 | ⬜ | Differito: dipende da auth API (Sanctum, E4.3.1). Da fare insieme a E4.3 |
 
 ### E3.3 — Richiesta Recensione
 

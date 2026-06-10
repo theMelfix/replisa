@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Contact;
 use App\Models\Message;
 use App\Models\Tenant;
+use App\Services\Automation\AppointmentReminder;
 use App\Services\Automation\WelcomeFlow;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -93,16 +94,22 @@ class ProcessWhatsAppWebhook implements ShouldQueue
      */
     private function runAutomations(Tenant $tenant, Contact $contact, array $message, bool $isFirstContact): void
     {
-        $welcome = WelcomeFlow::for($tenant);
-
         if ($isFirstContact) {
-            $welcome->greet($contact);
+            WelcomeFlow::for($tenant)->greet($contact);
 
             return;
         }
 
+        // Risposta a un menu interattivo (Welcome Flow, E3.1).
         if (data_get($message, 'interactive.type') === 'button_reply') {
-            $welcome->handleButtonReply($contact, (string) data_get($message, 'interactive.button_reply.id'));
+            WelcomeFlow::for($tenant)->handleButtonReply($contact, (string) data_get($message, 'interactive.button_reply.id'));
+
+            return;
+        }
+
+        // Quick-reply di un template (Reminder appuntamento Conferma/Disdici, E3.2).
+        if (data_get($message, 'type') === 'button') {
+            AppointmentReminder::for($tenant)->handleButtonReply($contact, data_get($message, 'button.payload'));
         }
     }
 
