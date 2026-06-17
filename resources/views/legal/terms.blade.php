@@ -17,7 +17,7 @@
     <p>
         Il servizio è fornito da <strong>Giovanni Melfi</strong> (marchio &laquo;Replisa&raquo; /
         theMelfix), libero professionista, P.IVA IT01809180886, con sede in
-        <span class="ph">[comune/sede da confermare]</span> — contatti:
+        Vittoria (RG) — contatti:
         <a href="mailto:info@giovannimelfi.it">info@giovannimelfi.it</a>.
     </p>
 
