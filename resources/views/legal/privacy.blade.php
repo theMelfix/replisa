@@ -16,10 +16,10 @@
     <h2>1. Titolare del trattamento</h2>
     <p>
         Titolare del trattamento è <strong>Giovanni Melfi</strong> (marchio &laquo;Replisa&raquo; /
-        theMelfix), <span class="ph">[forma giuridica e P.IVA/C.F. da inserire]</span>, con sede in
-        <span class="ph">[indirizzo sede da inserire]</span>.<br>
+        theMelfix), libero professionista, P.IVA IT01809180886, con sede in
+        <span class="ph">[comune/sede da confermare]</span>.<br>
         Per qualunque richiesta relativa ai tuoi dati puoi scrivere a
-        <span class="ph">[email di contatto, es. privacy@replisa.com]</span>.
+        <a href="mailto:info@giovannimelfi.it">info@giovannimelfi.it</a>.
     </p>
 
     <h2>2. Doppio ruolo di Replisa</h2>

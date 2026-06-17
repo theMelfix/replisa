@@ -16,9 +16,9 @@
     <h2>1. Fornitore del servizio</h2>
     <p>
         Il servizio è fornito da <strong>Giovanni Melfi</strong> (marchio &laquo;Replisa&raquo; /
-        theMelfix), <span class="ph">[forma giuridica e P.IVA/C.F. da inserire]</span>, con sede in
-        <span class="ph">[indirizzo sede da inserire]</span> — contatti:
-        <span class="ph">[email di contatto da inserire]</span>.
+        theMelfix), libero professionista, P.IVA IT01809180886, con sede in
+        <span class="ph">[comune/sede da confermare]</span> — contatti:
+        <a href="mailto:info@giovannimelfi.it">info@giovannimelfi.it</a>.
     </p>
 
     <h2>2. Oggetto del servizio</h2>

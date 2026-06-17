@@ -16,7 +16,7 @@
     <h2>1. Se sei un'impresa cliente</h2>
     <p>
         Se hai un account Replisa, puoi richiedere la cancellazione del tuo account e dei dati
-        associati scrivendo a <span class="ph">[email di contatto, es. privacy@replisa.com]</span>
+        associati scrivendo a <a href="mailto:info@giovannimelfi.it">info@giovannimelfi.it</a>
         dall'indirizzo email collegato all'account. Procederemo alla cancellazione entro
         <strong>30 giorni</strong>, fatti salvi i dati che dobbiamo conservare per obblighi di legge
         (es. documenti fiscali e contabili).
@@ -32,8 +32,8 @@
     <ul>
         <li>rivolgerti direttamente all'attività che ti ha contattato, oppure</li>
         <li>
-            scrivere a <span class="ph">[email di contatto da inserire]</span> indicando il tuo
-            numero di telefono e l'attività di riferimento: inoltreremo la richiesta al Titolare e
+            scrivere a <a href="mailto:info@giovannimelfi.it">info@giovannimelfi.it</a> indicando il
+            tuo numero di telefono e l'attività di riferimento: inoltreremo la richiesta al Titolare e
             la gestiremo come Responsabile del trattamento.
         </li>
     </ul>
