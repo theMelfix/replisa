@@ -1,8 +1,10 @@
 <?php
 
+use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
@@ -10,6 +12,7 @@ use Livewire\Volt\Component;
 
 new #[Layout('layouts.guest')] class extends Component
 {
+    public string $business_name = '';
     public string $name = '';
     public string $email = '';
     public string $password = '';
@@ -17,18 +20,35 @@ new #[Layout('layouts.guest')] class extends Component
 
     /**
      * Handle an incoming registration request.
+     *
+     * Self-service signup: crea un nuovo tenant (l'attività) e l'utente che
+     * registra ne diventa l'owner. WhatsApp credentials configurate dopo.
      */
     public function register(): void
     {
         $validated = $this->validate([
+            'business_name' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $validated['password'] = Hash::make($validated['password']);
+        $user = DB::transaction(function () use ($validated) {
+            $tenant = Tenant::create(['name' => $validated['business_name']]);
 
-        event(new Registered($user = User::create($validated)));
+            $user = User::create([
+                'tenant_id' => $tenant->id,
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+            ]);
+
+            $user->assignRole(User::ROLE_OWNER);
+
+            return $user;
+        });
+
+        event(new Registered($user));
 
         Auth::login($user);
 
@@ -38,10 +58,17 @@ new #[Layout('layouts.guest')] class extends Component
 
 <div>
     <form wire:submit="register">
-        <!-- Name -->
+        <!-- Business Name -->
         <div>
+            <x-input-label for="business_name" :value="__('Nome attività')" />
+            <x-text-input wire:model="business_name" id="business_name" class="block mt-1 w-full" type="text" name="business_name" required autofocus autocomplete="organization" />
+            <x-input-error :messages="$errors->get('business_name')" class="mt-2" />
+        </div>
+
+        <!-- Name -->
+        <div class="mt-4">
             <x-input-label for="name" :value="__('Name')" />
-            <x-text-input wire:model="name" id="name" class="block mt-1 w-full" type="text" name="name" required autofocus autocomplete="name" />
+            <x-text-input wire:model="name" id="name" class="block mt-1 w-full" type="text" name="name" required autocomplete="name" />
             <x-input-error :messages="$errors->get('name')" class="mt-2" />
         </div>
 
