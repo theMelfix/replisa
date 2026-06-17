@@ -8,7 +8,7 @@
 > **Pricing:** Starter €14 | Base €39 | Pro €79 | Business €149 /mese
 > **PM / Scrum Master:** Claude (AI) · **Dev / Product Owner:** Giovanni Melfi
 > **Data inizio progetto:** 14/05/2026
-> **Ultimo aggiornamento:** 08/06/2026
+> **Ultimo aggiornamento:** 10/06/2026
 
 ---
 
@@ -163,30 +163,30 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 3.1.1 | Creare template Meta "welcome_message" (con bottoni interattivi) | `P0` | 2 | ⬜ | Sottomettere per approvazione Meta (24-48h) |
-| 3.1.2 | Implementare trigger: nuovo messaggio in ingresso → check se primo contatto | `P0` | 3 | ⬜ | Controllare se `contact` esiste già |
-| 3.1.3 | Risposta automatica con messaggio interattivo (menu servizi) | `P0` | 3 | ⬜ | Bottoni: "Info Servizi", "Prenota", "Parla con noi" |
-| 3.1.4 | Gestione risposte ai bottoni (routing verso azione corretta) | `P1` | 3 | ⬜ | Switch su `button_reply.id` |
-| 3.1.5 | Opt-in tracking: salvare consenso esplicito del contatto | `P0` | 1 | ⬜ | GDPR: obbligatorio prima di inviare marketing |
+| 3.1.1 | Creare template Meta "welcome_message" (con bottoni interattivi) | `P0` | 2 | ⬜ | Azione su dashboard Meta (approvazione 24-48h). **Non blocca il flusso**: il menu welcome viaggia come messaggio interattivo free-form dentro la finestra 24h aperta dall'inbound — il template servirebbe solo per ri-aprire la conversazione fuori finestra |
+| 3.1.2 | Implementare trigger: nuovo messaggio in ingresso → check se primo contatto | `P0` | 3 | ✅ | `WelcomeFlow` agganciato a `ProcessWhatsAppWebhook`: trigger su `$contact->wasRecentlyCreated`, solo su messaggi appena loggati (idempotente). 2026-06-09, commit `2e859a0` |
+| 3.1.3 | Risposta automatica con messaggio interattivo (menu servizi) | `P0` | 3 | ✅ | `WelcomeFlow::greet()` invia `sendButtons` (default: Info Servizi / Prenota / Parla con noi). Testo+bottoni personalizzabili per-tenant via `automations.config`. 2026-06-09 |
+| 3.1.4 | Gestione risposte ai bottoni (routing verso azione corretta) | `P1` | 3 | ✅ | `handleButtonReply()`: id namespaced `welcome:<action>`, risposta da `config.replies[action]`. 2026-06-09 |
+| 3.1.5 | Opt-in tracking: salvare consenso esplicito del contatto | `P0` | 1 | ✅ | `recordOptIn()` al primo contatto (`opted_in`+`opted_in_at`, idempotente). Marketing richiederà opt-in dedicato. 2026-06-09 |
 
 ### E3.2 — Reminder Appuntamento
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 3.2.1 | Creare template Meta "appointment_reminder" con parametri (nome, data, ora) | `P0` | 2 | ⬜ | Categoria: UTILITY (costo inferiore) |
-| 3.2.2 | Laravel Scheduler: job che gira ogni ora, trova appuntamenti a -24h e -2h | `P0` | 3 | ⬜ | `php artisan schedule:run` via cron |
-| 3.2.3 | Invio reminder con bottoni "✅ Confermo" / "❌ Disdici" | `P0` | 2 | ⬜ | |
-| 3.2.4 | Gestione risposta: aggiornare stato appuntamento su DB | `P1` | 2 | ⬜ | Notificare l'attività in caso di disdetta |
-| 3.2.5 | Endpoint API per inserimento appuntamenti (da gestionale esterno) | `P1` | 2 | ⬜ | `POST /api/v1/appointments` autenticato |
+| 3.2.1 | Creare template Meta "appointment_reminder" con parametri (nome, data, ora) | `P0` | 2 | ⬜ | Azione su dashboard Meta, categoria UTILITY. **Obbligatorio** (reminder = fuori finestra 24h): nome/lingua/payload bottoni configurabili via `automations.config`. Body params: {{1}} nome, {{2}} data, {{3}} ora; quick-reply payload `CONFIRM`/`CANCEL` |
+| 3.2.2 | Laravel Scheduler: job che gira ogni ora, trova appuntamenti a -24h e -2h | `P0` | 3 | ✅ | Command `replisa:send-reminders` + `AppointmentReminder::dispatchDue()`. Logica due idempotente a due finestre sull'unica colonna `reminded_at`. Schedule `->hourly()` in `routes/console.php`. ⚠️ Serve cron `schedule:run` sul VPS (vedi deploy/README). 2026-06-10, commit `e45e73b` |
+| 3.2.3 | Invio reminder con bottoni "✅ Confermo" / "❌ Disdici" | `P0` | 2 | ✅ | `remind()` invia il template (i bottoni quick-reply fanno parte del template 3.2.1) e segna `reminded_at`. Fallimenti loggati senza marcare reminded_at → retry. 2026-06-10 |
+| 3.2.4 | Gestione risposta: aggiornare stato appuntamento su DB | `P1` | 2 | ✅ | `handleButtonReply()` su messaggi inbound tipo `button`: `CONFIRM`→confirmed / `CANCEL`→cancelled sul prossimo appuntamento scheduled del contatto. Agganciato a `ProcessWhatsAppWebhook`. 2026-06-10 |
+| 3.2.5 | Endpoint API per inserimento appuntamenti (da gestionale esterno) | `P1` | 2 | ⬜ | Differito: dipende da auth API (Sanctum, E4.3.1). Da fare insieme a E4.3 |
 
 ### E3.3 — Richiesta Recensione
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 3.3.1 | Creare template Meta "review_request" con link Google Reviews | `P0` | 2 | ⬜ | Categoria: MARKETING (serve opt-in) |
-| 3.3.2 | Job schedulato: invia richiesta 24h dopo visita/appuntamento completato | `P0` | 2 | ⬜ | Solo se appuntamento status = "completed" |
-| 3.3.3 | Gestione risposta: tracking chi ha cliccato / risposto | `P2` | 1 | ⬜ | Utile per analytics |
-| 3.3.4 | Rate limiting: non inviare più di 1 richiesta recensione per contatto ogni 30 giorni | `P1` | 1 | ⬜ | Evitare spam |
+| 3.3.1 | Creare template Meta "review_request" con link Google Reviews | `P0` | 2 | ⬜ | Azione su dashboard Meta, categoria MARKETING (serve opt-in). Body param {{1}} nome; button URL dinamico opzionale (suffisso via `automations.config.review_url_param`) |
+| 3.3.2 | Job schedulato: invia richiesta 24h dopo visita/appuntamento completato | `P0` | 2 | ✅ | `App\Services\Automation\ReviewRequest` + command `replisa:send-review-requests` schedulato `->hourly()`. `dispatchDue()` trova gli appuntamenti `completed` con `review_requested=false` e `scheduled_at <= now-delay` (delay default 24h, configurabile). Solo verso contatti `opted_in`. 2026-06-17 |
+| 3.3.3 | Gestione risposta: tracking chi ha cliccato / risposto | `P2` | 1 | ⬜ | Differito: i click sul button URL del template non passano dal webhook Meta. Servirà uno short-link tracciato (o quick-reply) — rivalutare con analytics E4.2.1 |
+| 3.3.4 | Rate limiting: non inviare più di 1 richiesta recensione per contatto ogni 30 giorni | `P1` | 1 | ✅ | `recentlyRequested()`: nessuna nuova richiesta se un template recensione (non `failed`) è già partito al contatto entro `rate_limit_days` (default 30). Appuntamento saltato comunque marcato `review_requested` per non rivalutarlo. 2026-06-17 |
 
 ---
 

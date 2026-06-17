@@ -2,8 +2,11 @@
 
 namespace App\Jobs;
 
+use App\Models\Contact;
 use App\Models\Message;
 use App\Models\Tenant;
+use App\Services\Automation\AppointmentReminder;
+use App\Services\Automation\WelcomeFlow;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
@@ -62,7 +65,9 @@ class ProcessWhatsAppWebhook implements ShouldQueue
             $contact->last_seen_at = now();
             $contact->save();
 
-            Message::firstOrCreate(
+            $isFirstContact = $contact->wasRecentlyCreated;
+
+            $logged = Message::firstOrCreate(
                 ['tenant_id' => $tenant->id, 'meta_message_id' => $wamid],
                 [
                     'contact_id' => $contact->id,
@@ -72,6 +77,39 @@ class ProcessWhatsAppWebhook implements ShouldQueue
                     'status' => Message::STATUS_RECEIVED,
                 ],
             );
+
+            // Solo su messaggi appena loggati: evita di rieseguire le automazioni
+            // se il webhook viene riconsegnato (idempotenza).
+            if ($logged->wasRecentlyCreated) {
+                $this->runAutomations($tenant, $contact, $message, $isFirstContact);
+            }
+        }
+    }
+
+    /**
+     * Inoltra il messaggio in ingresso ai flussi di automazione (E3.1 Welcome Flow):
+     * trigger di benvenuto al primo contatto, routing delle risposte ai bottoni.
+     *
+     * @param  array<string, mixed>  $message
+     */
+    private function runAutomations(Tenant $tenant, Contact $contact, array $message, bool $isFirstContact): void
+    {
+        if ($isFirstContact) {
+            WelcomeFlow::for($tenant)->greet($contact);
+
+            return;
+        }
+
+        // Risposta a un menu interattivo (Welcome Flow, E3.1).
+        if (data_get($message, 'interactive.type') === 'button_reply') {
+            WelcomeFlow::for($tenant)->handleButtonReply($contact, (string) data_get($message, 'interactive.button_reply.id'));
+
+            return;
+        }
+
+        // Quick-reply di un template (Reminder appuntamento Conferma/Disdici, E3.2).
+        if (data_get($message, 'type') === 'button') {
+            AppointmentReminder::for($tenant)->handleButtonReply($contact, data_get($message, 'button.payload'));
         }
     }
 
