@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
 use Database\Factories\AutomationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Automation extends Model
 {
     /** @use HasFactory<AutomationFactory> */
-    use HasFactory;
+    use BelongsToTenant, HasFactory;
 
     public const TYPE_WELCOME = 'welcome';
 
