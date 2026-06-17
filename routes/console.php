@@ -13,3 +13,9 @@ Artisan::command('inspire', function () {
 Schedule::command('replisa:send-reminders')
     ->hourly()
     ->withoutOverlapping();
+
+// Richiesta recensione (E3.3): controlla ogni ora gli appuntamenti completati
+// pronti per la richiesta. Stesso cron `schedule:run` del reminder.
+Schedule::command('replisa:send-review-requests')
+    ->hourly()
+    ->withoutOverlapping();
