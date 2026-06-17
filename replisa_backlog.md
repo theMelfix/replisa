@@ -8,7 +8,7 @@
 > **Pricing:** Starter €14 | Base €39 | Pro €79 | Business €149 /mese
 > **PM / Scrum Master:** Claude (AI) · **Dev / Product Owner:** Giovanni Melfi
 > **Data inizio progetto:** 14/05/2026
-> **Ultimo aggiornamento:** 10/06/2026
+> **Ultimo aggiornamento:** 17/06/2026 — primo rilascio applicativo di replisa.com (Sprint 2+3 live)
 
 ---
 
