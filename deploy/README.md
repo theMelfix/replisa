@@ -55,16 +55,25 @@ sudo systemctl restart replisa-worker.service
 
 ---
 
-## Scheduler (E3.2 — ⚠️ da attivare sul VPS)
+## Scheduler (E3.2 / E3.3 — ⚠️ da attivare sul VPS)
 
-Il reminder appuntamento (`replisa:send-reminders`) gira **ogni ora** via Laravel
-Scheduler. In produzione serve questa entry in crontab (utente del sito), senza la
-quale i reminder non partono:
+Due command girano **ogni ora** via Laravel Scheduler:
+- `replisa:send-reminders` — reminder appuntamento (E3.2, -24h / -2h)
+- `replisa:send-review-requests` — richiesta recensione post appuntamento completato (E3.3)
+
+Entrambi sono coperti da **un'unica** entry in crontab (utente del sito), senza la
+quale né reminder né richieste recensione partono:
 
 ```
 * * * * * cd /home/replisa-com/htdocs/replisa.com/current && php8.4 artisan schedule:run >> /dev/null 2>&1
 ```
 
-Verifica con `php8.4 artisan schedule:list`. Lo schedule è definito in
-`routes/console.php` (`->hourly()->withoutOverlapping()`); il job è idempotente,
-quindi run ravvicinati non generano reminder duplicati.
+Verifica con `php8.4 artisan schedule:list`. Gli schedule sono definiti in
+`routes/console.php` (`->hourly()->withoutOverlapping()`); i job sono idempotenti,
+quindi run ravvicinati non generano invii duplicati.
+
+> I flussi E3 partono solo se il tenant ha la relativa riga in `automations`
+> attiva. Reminder e recensioni usano **template Meta approvati**
+> (`appointment_reminder` UTILITY, `review_request` MARKETING): finché non sono
+> approvati gli invii falliscono e vengono ritentati al giro dopo (nessun crash).
+> Il Welcome Flow viaggia free-form nella finestra 24h, quindi non richiede template.
