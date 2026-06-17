@@ -41,6 +41,7 @@
             <nav>
                 <a href="/privacy">Privacy</a>
                 <a href="/termini">Condizioni d'uso</a>
+                <a href="/eliminazione-dati">Eliminazione dati</a>
             </nav>
         </header>
 
