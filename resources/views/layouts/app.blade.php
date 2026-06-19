@@ -34,6 +34,8 @@
             </main>
         </div>
 
+        <x-toast-hub />
+
         @livewireScriptConfig
     </body>
 </html>

@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Exceptions\TenantContextException;
 use App\Models\Automation;
 use App\Models\Scopes\TenantScope;
 use Illuminate\Contracts\View\View;
@@ -41,20 +42,26 @@ class Automations extends Component
             return;
         }
 
-        $automation = Automation::where('type', $type)->first();
+        try {
+            $automation = Automation::where('type', $type)->first();
 
-        if ($automation) {
-            $automation->update(['active' => ! $automation->active]);
+            if ($automation) {
+                $automation->update(['active' => ! $automation->active]);
 
-            return;
+                return;
+            }
+
+            Automation::create([
+                'type' => $type,
+                'trigger' => self::FLOWS[$type]['trigger'],
+                'config' => [],
+                'active' => true,
+            ]);
+        } catch (TenantContextException $e) {
+            // Errore di dominio atteso (es. super-admin senza tenant): mostra un
+            // toast col messaggio invece di propagare un 500. Vedi <x-toast-hub />.
+            $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
-
-        Automation::create([
-            'type' => $type,
-            'trigger' => self::FLOWS[$type]['trigger'],
-            'config' => [],
-            'active' => true,
-        ]);
     }
 
     public function render(): View
