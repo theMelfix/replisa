@@ -30,6 +30,22 @@ trait BelongsToTenant
 
             if ($user && $user->tenant_id) {
                 $model->tenant_id = $user->tenant_id;
+
+                return;
+            }
+
+            // Backstop (E4.2.3): un utente autenticato senza tenant — es. un
+            // super-admin (tenant_id null) — non può creare record per-tenant.
+            // Senza questa guardia MySQL solleverebbe un 1364 criptico
+            // ("Field 'tenant_id' doesn't have a default value"); qui falliamo
+            // con un messaggio chiaro. I contesti senza Auth (console, queue,
+            // webhook) restano liberi: lì il tenant_id va passato esplicitamente
+            // dalla relazione `$tenant->...()->create(...)`.
+            if ($user) {
+                throw new \RuntimeException(sprintf(
+                    'Impossibile creare un record %s: l\'utente autenticato non appartiene a nessun tenant.',
+                    class_basename($model)
+                ));
             }
         });
     }

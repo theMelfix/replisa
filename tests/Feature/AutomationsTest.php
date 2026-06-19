@@ -61,6 +61,23 @@ it('disattiva un flusso già attivo al secondo toggle', function () {
     expect($automation->active)->toBeFalse();
 });
 
+it('rifiuta la creazione per un utente senza tenant (super-admin)', function () {
+    $admin = User::create([
+        'tenant_id' => null,
+        'name' => 'Super',
+        'email' => 'super@example.com',
+        'password' => bcrypt('password'),
+    ]);
+    $admin->assignRole(User::ROLE_SUPER_ADMIN);
+
+    $this->actingAs($admin);
+
+    expect(fn () => Livewire::test(Automations::class)->call('toggle', Automation::TYPE_WELCOME))
+        ->toThrow(RuntimeException::class);
+
+    expect(Automation::withoutGlobalScopes()->count())->toBe(0);
+});
+
 it('ignora tipi di flusso sconosciuti', function () {
     $this->actingAs($this->owner);
 
