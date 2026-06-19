@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\Admin\Tenants;
+use App\Livewire\Appointments;
 use App\Livewire\Automations;
 use App\Livewire\Contacts;
 use App\Livewire\Dashboard;
@@ -30,6 +31,10 @@ Route::get('contacts', Contacts::class)
 Route::get('messages', Messages::class)
     ->middleware(['auth', 'verified'])
     ->name('messages');
+
+Route::get('appointments', Appointments::class)
+    ->middleware(['auth', 'verified'])
+    ->name('appointments');
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])

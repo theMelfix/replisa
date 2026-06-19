@@ -42,6 +42,10 @@ new class extends Component
                         {{ __('Messaggi') }}
                     </x-nav-link>
 
+                    <x-nav-link :href="route('appointments')" :active="request()->routeIs('appointments')" wire:navigate>
+                        {{ __('Appuntamenti') }}
+                    </x-nav-link>
+
                     <x-nav-link :href="route('automations')" :active="request()->routeIs('automations')" wire:navigate>
                         {{ __('Automazioni') }}
                     </x-nav-link>
