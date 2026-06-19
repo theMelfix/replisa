@@ -55,6 +55,35 @@ sudo systemctl restart replisa-worker.service
 
 ---
 
+## Build frontend (E4.1+ — dashboard Breeze/Livewire)
+
+Da Sprint 3/E4.1 l'app ha una UI (Breeze + Livewire + **Tailwind via Vite**):
+servono gli asset compilati in `public/build/`. **Senza build, le pagine non
+hanno stili.** Richiede Node sul VPS.
+
+Aggiungere alla pipeline DPLOY (build step, dopo `composer install`):
+
+```bash
+npm ci && npm run build
+```
+
+Verifica post-deploy: esiste `public/build/manifest.json` ed è recente.
+
+## Checklist rilascio E4.1 (Auth & Multi-Tenancy)
+
+1. `main` aggiornato (merge `develop`→`main`) e pushato.
+2. Deploy: `dploy deploy main` (composer + `npm ci && npm run build` + migrate).
+3. **Migration nuove**: `users.tenant_id` + tabelle ruoli spatie (girano col deploy; in caso `php8.4 artisan migrate --force`).
+4. **Ruoli + super-admin**:
+   ```bash
+   php8.4 artisan db:seed --class=RoleSeeder --force
+   php8.4 artisan replisa:create-admin      # crea il tuo utente super-admin
+   ```
+5. **Dashboard su `app.replisa.com`**: vhost CloudPanel che punta alla stessa app (root `current/public`), SSL Let's Encrypt sul sottodominio `app`.
+6. `php8.4 artisan config:clear` dopo modifiche al `.env`.
+
+---
+
 ## Scheduler (E3.2 / E3.3 — ⚠️ da attivare sul VPS)
 
 Due command girano **ogni ora** via Laravel Scheduler:

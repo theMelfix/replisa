@@ -8,7 +8,7 @@
 > **Pricing:** Starter €14 | Base €39 | Pro €79 | Business €149 /mese
 > **PM / Scrum Master:** Claude (AI) · **Dev / Product Owner:** Giovanni Melfi
 > **Data inizio progetto:** 14/05/2026
-> **Ultimo aggiornamento:** 17/06/2026 — primo rilascio applicativo di replisa.com (Sprint 2+3 live)
+> **Ultimo aggiornamento:** 17/06/2026 — E4.1 Auth & Multi-Tenancy completa (su `develop`)
 
 ---
 
@@ -198,10 +198,10 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 4.1.1 | Setup Laravel Breeze/Jetstream per autenticazione | `P0` | 2 | ⬜ | Login, registrazione, reset password |
-| 4.1.2 | Middleware tenant: ogni utente vede solo i dati del suo tenant | `P0` | 3 | ⬜ | Scope globale su tutte le query |
-| 4.1.3 | Ruoli base: admin (tu), owner (cliente), operator (dipendente) | `P1` | 2 | ⬜ | Spatie/Laravel-Permission |
-| 4.1.4 | Super-admin area: gestire tutti i tenant, attivare/disattivare account | `P1` | 3 | ⬜ | Solo per te |
+| 4.1.1 | Setup Laravel Breeze/Jetstream per autenticazione | `P0` | 2 | ✅ | Breeze stack **Livewire** (Volt). Registrazione self-service crea Tenant + utente `owner` (campo "Nome attività"); `users.tenant_id` nullable (super-admin=null). 2026-06-17 |
+| 4.1.2 | Middleware tenant: ogni utente vede solo i dati del suo tenant | `P0` | 3 | ✅ | `TenantScope` global + trait `BelongsToTenant` su Contact/Message/Conversation/Automation/Appointment. No-op in console/webhook (nessun auth) e per super-admin. Auto-fill `tenant_id` in scrittura. 2026-06-17 |
+| 4.1.3 | Ruoli base: admin (tu), owner (cliente), operator (dipendente) | `P1` | 2 | ✅ | `spatie/laravel-permission`. Ruoli `super-admin`/`owner`/`operator` (RoleSeeder, costanti su `User`). 2026-06-17 |
+| 4.1.4 | Super-admin area: gestire tutti i tenant, attivare/disattivare account | `P1` | 3 | ✅ | Livewire `Admin\Tenants` (lista + toggle attivo) su `/admin/tenants`, middleware `role:super-admin`. Command `replisa:create-admin`. 2026-06-17 |
 
 ### E4.2 — Dashboard Cliente
 
@@ -234,9 +234,9 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 5.1.1 | Pagina su replisa.com (dominio dedicato) | `P0` | 3 | ⬜ | Hero + problema/soluzione + pricing + CTA |
-| 5.1.2 | Form contatto / Calendly embed per prenotare chiamata | `P0` | 1 | ⬜ | |
-| 5.1.3 | SEO base: meta tags, Open Graph, structured data | `P1` | 1 | ⬜ | |
+| 5.1.1 | Pagina su replisa.com (dominio dedicato) | `P0` | 3 | ✅ | Landing v1: hero, 3 automazioni, prezzi (4 piani), CTA demo, footer legale. Tailwind/Vite. 2026-06-19 |
+| 5.1.2 | Form contatto / Calendly embed per prenotare chiamata | `P0` | 1 | ⬜ | Per ora CTA `mailto:` — da sostituire con form/Calendly |
+| 5.1.3 | SEO base: meta tags, Open Graph, structured data | `P1` | 1 | 🟡 | Title/description/OG fatti in landing; manca structured data (JSON-LD) |
 | 5.1.4 | Cookie banner GDPR | `P1` | 1 | ⬜ | Hai già esperienza da giovannimelfi.com |
 
 ### E5.2 — Materiale Commerciale

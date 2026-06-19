@@ -12,8 +12,8 @@ $im = imagecreatetruecolor($S, $S);
 imagesavealpha($im, true);
 
 // Gradiente verticale: brand green #16a34a -> #0f7a37
-$top = [0x16, 0xa3, 0x4a];
-$bot = [0x0f, 0x7a, 0x37];
+$top = [0x16, 0xA3, 0x4A];
+$bot = [0x0F, 0x7A, 0x37];
 for ($y = 0; $y < $S; $y++) {
     $t = $y / ($S - 1);
     $r = (int) round($top[0] + ($bot[0] - $top[0]) * $t);
@@ -39,4 +39,4 @@ $out = __DIR__.'/replisa-icon-1024.png';
 imagepng($im, $out);
 
 $info = getimagesize($out);
-echo "Creato: {$info[0]}x{$info[1]}  ".round(filesize($out) / 1024)." KB".PHP_EOL;
+echo "Creato: {$info[0]}x{$info[1]}  ".round(filesize($out) / 1024).' KB'.PHP_EOL;
