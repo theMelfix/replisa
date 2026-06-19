@@ -234,9 +234,9 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 5.1.1 | Pagina su replisa.com (dominio dedicato) | `P0` | 3 | ⬜ | Hero + problema/soluzione + pricing + CTA |
-| 5.1.2 | Form contatto / Calendly embed per prenotare chiamata | `P0` | 1 | ⬜ | |
-| 5.1.3 | SEO base: meta tags, Open Graph, structured data | `P1` | 1 | ⬜ | |
+| 5.1.1 | Pagina su replisa.com (dominio dedicato) | `P0` | 3 | ✅ | Landing v1: hero, 3 automazioni, prezzi (4 piani), CTA demo, footer legale. Tailwind/Vite. 2026-06-19 |
+| 5.1.2 | Form contatto / Calendly embed per prenotare chiamata | `P0` | 1 | ⬜ | Per ora CTA `mailto:` — da sostituire con form/Calendly |
+| 5.1.3 | SEO base: meta tags, Open Graph, structured data | `P1` | 1 | 🟡 | Title/description/OG fatti in landing; manca structured data (JSON-LD) |
 | 5.1.4 | Cookie banner GDPR | `P1` | 1 | ⬜ | Hai già esperienza da giovannimelfi.com |
 
 ### E5.2 — Materiale Commerciale
