@@ -199,7 +199,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
 | 4.1.1 | Setup Laravel Breeze/Jetstream per autenticazione | `P0` | 2 | ✅ | Breeze stack **Livewire** (Volt). Registrazione self-service crea Tenant + utente `owner` (campo "Nome attività"); `users.tenant_id` nullable (super-admin=null). 2026-06-17 |
-| 4.1.2 | Middleware tenant: ogni utente vede solo i dati del suo tenant | `P0` | 3 | ✅ | `TenantScope` global + trait `BelongsToTenant` su Contact/Message/Conversation/Automation/Appointment. No-op in console/webhook (nessun auth) e per super-admin. Auto-fill `tenant_id` in scrittura. 2026-06-17 |
+| 4.1.2 | Middleware tenant: ogni utente vede solo i dati del suo tenant | `P0` | 3 | ✅ | `TenantScope` global + trait `BelongsToTenant` su Contact/Message/Conversation/Automation/Appointment. No-op in console/webhook (nessun auth) e per super-admin. Auto-fill `tenant_id` in scrittura; backstop `TenantContextException` se un utente autenticato senza tenant tenta una scrittura per-tenant (2026-06-19). 2026-06-17 |
 | 4.1.3 | Ruoli base: admin (tu), owner (cliente), operator (dipendente) | `P1` | 2 | ✅ | `spatie/laravel-permission`. Ruoli `super-admin`/`owner`/`operator` (RoleSeeder, costanti su `User`). 2026-06-17 |
 | 4.1.4 | Super-admin area: gestire tutti i tenant, attivare/disattivare account | `P1` | 3 | ✅ | Livewire `Admin\Tenants` (lista + toggle attivo) su `/admin/tenants`, middleware `role:super-admin`. Command `replisa:create-admin`. 2026-06-17 |
 
@@ -209,7 +209,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 |---|------|:--------:|:--:|:-----:|------|
 | 4.2.1 | Overview: messaggi inviati/ricevuti, conversazioni attive, costi stimati | `P1` | 3 | 🟡 | Livewire `Dashboard` con card (inviati/ricevuti/contatti/conversazioni attive/appuntamenti). Mancano grafici e costi stimati. 2026-06-19 |
 | 4.2.2 | Sezione Contatti: lista, ricerca, dettaglio conversazione | `P1` | 3 | 🟡 | Livewire `Contacts`: lista paginata + ricerca nome/telefono + conteggio messaggi. Manca il dettaglio conversazione. 2026-06-19 |
-| 4.2.3 | Sezione Automazioni: attiva/disattiva flussi, configura parametri | `P1` | 3 | 🟡 | Livewire `Automations`: toggle on/off dei 3 flussi (crea/aggiorna `Automation` per-tenant). Manca la configurazione parametri (testi/offset/template). 2026-06-19 |
+| 4.2.3 | Sezione Automazioni: attiva/disattiva flussi, configura parametri | `P1` | 3 | 🟡 | Livewire `Automations`: toggle on/off dei 3 flussi (crea/aggiorna `Automation` per-tenant). Hardening: backstop `tenant_id` (`TenantContextException`) + sistema toast in-app `<x-toast-hub />` per le eccezioni (niente più 500/`1364`). Manca la configurazione parametri (testi/offset/template). 2026-06-19 |
 | 4.2.4 | Sezione Appuntamenti: CRUD manuale + import CSV | `P2` | 3 | ✅ | Livewire `Appointments`: form nuovo (crea contatto), cambio stato, elimina, import CSV (telefono,nome,data). Scoped per-tenant. 2026-06-19 |
 | 4.2.5 | Log messaggi: cronologia completa con status (sent/delivered/read/failed) | `P1` | 2 | 🟡 | Livewire `Messages`: cronologia paginata, badge stato, ricerca contatto + filtri direzione/stato. Mancano filtri per data e tipo. 2026-06-19 |
 | 4.2.6 | Sezione Billing: piano attivo, conteggio messaggi, upgrade | `P2` | 3 | ⬜ | Per MVP basta mostrare il piano |
