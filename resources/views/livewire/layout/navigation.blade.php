@@ -34,6 +34,14 @@ new class extends Component
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
+                    <x-nav-link :href="route('contacts')" :active="request()->routeIs('contacts')" wire:navigate>
+                        {{ __('Contatti') }}
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('messages')" :active="request()->routeIs('messages')" wire:navigate>
+                        {{ __('Messaggi') }}
+                    </x-nav-link>
+
                     <x-nav-link :href="route('automations')" :active="request()->routeIs('automations')" wire:navigate>
                         {{ __('Automazioni') }}
                     </x-nav-link>

@@ -2,7 +2,9 @@
 
 use App\Livewire\Admin\Tenants;
 use App\Livewire\Automations;
+use App\Livewire\Contacts;
 use App\Livewire\Dashboard;
+use App\Livewire\Messages;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +22,14 @@ Route::get('dashboard', Dashboard::class)
 Route::get('automations', Automations::class)
     ->middleware(['auth', 'verified'])
     ->name('automations');
+
+Route::get('contacts', Contacts::class)
+    ->middleware(['auth', 'verified'])
+    ->name('contacts');
+
+Route::get('messages', Messages::class)
+    ->middleware(['auth', 'verified'])
+    ->name('messages');
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])
