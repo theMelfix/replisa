@@ -61,7 +61,7 @@ it('disattiva un flusso già attivo al secondo toggle', function () {
     expect($automation->active)->toBeFalse();
 });
 
-it('rifiuta la creazione per un utente senza tenant (super-admin)', function () {
+it('mostra un toast e non crea nulla per un utente senza tenant (super-admin)', function () {
     $admin = User::create([
         'tenant_id' => null,
         'name' => 'Super',
@@ -72,8 +72,9 @@ it('rifiuta la creazione per un utente senza tenant (super-admin)', function () 
 
     $this->actingAs($admin);
 
-    expect(fn () => Livewire::test(Automations::class)->call('toggle', Automation::TYPE_WELCOME))
-        ->toThrow(RuntimeException::class);
+    Livewire::test(Automations::class)
+        ->call('toggle', Automation::TYPE_WELCOME)
+        ->assertDispatched('toast');
 
     expect(Automation::withoutGlobalScopes()->count())->toBe(0);
 });

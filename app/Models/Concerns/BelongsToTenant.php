@@ -2,6 +2,7 @@
 
 namespace App\Models\Concerns;
 
+use App\Exceptions\TenantContextException;
 use App\Models\Scopes\TenantScope;
 use Illuminate\Support\Facades\Auth;
 
@@ -38,11 +39,12 @@ trait BelongsToTenant
             // super-admin (tenant_id null) — non può creare record per-tenant.
             // Senza questa guardia MySQL solleverebbe un 1364 criptico
             // ("Field 'tenant_id' doesn't have a default value"); qui falliamo
-            // con un messaggio chiaro. I contesti senza Auth (console, queue,
+            // con un messaggio chiaro, che i componenti Livewire intercettano
+            // per mostrare un toast. I contesti senza Auth (console, queue,
             // webhook) restano liberi: lì il tenant_id va passato esplicitamente
             // dalla relazione `$tenant->...()->create(...)`.
             if ($user) {
-                throw new \RuntimeException(sprintf(
+                throw new TenantContextException(sprintf(
                     'Impossibile creare un record %s: l\'utente autenticato non appartiene a nessun tenant.',
                     class_basename($model)
                 ));
