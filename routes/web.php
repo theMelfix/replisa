@@ -1,6 +1,8 @@
 <?php
 
 use App\Livewire\Admin\Tenants;
+use App\Livewire\Automations;
+use App\Livewire\Dashboard;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
@@ -11,9 +13,13 @@ Route::view('/privacy', 'legal.privacy')->name('privacy');
 Route::view('/termini', 'legal.terms')->name('terms');
 Route::view('/eliminazione-dati', 'legal.data-deletion')->name('data-deletion');
 
-Route::view('dashboard', 'dashboard')
+Route::get('dashboard', Dashboard::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
+Route::get('automations', Automations::class)
+    ->middleware(['auth', 'verified'])
+    ->name('automations');
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])
