@@ -207,9 +207,9 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 4.2.1 | Overview: messaggi inviati/ricevuti, conversazioni attive, costi stimati | `P1` | 3 | ⬜ | Widget con grafici base |
+| 4.2.1 | Overview: messaggi inviati/ricevuti, conversazioni attive, costi stimati | `P1` | 3 | 🟡 | Livewire `Dashboard` con card (inviati/ricevuti/contatti/conversazioni attive/appuntamenti). Mancano grafici e costi stimati. 2026-06-19 |
 | 4.2.2 | Sezione Contatti: lista, ricerca, dettaglio conversazione | `P1` | 3 | ⬜ | |
-| 4.2.3 | Sezione Automazioni: attiva/disattiva flussi, configura parametri | `P1` | 3 | ⬜ | Toggle on/off per flusso |
+| 4.2.3 | Sezione Automazioni: attiva/disattiva flussi, configura parametri | `P1` | 3 | 🟡 | Livewire `Automations`: toggle on/off dei 3 flussi (crea/aggiorna `Automation` per-tenant). Manca la configurazione parametri (testi/offset/template). 2026-06-19 |
 | 4.2.4 | Sezione Appuntamenti: CRUD manuale + import CSV | `P2` | 3 | ⬜ | Per chi non ha gestionale |
 | 4.2.5 | Log messaggi: cronologia completa con status (sent/delivered/read/failed) | `P1` | 2 | ⬜ | Filtri per data, contatto, tipo |
 | 4.2.6 | Sezione Billing: piano attivo, conteggio messaggi, upgrade | `P2` | 3 | ⬜ | Per MVP basta mostrare il piano |
