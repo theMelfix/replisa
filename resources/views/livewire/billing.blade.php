@@ -34,6 +34,33 @@
             </div>
         @endif
 
+        {{-- Utilizzo del mese corrente --}}
+        @if ($usage)
+            @php($contactsLimit = $currentPlanKey ? ($plans[$currentPlanKey]['limits']['contacts'] ?? null) : null)
+            <div class="mb-8 bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
+                <div class="flex items-baseline justify-between mb-4">
+                    <h2 class="font-semibold text-gray-900 dark:text-gray-100">Utilizzo</h2>
+                    <span class="text-sm text-gray-500 dark:text-gray-400 capitalize">{{ $usage['period_label'] }}</span>
+                </div>
+                <div class="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                        <div class="text-3xl font-bold text-gray-900 dark:text-gray-100">{{ number_format($usage['sent'], 0, ',', '.') }}</div>
+                        <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">Messaggi inviati</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-gray-900 dark:text-gray-100">{{ number_format($usage['received'], 0, ',', '.') }}</div>
+                        <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">Messaggi ricevuti</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold {{ $contactsLimit && $usage['contacts'] > $contactsLimit ? 'text-amber-600' : 'text-gray-900 dark:text-gray-100' }}">
+                            {{ number_format($usage['contacts'], 0, ',', '.') }}<span class="text-base font-medium text-gray-400">/{{ $contactsLimit ? number_format($contactsLimit, 0, ',', '.') : '∞' }}</span>
+                        </div>
+                        <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">Contatti</div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         {{-- Griglia piani --}}
         <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             @foreach ($plans as $key => $plan)

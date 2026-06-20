@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Message;
 use App\Models\Tenant;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -94,6 +95,32 @@ class Billing extends Component
             'plans' => config('plans.plans'),
             'subscription' => $subscription,
             'currentPriceId' => $subscription?->stripe_price,
+            'usage' => $tenant ? $this->usage($tenant) : null,
         ]);
+    }
+
+    /**
+     * Conteggio di utilizzo del mese corrente (E4.2.6). Periodo = mese di
+     * calendario; il modello di costo Meta è per-conversazione, ma per la
+     * dashboard cliente conta soprattutto il volume di messaggi.
+     *
+     * @return array{period_label: string, sent: int, received: int, contacts: int}
+     */
+    protected function usage(Tenant $tenant): array
+    {
+        $periodStart = now()->startOfMonth();
+
+        return [
+            'period_label' => $periodStart->translatedFormat('F Y'),
+            'sent' => $tenant->messages()
+                ->where('direction', Message::DIRECTION_OUTBOUND)
+                ->where('created_at', '>=', $periodStart)
+                ->count(),
+            'received' => $tenant->messages()
+                ->where('direction', Message::DIRECTION_INBOUND)
+                ->where('created_at', '>=', $periodStart)
+                ->count(),
+            'contacts' => $tenant->contacts()->count(),
+        ];
     }
 }

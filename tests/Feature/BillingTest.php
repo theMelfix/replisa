@@ -48,6 +48,23 @@ it('mostra un toast se il piano non ha un price id configurato', function () {
     expect($this->tenant->fresh()->subscriptions()->count())->toBe(0);
 });
 
+it('conta i messaggi del mese e i contatti', function () {
+    $this->actingAs($this->owner);
+
+    $contact = $this->tenant->contacts()->create(['phone' => '393331110001', 'name' => 'Anna']);
+
+    $this->tenant->messages()->create(['contact_id' => $contact->id, 'direction' => App\Models\Message::DIRECTION_OUTBOUND, 'type' => 'text', 'content' => ['body' => 'a'], 'status' => 'sent']);
+    $this->tenant->messages()->create(['contact_id' => $contact->id, 'direction' => App\Models\Message::DIRECTION_OUTBOUND, 'type' => 'text', 'content' => ['body' => 'b'], 'status' => 'sent']);
+    $this->tenant->messages()->create(['contact_id' => $contact->id, 'direction' => App\Models\Message::DIRECTION_INBOUND, 'type' => 'text', 'content' => ['body' => 'c'], 'status' => 'received']);
+
+    // Messaggio del mese scorso: non deve essere conteggiato.
+    $old = $this->tenant->messages()->create(['contact_id' => $contact->id, 'direction' => App\Models\Message::DIRECTION_OUTBOUND, 'type' => 'text', 'content' => ['body' => 'old'], 'status' => 'sent']);
+    $old->forceFill(['created_at' => now()->subMonthNoOverflow()->startOfMonth()])->save();
+
+    Livewire::test(Billing::class)
+        ->assertViewHas('usage', fn ($u) => $u['sent'] === 2 && $u['received'] === 1 && $u['contacts'] === 1);
+});
+
 it('non mostra il link abbonamento al super-admin', function () {
     $admin = User::create([
         'tenant_id' => null,
