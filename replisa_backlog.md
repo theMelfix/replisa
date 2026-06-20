@@ -169,7 +169,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 | 3.1.4 | Gestione risposte ai bottoni (routing verso azione corretta) | `P1` | 3 | ✅ | `handleButtonReply()`: id namespaced `welcome:<action>`, risposta da `config.replies[action]`. 2026-06-09 |
 | 3.1.5 | Opt-in tracking: salvare consenso esplicito del contatto | `P0` | 1 | ✅ | `recordOptIn()` al primo contatto (`opted_in`+`opted_in_at`, idempotente). Marketing richiederà opt-in dedicato. 2026-06-09 |
 
-### E3.2 — Reminder Appuntamento
+### E3.2 — Promemoria & Scadenze (ex Reminder Appuntamento)
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
@@ -178,8 +178,11 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 | 3.2.3 | Invio reminder con bottoni "✅ Confermo" / "❌ Disdici" | `P0` | 2 | ✅ | `remind()` invia il template (i bottoni quick-reply fanno parte del template 3.2.1) e segna `reminded_at`. Fallimenti loggati senza marcare reminded_at → retry. 2026-06-10 |
 | 3.2.4 | Gestione risposta: aggiornare stato appuntamento su DB | `P1` | 2 | ✅ | `handleButtonReply()` su messaggi inbound tipo `button`: `CONFIRM`→confirmed / `CANCEL`→cancelled sul prossimo appuntamento scheduled del contatto. Agganciato a `ProcessWhatsAppWebhook`. 2026-06-10 |
 | 3.2.5 | Endpoint API per inserimento appuntamenti (da gestionale esterno) | `P1` | 2 | ⬜ | Differito: dipende da auth API (Sanctum, E4.3.1). Da fare insieme a E4.3 |
+| 3.2.6 | Generalizzare in "Promemoria & Scadenze": scadenze ricorrenti senza conferma (IMU/730/rinnovi) | `P1` | 3 | ⬜ | Engine di reminder generici oltre gli appuntamenti (es. CAF/patronato). Prodotto già rinominato in UI/landing. 2026-06-21 |
 
-### E3.3 — Richiesta Recensione
+### E3.3 — Richiesta Recensione (add-on)
+
+> **Nota (2026-06-21):** non più flusso core — venduto come **add-on Recensioni Google** (+€19/mese, incluso in Business). Da fare: gating dell'add-on (attivo solo se acquistato) e UI di acquisto.
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
@@ -187,6 +190,14 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 | 3.3.2 | Job schedulato: invia richiesta 24h dopo visita/appuntamento completato | `P0` | 2 | ✅ | `App\Services\Automation\ReviewRequest` + command `replisa:send-review-requests` schedulato `->hourly()`. `dispatchDue()` trova gli appuntamenti `completed` con `review_requested=false` e `scheduled_at <= now-delay` (delay default 24h, configurabile). Solo verso contatti `opted_in`. 2026-06-17 |
 | 3.3.3 | Gestione risposta: tracking chi ha cliccato / risposto | `P2` | 1 | ⬜ | Differito: i click sul button URL del template non passano dal webhook Meta. Servirà uno short-link tracciato (o quick-reply) — rivalutare con analytics E4.2.1 |
 | 3.3.4 | Rate limiting: non inviare più di 1 richiesta recensione per contatto ogni 30 giorni | `P1` | 1 | ✅ | `recentlyRequested()`: nessuna nuova richiesta se un template recensione (non `failed`) è già partito al contatto entro `rate_limit_days` (default 30). Appuntamento saltato comunque marcato `review_requested` per non rivalutarlo. 2026-06-17 |
+
+### E3.4 — Campagne e comunicazioni (nuovo prodotto core)
+
+| # | Task | Priorità | SP | Stato | Note |
+|---|------|:--------:|:--:|:-----:|------|
+| 3.4.1 | Prodotto/flusso "Campagne" in UI + landing | `P1` | 1 | 🟡 | `Automation::TYPE_CAMPAIGN`, card landing e toggle Automazioni. Engine a parte. 2026-06-21 |
+| 3.4.2 | Engine invio a liste/segmenti di contatti | `P1` | 5 | ⬜ | Compositore messaggio + selezione segmento (filtri su contatti) + invio batch via template MARKETING (opt-in) con throttling. Casi d'uso: avvisi/promozioni, scadenze collettive (es. IMU per CAF) |
+| 3.4.3 | Segmentazione contatti (tag/filtri) | `P2` | 3 | ⬜ | Base per targettizzare le campagne |
 
 ---
 
@@ -234,7 +245,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 5.1.1 | Pagina su replisa.com (dominio dedicato) | `P0` | 3 | ✅ | Landing v1: hero, 3 automazioni, prezzi (4 piani), CTA demo, footer legale. Tailwind/Vite. 2026-06-19 |
+| 5.1.1 | Pagina su replisa.com (dominio dedicato) | `P0` | 3 | ✅ | Landing v1: hero, 3 automazioni (Benvenuto/Promemoria&Scadenze/Campagne), prezzi aggiornati 29/69/129/249 + add-on Recensioni €19, CTA demo, footer legale. Tailwind/Vite. 2026-06-19 (prodotti/prezzi rivisti 2026-06-21) |
 | 5.1.2 | Form contatto / Calendly embed per prenotare chiamata | `P0` | 1 | ⬜ | Per ora CTA `mailto:` — da sostituire con form/Calendly |
 | 5.1.3 | SEO base: meta tags, Open Graph, structured data | `P1` | 1 | 🟡 | Title/description/OG fatti in landing; manca structured data (JSON-LD) |
 | 5.1.4 | Cookie banner GDPR | `P1` | 1 | ⬜ | Hai già esperienza da giovannimelfi.com |
