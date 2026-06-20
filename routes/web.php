@@ -3,6 +3,7 @@
 use App\Livewire\Admin\Tenants;
 use App\Livewire\Appointments;
 use App\Livewire\Automations;
+use App\Livewire\Billing;
 use App\Livewire\Contacts;
 use App\Livewire\Dashboard;
 use App\Livewire\Messages;
@@ -35,6 +36,10 @@ Route::get('messages', Messages::class)
 Route::get('appointments', Appointments::class)
     ->middleware(['auth', 'verified'])
     ->name('appointments');
+
+Route::get('billing', Billing::class)
+    ->middleware(['auth', 'verified'])
+    ->name('billing');
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])
