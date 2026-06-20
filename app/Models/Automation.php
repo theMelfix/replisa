@@ -17,6 +17,8 @@ class Automation extends Model
 
     public const TYPE_APPOINTMENT_REMINDER = 'appointment_reminder';
 
+    public const TYPE_CAMPAIGN = 'campaign';
+
     public const TYPE_REVIEW_REQUEST = 'review_request';
 
     protected $fillable = [

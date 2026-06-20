@@ -21,7 +21,7 @@ return [
 
         'starter' => [
             'name' => 'Starter',
-            'price' => 14,
+            'price' => 29,
             'stripe_price_id' => env('STRIPE_PRICE_STARTER'),
             'limits' => [
                 'contacts' => 500,
@@ -31,7 +31,7 @@ return [
 
         'base' => [
             'name' => 'Base',
-            'price' => 39,
+            'price' => 69,
             'stripe_price_id' => env('STRIPE_PRICE_BASE'),
             'limits' => [
                 'contacts' => 2000,
@@ -41,7 +41,7 @@ return [
 
         'pro' => [
             'name' => 'Pro',
-            'price' => 79,
+            'price' => 129,
             'stripe_price_id' => env('STRIPE_PRICE_PRO'),
             'limits' => [
                 'contacts' => null,
@@ -51,12 +51,27 @@ return [
 
         'business' => [
             'name' => 'Business',
-            'price' => 149,
+            'price' => 249,
             'stripe_price_id' => env('STRIPE_PRICE_BUSINESS'),
             'limits' => [
                 'contacts' => null,
                 'automations' => null,
             ],
+        ],
+
+    ],
+
+    /*
+    | Servizi aggiuntivi (add-on) acquistabili separatamente o inclusi in alcuni
+    | piani. `included_in`: chiavi piano che lo comprendono senza costo extra.
+    */
+    'addons' => [
+
+        'reviews' => [
+            'name' => 'Recensioni Google',
+            'price' => 19,
+            'stripe_price_id' => env('STRIPE_PRICE_REVIEWS_ADDON'),
+            'included_in' => ['business'],
         ],
 
     ],
