@@ -33,8 +33,8 @@ it('mostra i tre flussi a un owner', function () {
     $this->get('/automations')
         ->assertOk()
         ->assertSee('Benvenuto automatico')
-        ->assertSee('Promemoria appuntamenti')
-        ->assertSee('Richiesta recensione');
+        ->assertSee('Promemoria')
+        ->assertSee('Campagne e comunicazioni');
 });
 
 it('attiva un flusso creando l\'automation per il tenant', function () {

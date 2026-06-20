@@ -51,7 +51,7 @@
                 Automatizza WhatsApp e fai tornare i tuoi clienti
             </h1>
             <p class="mt-6 text-lg text-gray-600 max-w-2xl mx-auto">
-                Replisa risponde, ricorda gli appuntamenti e chiede recensioni al posto tuo — sul canale che i tuoi clienti usano davvero. Meno lavoro manuale, più tempo per la tua attività.
+                Replisa risponde ai clienti, ricorda appuntamenti e scadenze, e invia comunicazioni al posto tuo — sul canale che i tuoi clienti usano davvero. Meno lavoro manuale, più tempo per la tua attività.
             </p>
             <div class="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
                 <a href="{{ Route::has('register') ? route('register') : '#prezzi' }}" class="inline-flex items-center justify-center rounded-lg bg-green-600 px-6 py-3 text-white font-semibold hover:bg-green-700">Inizia ora</a>
@@ -73,15 +73,19 @@
             </div>
             <div class="rounded-2xl border border-gray-100 p-8 shadow-sm">
                 <div class="h-12 w-12 rounded-xl bg-green-100 text-green-700 flex items-center justify-center text-2xl">⏰</div>
-                <h3 class="mt-5 text-lg font-semibold text-gray-900">Promemoria appuntamenti</h3>
-                <p class="mt-2 text-gray-600">Ricorda l'appuntamento a -24h e -2h con bottoni Conferma / Disdici. Meno assenze, agenda sotto controllo.</p>
+                <h3 class="mt-5 text-lg font-semibold text-gray-900">Promemoria &amp; Scadenze</h3>
+                <p class="mt-2 text-gray-600">Ricorda appuntamenti e scadenze importanti (IMU, 730, rinnovi) al momento giusto, con o senza conferma. Meno dimenticanze, più puntualità.</p>
             </div>
             <div class="rounded-2xl border border-gray-100 p-8 shadow-sm">
-                <div class="h-12 w-12 rounded-xl bg-green-100 text-green-700 flex items-center justify-center text-2xl">⭐</div>
-                <h3 class="mt-5 text-lg font-semibold text-gray-900">Richiesta recensione</h3>
-                <p class="mt-2 text-gray-600">Dopo il servizio, Replisa chiede una recensione Google al cliente giusto, al momento giusto — senza spam.</p>
+                <div class="h-12 w-12 rounded-xl bg-green-100 text-green-700 flex items-center justify-center text-2xl">📣</div>
+                <h3 class="mt-5 text-lg font-semibold text-gray-900">Campagne e comunicazioni</h3>
+                <p class="mt-2 text-gray-600">Invia comunicazioni e promozioni a liste o segmenti di contatti: avvisi, offerte e scadenze collettive, in pochi clic.</p>
             </div>
         </div>
+
+        <p class="mt-10 text-center text-sm text-gray-500">
+            Vuoi più recensioni? <span class="font-semibold text-gray-700">Richiesta recensione Google</span> è disponibile come add-on.
+        </p>
     </section>
 
     {{-- Prezzi --}}
@@ -92,10 +96,10 @@
 
             <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 @foreach ([
-                    ['Starter', 14, 'Per iniziare', ['1 automazione', 'Fino a 500 contatti', 'Supporto email']],
-                    ['Base', 39, 'Il più scelto', ['Tutte le automazioni', 'Fino a 2.000 contatti', 'Dashboard completa']],
-                    ['Pro', 79, 'Per chi cresce', ['Contatti illimitati', 'API integrazioni', 'Supporto prioritario']],
-                    ['Business', 149, 'Su misura', ['Multi-operatore', 'Onboarding dedicato', 'SLA dedicato']],
+                    ['Starter', 29, 'Per iniziare', ['1 automazione', 'Fino a 500 contatti', 'Supporto email']],
+                    ['Base', 69, 'Il più scelto', ['Tutte le automazioni', 'Fino a 2.000 contatti', 'Dashboard completa']],
+                    ['Pro', 129, 'Per chi cresce', ['Contatti illimitati', 'API integrazioni', 'Multi-operatore']],
+                    ['Business', 249, 'Su misura', ['Tutto del piano Pro', 'Recensioni Google incluse', 'Onboarding + SLA dedicati']],
                 ] as [$nome, $prezzo, $tag, $features])
                     <div class="rounded-2xl bg-white border @if($nome==='Base') border-green-500 ring-2 ring-green-500 @else border-gray-200 @endif p-6 flex flex-col">
                         <div class="flex items-center justify-between">
@@ -113,6 +117,10 @@
                     </div>
                 @endforeach
             </div>
+
+            <p class="mt-8 text-center text-sm text-gray-500">
+                Add-on <span class="font-semibold text-gray-700">Recensioni Google</span> +€19/mese — incluso nel piano Business.
+            </p>
         </div>
     </section>
 

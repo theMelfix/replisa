@@ -26,14 +26,14 @@ class Automations extends Component
             'trigger' => 'inbound',
         ],
         Automation::TYPE_APPOINTMENT_REMINDER => [
-            'label' => 'Promemoria appuntamenti',
-            'desc' => 'Reminder a -24h e -2h con conferma/disdetta.',
+            'label' => 'Promemoria & Scadenze',
+            'desc' => 'Promemoria automatici di appuntamenti e scadenze (IMU, 730, rinnovi), con o senza conferma.',
             'trigger' => 'schedule',
         ],
-        Automation::TYPE_REVIEW_REQUEST => [
-            'label' => 'Richiesta recensione',
-            'desc' => 'Richiesta recensione dopo un appuntamento completato.',
-            'trigger' => 'schedule',
+        Automation::TYPE_CAMPAIGN => [
+            'label' => 'Campagne e comunicazioni',
+            'desc' => 'Invii programmati a liste o segmenti di contatti: promozioni, avvisi e comunicazioni massive.',
+            'trigger' => 'manual',
         ],
     ];
 
