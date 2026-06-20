@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Exceptions\TenantContextException;
 use App\Models\Automation;
 use App\Models\Scopes\TenantScope;
+use App\Support\PlanLimits;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -42,8 +43,21 @@ class Automations extends Component
             return;
         }
 
+        $tenant = auth()->user()?->tenant;
+
         try {
             $automation = Automation::where('type', $type)->first();
+
+            $activating = $automation ? ! $automation->active : true;
+
+            // Enforcement limiti di piano (E4.2.6): blocca l'attivazione di una
+            // nuova automazione oltre il numero consentito dal piano.
+            if ($activating && $tenant && ! PlanLimits::for($tenant)->canActivateAnotherAutomation()) {
+                $limit = PlanLimits::for($tenant)->automationsLimit();
+                $this->dispatch('toast', type: 'error', message: "Il tuo piano consente fino a {$limit} automazioni attive. Passa a un piano superiore per attivarne altre.");
+
+                return;
+            }
 
             if ($automation) {
                 $automation->update(['active' => ! $automation->active]);

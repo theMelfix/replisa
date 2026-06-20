@@ -36,7 +36,6 @@
 
         {{-- Utilizzo del mese corrente --}}
         @if ($usage)
-            @php($contactsLimit = $currentPlanKey ? ($plans[$currentPlanKey]['limits']['contacts'] ?? null) : null)
             <div class="mb-8 bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
                 <div class="flex items-baseline justify-between mb-4">
                     <h2 class="font-semibold text-gray-900 dark:text-gray-100">Utilizzo</h2>

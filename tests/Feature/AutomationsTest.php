@@ -79,6 +79,18 @@ it('mostra un toast e non crea nulla per un utente senza tenant (super-admin)', 
     expect(Automation::withoutGlobalScopes()->count())->toBe(0);
 });
 
+it('blocca l\'attivazione oltre il limite di automazioni del piano', function () {
+    // Tenant senza abbonamento → piano default Starter (1 automazione attiva).
+    $this->actingAs($this->owner);
+
+    $component = Livewire::test(Automations::class);
+    $component->call('toggle', Automation::TYPE_WELCOME);
+    $component->call('toggle', Automation::TYPE_APPOINTMENT_REMINDER)
+        ->assertDispatched('toast');
+
+    expect(Automation::withoutGlobalScopes()->where('active', true)->count())->toBe(1);
+});
+
 it('ignora tipi di flusso sconosciuti', function () {
     $this->actingAs($this->owner);
 
