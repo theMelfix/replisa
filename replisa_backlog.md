@@ -212,7 +212,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 | 4.2.3 | Sezione Automazioni: attiva/disattiva flussi, configura parametri | `P1` | 3 | 🟡 | Livewire `Automations`: toggle on/off dei 3 flussi (crea/aggiorna `Automation` per-tenant). Hardening: backstop `tenant_id` (`TenantContextException`) + sistema toast in-app `<x-toast-hub />` per le eccezioni (niente più 500/`1364`). Manca la configurazione parametri (testi/offset/template). 2026-06-19 |
 | 4.2.4 | Sezione Appuntamenti: CRUD manuale + import CSV | `P2` | 3 | ✅ | Livewire `Appointments`: form nuovo (crea contatto), cambio stato, elimina, import CSV (telefono,nome,data). Scoped per-tenant. 2026-06-19 |
 | 4.2.5 | Log messaggi: cronologia completa con status (sent/delivered/read/failed) | `P1` | 2 | 🟡 | Livewire `Messages`: cronologia paginata, badge stato, ricerca contatto + filtri direzione/stato. Mancano filtri per data e tipo. 2026-06-19 |
-| 4.2.6 | Sezione Billing: piano attivo, conteggio messaggi, upgrade | `P2` | 3 | ⬜ | Per MVP basta mostrare il piano |
+| 4.2.6 | Sezione Billing: piano attivo, conteggio messaggi, upgrade | `P2` | 3 | 🟡 | Stripe via **Laravel Cashier** (Billable su `Tenant`). Pagina `/billing`: 4 piani → Stripe Checkout ospitato + Billing Portal per gestione/disdetta; webhook auto-registrato. `config/plans.php` (Price ID da `.env`). Mancano: setup prodotti/prezzi lato Stripe, conteggio messaggi e enforcement limiti. 2026-06-20 |
 
 ### E4.3 — API Pubblica per Integrazioni
 
@@ -269,7 +269,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 |---|------|:--------:|:--:|:-----:|------|
 | 6.2.1 | Processo onboarding documentato (checklist step-by-step) | `P1` | 2 | ⬜ | Registrazione WABA, verifica numero, setup template |
 | 6.2.2 | Contratto di servizio / T&C base | `P1` | 2 | ⬜ | Consulta commercialista per P.IVA |
-| 6.2.3 | Setup account cliente sulla piattaforma | `P0` | 1 | ⬜ | |
+| 6.2.3 | Setup account cliente sulla piattaforma | `P0` | 1 | 🟡 | Form `/whatsapp` (Livewire `WhatsAppSettings`): il tenant collega il numero inserendo `phone_number_id`/`waba_id`/`access_token` (criptato), con "Verifica connessione" live sulla Graph API. Interim manuale verso l'Embedded Signup (ICE-11). 2026-06-20 |
 | 6.2.4 | Personalizzazione template messaggi per il cliente | `P1` | 1 | ⬜ | |
 | 6.2.5 | Raccolta feedback post-onboarding | `P2` | 1 | ⬜ | Base per testimonial |
 

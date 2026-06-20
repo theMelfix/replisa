@@ -7,6 +7,7 @@ use App\Livewire\Billing;
 use App\Livewire\Contacts;
 use App\Livewire\Dashboard;
 use App\Livewire\Messages;
+use App\Livewire\WhatsAppSettings;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
@@ -40,6 +41,10 @@ Route::get('appointments', Appointments::class)
 Route::get('billing', Billing::class)
     ->middleware(['auth', 'verified'])
     ->name('billing');
+
+Route::get('whatsapp', WhatsAppSettings::class)
+    ->middleware(['auth', 'verified'])
+    ->name('whatsapp');
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])

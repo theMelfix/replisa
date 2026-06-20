@@ -79,6 +79,10 @@ new class extends Component
                         </x-dropdown-link>
 
                         @unless (auth()->user()->isSuperAdmin())
+                            <x-dropdown-link :href="route('whatsapp')" wire:navigate>
+                                {{ __('Account WhatsApp') }}
+                            </x-dropdown-link>
+
                             <x-dropdown-link :href="route('billing')" wire:navigate>
                                 {{ __('Abbonamento') }}
                             </x-dropdown-link>
@@ -127,6 +131,10 @@ new class extends Component
                 </x-responsive-nav-link>
 
                 @unless (auth()->user()->isSuperAdmin())
+                    <x-responsive-nav-link :href="route('whatsapp')" wire:navigate>
+                        {{ __('Account WhatsApp') }}
+                    </x-responsive-nav-link>
+
                     <x-responsive-nav-link :href="route('billing')" wire:navigate>
                         {{ __('Abbonamento') }}
                     </x-responsive-nav-link>
