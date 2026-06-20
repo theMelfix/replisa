@@ -15,6 +15,16 @@ class Tenant extends Model
 
     protected $fillable = [
         'name',
+        'vat_number',
+        'tax_code',
+        'address',
+        'city',
+        'postal_code',
+        'province',
+        'country',
+        'sdi_code',
+        'pec',
+        'vat_validated_at',
         'phone_number_id',
         'waba_id',
         'access_token',
@@ -31,6 +41,7 @@ class Tenant extends Model
         return [
             'access_token' => 'encrypted', // ADR-003: criptato a riposo
             'active' => 'boolean',
+            'vat_validated_at' => 'datetime',
         ];
     }
 
