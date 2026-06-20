@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Appointment;
 use App\Models\Contact;
+use App\Support\PlanLimits;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
@@ -40,10 +41,16 @@ class Appointments extends Component
             'scheduled_at' => ['required', 'date'],
         ]);
 
-        $contact = Contact::firstOrCreate(
-            ['phone' => preg_replace('/\D+/', '', $data['phone'])],
-            ['name' => $data['name'] ?: null],
-        );
+        $phone = preg_replace('/\D+/', '', $data['phone']);
+        $contact = Contact::where('phone', $phone)->first();
+
+        // Enforcement limiti di piano (E4.2.6): un contatto nuovo oltre il limite
+        // del piano viene bloccato (i contatti già esistenti restano utilizzabili).
+        if (! $contact && ! $this->canAddContact()) {
+            return;
+        }
+
+        $contact ??= Contact::create(['phone' => $phone, 'name' => $data['name'] ?: null]);
 
         Appointment::create([
             'contact_id' => $contact->id,
@@ -53,6 +60,20 @@ class Appointments extends Component
 
         $this->reset('phone', 'name', 'scheduled_at');
         $this->resetPage();
+    }
+
+    /** Verifica il limite contatti del piano; in caso emette un toast. */
+    private function canAddContact(): bool
+    {
+        $tenant = auth()->user()?->tenant;
+
+        if (! $tenant || PlanLimits::for($tenant)->canAddContacts()) {
+            return true;
+        }
+
+        $this->dispatch('toast', type: 'error', message: 'Hai raggiunto il limite di contatti del tuo piano ('.PlanLimits::for($tenant)->contactsLimit().'). Passa a un piano superiore per aggiungerne altri.');
+
+        return false;
     }
 
     public function updateStatus(int $id, string $status): void
@@ -81,6 +102,10 @@ class Appointments extends Component
 
         $rows = array_map('str_getcsv', file($this->csv->getRealPath(), FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES));
         $imported = 0;
+        $skippedLimit = 0;
+
+        $tenant = auth()->user()?->tenant;
+        $limits = $tenant ? PlanLimits::for($tenant) : null;
 
         foreach ($rows as $row) {
             $phone = preg_replace('/\D+/', '', $row[0] ?? '');
@@ -93,7 +118,20 @@ class Appointments extends Component
                 continue;
             }
 
-            $contact = Contact::firstOrCreate(['phone' => $phone], ['name' => trim($row[1] ?? '') ?: null]);
+            $contact = Contact::where('phone', $phone)->first();
+
+            // Enforcement limiti di piano (E4.2.6): salta i contatti nuovi oltre
+            // il limite, importando comunque gli appuntamenti dei già esistenti.
+            if (! $contact) {
+                if ($limits && ! $limits->canAddContacts()) {
+                    $skippedLimit++;
+
+                    continue;
+                }
+
+                $contact = Contact::create(['phone' => $phone, 'name' => trim($row[1] ?? '') ?: null]);
+            }
+
             Appointment::create([
                 'contact_id' => $contact->id,
                 'scheduled_at' => $when,
@@ -103,7 +141,8 @@ class Appointments extends Component
         }
 
         $this->reset('csv');
-        $this->importMessage = "Importati {$imported} appuntamenti.";
+        $this->importMessage = "Importati {$imported} appuntamenti."
+            .($skippedLimit > 0 ? " {$skippedLimit} contatti saltati: limite del piano raggiunto." : '');
         $this->resetPage();
     }
 

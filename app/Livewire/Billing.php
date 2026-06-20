@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Message;
 use App\Models\Tenant;
+use App\Support\PlanLimits;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Livewire\Attributes\Layout;
@@ -96,6 +97,7 @@ class Billing extends Component
             'subscription' => $subscription,
             'currentPriceId' => $subscription?->stripe_price,
             'usage' => $tenant ? $this->usage($tenant) : null,
+            'contactsLimit' => $tenant ? PlanLimits::for($tenant)->contactsLimit() : null,
         ]);
     }
 

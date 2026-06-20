@@ -31,6 +31,24 @@ it('reindirizza gli ospiti al login', function () {
     $this->get('/appointments')->assertRedirect(route('login'));
 });
 
+it('blocca un contatto nuovo oltre il limite del piano', function () {
+    config(['plans.plans.starter.limits.contacts' => 1]);
+
+    Livewire::test(Appointments::class)
+        ->set('phone', '393331110001')->set('name', 'Anna')->set('scheduled_at', '2026-06-25T15:30')
+        ->call('create');
+
+    expect($this->tenant->contacts()->count())->toBe(1);
+
+    Livewire::test(Appointments::class)
+        ->set('phone', '393339990002')->set('name', 'Bea')->set('scheduled_at', '2026-06-26T10:00')
+        ->call('create')
+        ->assertDispatched('toast');
+
+    expect($this->tenant->contacts()->count())->toBe(1)
+        ->and(Appointment::count())->toBe(1);
+});
+
 it('crea un appuntamento e il contatto associato per il tenant', function () {
     Livewire::test(Appointments::class)
         ->set('phone', '+39 333 444 5566')

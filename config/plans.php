@@ -14,6 +14,9 @@
 
 return [
 
+    // Piano applicato ai tenant senza abbonamento attivo (onboarding/free tier).
+    'default' => 'starter',
+
     'plans' => [
 
         'starter' => [
