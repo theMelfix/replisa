@@ -50,6 +50,10 @@ new class extends Component
                         {{ __('Automazioni') }}
                     </x-nav-link>
 
+                    <x-nav-link :href="route('campaigns')" :active="request()->routeIs('campaigns')" wire:navigate>
+                        {{ __('Campagne') }}
+                    </x-nav-link>
+
                     @if (auth()->user()->isSuperAdmin())
                         <x-nav-link :href="route('admin.tenants')" :active="request()->routeIs('admin.tenants')" wire:navigate>
                             {{ __('Tenant') }}

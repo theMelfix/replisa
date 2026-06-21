@@ -5,6 +5,7 @@ use App\Livewire\Admin\Tenants;
 use App\Livewire\Appointments;
 use App\Livewire\Automations;
 use App\Livewire\Billing;
+use App\Livewire\Campaigns;
 use App\Livewire\Contacts;
 use App\Livewire\Dashboard;
 use App\Livewire\Messages;
@@ -26,6 +27,10 @@ Route::get('dashboard', Dashboard::class)
 Route::get('automations', Automations::class)
     ->middleware(['auth', 'verified', 'tenant.active'])
     ->name('automations');
+
+Route::get('campaigns', Campaigns::class)
+    ->middleware(['auth', 'verified', 'tenant.active'])
+    ->name('campaigns');
 
 Route::get('contacts', Contacts::class)
     ->middleware(['auth', 'verified', 'tenant.active'])
