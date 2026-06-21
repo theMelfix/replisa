@@ -67,6 +67,23 @@ it('il tenant attiva un promemoria su una scadenza nazionale', function () {
         ->and($reminder->active)->toBeTrue();
 });
 
+it('le scadenze nazionali sono filtrate per settore', function () {
+    Deadline::create(['tenant_id' => null, 'sector' => 'commercialista', 'name' => '730 scadenza', 'due_date' => now()->addDays(40), 'active' => true]);
+
+    // Commercialista: vede la scadenza fiscale.
+    $this->tenant->update(['sector' => 'commercialista']);
+    $this->actingAs($this->owner);
+    $this->get('/scadenze')->assertOk()->assertSee('730 scadenza');
+
+    // Dentista: NON la vede (ma vede comunque le universali, come IMU acconto del beforeEach).
+    $dentista = Tenant::create(['name' => 'Dentista', 'sector' => 'studio_medico', 'active' => true]);
+    $dentistaUser = User::create(['tenant_id' => $dentista->id, 'name' => 'D', 'email' => 'd@example.com', 'password' => bcrypt('x')]);
+    $dentistaUser->assignRole(User::ROLE_OWNER);
+
+    $this->actingAs($dentistaUser);
+    $this->get('/scadenze')->assertOk()->assertSee('IMU acconto')->assertDontSee('730 scadenza');
+});
+
 it('il comando avvia una campagna per un promemoria dovuto', function () {
     Bus::fake();
 

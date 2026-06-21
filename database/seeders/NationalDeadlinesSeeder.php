@@ -25,7 +25,12 @@ class NationalDeadlinesSeeder extends Seeder
         foreach ($deadlines as [$name, $date]) {
             Deadline::updateOrCreate(
                 ['tenant_id' => null, 'name' => $name],
-                ['due_date' => $date, 'description' => 'Scadenza nazionale — verificare a ogni annuncio ufficiale', 'active' => true],
+                [
+                    'sector' => 'commercialista', // scadenze fiscali: rilevanti per commercialisti/CAF
+                    'due_date' => $date,
+                    'description' => 'Scadenza nazionale — verificare a ogni annuncio ufficiale',
+                    'active' => true,
+                ],
             );
         }
     }

@@ -65,7 +65,7 @@ class Deadlines extends Component
     {
         $tenant = auth()->user()?->tenant;
 
-        if (! $tenant || ! Deadline::visibleTo($tenant->id)->whereKey($deadlineId)->exists()) {
+        if (! $tenant || ! Deadline::visibleTo($tenant->id, $tenant->sector)->whereKey($deadlineId)->exists()) {
             $this->dispatch('toast', type: 'error', message: 'Scadenza non valida.');
 
             return;
@@ -116,7 +116,7 @@ class Deadlines extends Component
     {
         $tenant = auth()->user()?->tenant;
 
-        $deadlines = Deadline::visibleTo($tenant?->id)
+        $deadlines = Deadline::visibleTo($tenant?->id, $tenant?->sector)
             ->where('active', true)
             ->whereDate('due_date', '>=', today())
             ->orderBy('due_date')

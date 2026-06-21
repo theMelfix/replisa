@@ -29,6 +29,16 @@
                     <x-input-error :messages="$errors->get('newVatNumber')" class="mt-2" />
                 </div>
                 <div>
+                    <x-input-label for="newSector" value="Settore" />
+                    <select wire:model="newSector" id="newSector" class="block mt-1 w-full rounded-md border-gray-300 dark:bg-gray-900 dark:border-gray-700 text-sm">
+                        <option value="">— seleziona —</option>
+                        @foreach ($sectors as $key => $label)
+                            <option value="{{ $key }}">{{ $label }}</option>
+                        @endforeach
+                    </select>
+                    <x-input-error :messages="$errors->get('newSector')" class="mt-2" />
+                </div>
+                <div>
                     <x-input-label for="newOwnerName" value="Nome referente" />
                     <x-text-input wire:model="newOwnerName" id="newOwnerName" type="text" class="block mt-1 w-full" />
                     <x-input-error :messages="$errors->get('newOwnerName')" class="mt-2" />

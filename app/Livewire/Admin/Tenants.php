@@ -33,6 +33,8 @@ class Tenants extends Component
     // Form "Nuovo cliente" (censimento da admin).
     public string $newBusinessName = '';
 
+    public string $newSector = '';
+
     public string $newVatNumber = '';
 
     public string $newOwnerName = '';
@@ -55,6 +57,7 @@ class Tenants extends Component
 
         $validated = $this->validate([
             'newBusinessName' => ['required', 'string', 'max:255'],
+            'newSector' => ['required', 'in:'.implode(',', array_keys(config('sectors')))],
             'newVatNumber' => ['nullable', 'string', new ItalianVatChecksum, 'unique:tenants,vat_number'],
             'newOwnerName' => ['required', 'string', 'max:255'],
             'newOwnerEmail' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class.',email'],
@@ -70,6 +73,7 @@ class Tenants extends Component
         $user = DB::transaction(function () use ($validated): User {
             $tenant = Tenant::create([
                 'name' => $validated['newBusinessName'],
+                'sector' => $validated['newSector'],
                 'vat_number' => $validated['newVatNumber'] ?: null,
                 'manual_plan' => $validated['newPlan'] ?: null,
                 'manual_plan_expires_at' => $validated['newPlan'] && $validated['newPlanExpiry']
@@ -91,7 +95,7 @@ class Tenants extends Component
 
         $user->notify(new TenantInvitation);
 
-        $this->reset('newBusinessName', 'newVatNumber', 'newOwnerName', 'newOwnerEmail', 'newPlan', 'newPlanExpiry');
+        $this->reset('newBusinessName', 'newSector', 'newVatNumber', 'newOwnerName', 'newOwnerEmail', 'newPlan', 'newPlanExpiry');
         $this->dispatch('tenant-created');
         $this->dispatch('toast', type: 'success', message: "Cliente creato. Invito inviato a {$user->email}.");
     }
@@ -187,6 +191,7 @@ class Tenants extends Component
         return view('livewire.admin.tenants', [
             'tenants' => $tenants,
             'plans' => config('plans.plans'),
+            'sectors' => config('sectors'),
             'mrr' => $mrr,
         ]);
     }

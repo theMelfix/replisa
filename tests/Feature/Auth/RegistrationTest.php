@@ -27,6 +27,7 @@ function validRegistrationData(): array
 {
     return [
         'business_name' => 'Studio Rossi',
+        'sector' => 'commercialista',
         'vat_number' => '01809180886',
         'tax_code' => '',
         'address' => 'Via Roma 1',

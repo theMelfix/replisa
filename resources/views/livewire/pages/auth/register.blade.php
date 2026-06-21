@@ -16,6 +16,7 @@ use Livewire\Volt\Component;
 new #[Layout('layouts.guest')] class extends Component
 {
     public string $business_name = '';
+    public string $sector = '';
     public string $vat_number = '';
     public string $tax_code = '';
     public string $address = '';
@@ -42,6 +43,7 @@ new #[Layout('layouts.guest')] class extends Component
 
         $validated = $this->validate([
             'business_name' => ['required', 'string', 'max:255'],
+            'sector' => ['required', 'in:'.implode(',', array_keys(config('sectors')))],
             'vat_number' => ['required', 'string', new ItalianVatChecksum, 'unique:tenants,vat_number'],
             'tax_code' => ['nullable', 'string', 'max:16'],
             'address' => ['required', 'string', 'max:255'],
@@ -76,6 +78,7 @@ new #[Layout('layouts.guest')] class extends Component
         $user = DB::transaction(function () use ($validated, $viesValid) {
             $tenant = Tenant::create([
                 'name' => $validated['business_name'],
+                'sector' => $validated['sector'],
                 'vat_number' => $validated['vat_number'],
                 'tax_code' => $validated['tax_code'] ?: null,
                 'address' => $validated['address'],
@@ -117,6 +120,18 @@ new #[Layout('layouts.guest')] class extends Component
             <x-input-label for="business_name" value="Ragione sociale" />
             <x-text-input wire:model="business_name" id="business_name" class="block mt-1 w-full" type="text" name="business_name" required autofocus autocomplete="organization" />
             <x-input-error :messages="$errors->get('business_name')" class="mt-2" />
+        </div>
+
+        <!-- Settore -->
+        <div class="mt-4">
+            <x-input-label for="sector" value="Settore" />
+            <select wire:model="sector" id="sector" name="sector" required class="block mt-1 w-full rounded-md border-gray-300 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300 shadow-sm">
+                <option value="">— seleziona —</option>
+                @foreach (config('sectors') as $key => $label)
+                    <option value="{{ $key }}">{{ $label }}</option>
+                @endforeach
+            </select>
+            <x-input-error :messages="$errors->get('sector')" class="mt-2" />
         </div>
 
         <!-- Partita IVA -->

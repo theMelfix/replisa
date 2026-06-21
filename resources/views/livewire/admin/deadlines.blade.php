@@ -15,6 +15,15 @@
                 <x-text-input wire:model="due_date" id="due_date" type="date" class="block mt-1" />
                 <x-input-error :messages="$errors->get('due_date')" class="mt-2" />
             </div>
+            <div>
+                <x-input-label for="sector" value="Settore" />
+                <select wire:model="sector" id="sector" class="block mt-1 rounded-md border-gray-300 dark:bg-gray-900 dark:border-gray-700 text-sm">
+                    <option value="">Tutti i settori</option>
+                    @foreach ($sectors as $key => $label)
+                        <option value="{{ $key }}">{{ $label }}</option>
+                    @endforeach
+                </select>
+            </div>
             <x-primary-button>Aggiungi</x-primary-button>
         </form>
 
@@ -24,6 +33,7 @@
                 <thead class="text-xs uppercase text-gray-500 border-b dark:border-gray-700">
                     <tr>
                         <th class="py-3 px-4">Scadenza</th>
+                        <th class="py-3 px-4">Settore</th>
                         <th class="py-3 px-4">Data</th>
                         <th class="py-3 px-4">Stato</th>
                         <th class="py-3 px-4">Azioni</th>
@@ -33,6 +43,7 @@
                     @forelse ($deadlines as $deadline)
                         <tr class="border-b dark:border-gray-700" wire:key="nd-{{ $deadline->id }}">
                             <td class="py-3 px-4 font-medium">{{ $deadline->name }}</td>
+                            <td class="py-3 px-4 text-xs text-gray-500">{{ $deadline->sector ? ($sectors[$deadline->sector] ?? $deadline->sector) : 'Tutti' }}</td>
                             <td class="py-3 px-4">
                                 <div class="flex items-center gap-2">
                                     <input type="date" wire:model="dates.{{ $deadline->id }}" class="text-xs rounded border-gray-300 dark:bg-gray-900 dark:border-gray-700 py-1">
@@ -54,7 +65,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="4" class="py-4 text-center text-gray-500">Nessuna scadenza nazionale.</td></tr>
+                        <tr><td colspan="5" class="py-4 text-center text-gray-500">Nessuna scadenza nazionale.</td></tr>
                     @endforelse
                 </tbody>
             </table>
