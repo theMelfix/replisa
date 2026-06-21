@@ -3,9 +3,15 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Tenant;
+use App\Models\User;
+use App\Rules\ItalianVatChecksum;
+use App\Support\ItalianVat;
 use App\Support\PlanLimits;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -22,6 +28,69 @@ class Tenants extends Component
 
     /** @var array<int, string> scadenza opzionale (YYYY-MM-DD) della licenza, per tenant id */
     public array $licenseExpiry = [];
+
+    // Form "Nuovo cliente" (censimento da admin).
+    public string $newBusinessName = '';
+
+    public string $newVatNumber = '';
+
+    public string $newOwnerName = '';
+
+    public string $newOwnerEmail = '';
+
+    public string $newPassword = '';
+
+    public string $newPlan = '';
+
+    public string $newPlanExpiry = '';
+
+    /**
+     * Censimento manuale di un nuovo cliente (E5): crea il tenant e il suo
+     * utente owner, con eventuale licenza offline. La P.IVA è opzionale e, se
+     * presente, validata solo nel formato (l'admin è fidato: niente VIES).
+     */
+    public function createTenant(): void
+    {
+        $this->newVatNumber = ItalianVat::normalize($this->newVatNumber);
+
+        $validated = $this->validate([
+            'newBusinessName' => ['required', 'string', 'max:255'],
+            'newVatNumber' => ['nullable', 'string', new ItalianVatChecksum, 'unique:tenants,vat_number'],
+            'newOwnerName' => ['required', 'string', 'max:255'],
+            'newOwnerEmail' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class.',email'],
+            'newPassword' => ['required', 'string', Rules\Password::defaults()],
+            'newPlan' => ['nullable', 'in:'.implode(',', array_keys(config('plans.plans')))],
+            'newPlanExpiry' => ['nullable', 'date'],
+        ], attributes: [
+            'newBusinessName' => 'ragione sociale',
+            'newVatNumber' => 'Partita IVA',
+            'newOwnerName' => 'nome referente',
+            'newOwnerEmail' => 'email',
+            'newPassword' => 'password',
+        ]);
+
+        DB::transaction(function () use ($validated): void {
+            $tenant = Tenant::create([
+                'name' => $validated['newBusinessName'],
+                'vat_number' => $validated['newVatNumber'] ?: null,
+                'manual_plan' => $validated['newPlan'] ?: null,
+                'manual_plan_expires_at' => $validated['newPlan'] && $validated['newPlanExpiry']
+                    ? Carbon::parse($validated['newPlanExpiry'])->endOfDay()
+                    : null,
+            ]);
+
+            User::create([
+                'tenant_id' => $tenant->id,
+                'name' => $validated['newOwnerName'],
+                'email' => $validated['newOwnerEmail'],
+                'password' => Hash::make($validated['newPassword']),
+            ])->assignRole(User::ROLE_OWNER);
+        });
+
+        $this->reset('newBusinessName', 'newVatNumber', 'newOwnerName', 'newOwnerEmail', 'newPassword', 'newPlan', 'newPlanExpiry');
+        $this->dispatch('tenant-created');
+        $this->dispatch('toast', type: 'success', message: 'Cliente creato.');
+    }
 
     public function toggle(int $tenantId): void
     {

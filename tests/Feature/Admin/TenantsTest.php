@@ -128,6 +128,38 @@ it('un tenant attivo accede normalmente', function () {
     $this->get('/dashboard')->assertOk();
 });
 
+it('il super-admin crea un nuovo cliente con owner e licenza offline', function () {
+    $this->actingAs(makeUser(User::ROLE_SUPER_ADMIN));
+
+    Livewire::test(Tenants::class)
+        ->set('newBusinessName', 'Nuovo Studio')
+        ->set('newOwnerName', 'Mario')
+        ->set('newOwnerEmail', 'mario@example.com')
+        ->set('newPassword', 'password-123')
+        ->set('newPlan', 'base')
+        ->call('createTenant')
+        ->assertDispatched('toast');
+
+    $tenant = Tenant::where('name', 'Nuovo Studio')->first();
+    $owner = User::where('email', 'mario@example.com')->first();
+
+    expect($tenant)->not->toBeNull()
+        ->and($tenant->manual_plan)->toBe('base')
+        ->and($owner)->not->toBeNull()
+        ->and($owner->tenant_id)->toBe($tenant->id)
+        ->and($owner->hasRole(User::ROLE_OWNER))->toBeTrue();
+});
+
+it('la creazione cliente richiede ragione sociale ed email', function () {
+    $this->actingAs(makeUser(User::ROLE_SUPER_ADMIN));
+
+    Livewire::test(Tenants::class)
+        ->set('newBusinessName', '')
+        ->set('newOwnerEmail', '')
+        ->call('createTenant')
+        ->assertHasErrors(['newBusinessName', 'newOwnerEmail']);
+});
+
 it('il command crea un super-admin', function () {
     $this->artisan('replisa:create-admin', ['email' => 'boss@example.com'])
         ->expectsQuestion('Nome', 'Boss')
