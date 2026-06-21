@@ -107,6 +107,15 @@
                                 @if ($tenant->city)
                                     <div class="text-xs text-gray-400">{{ $tenant->city }} {{ $tenant->province ? '('.$tenant->province.')' : '' }}</div>
                                 @endif
+                                <div class="mt-2 flex items-center gap-1">
+                                    <select wire:model="sectorInput.{{ $tenant->id }}" class="text-xs rounded border-gray-300 dark:bg-gray-900 dark:border-gray-700 py-1">
+                                        <option value="">— settore —</option>
+                                        @foreach ($sectors as $key => $label)
+                                            <option value="{{ $key }}">{{ $label }}</option>
+                                        @endforeach
+                                    </select>
+                                    <button wire:click="updateSector({{ $tenant->id }})" class="text-xs text-green-700 hover:text-green-900">Salva</button>
+                                </div>
                             </td>
 
                             {{-- Piano effettivo + fonte --}}
