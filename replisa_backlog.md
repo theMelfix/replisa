@@ -280,7 +280,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 |---|------|:--------:|:--:|:-----:|------|
 | 6.2.1 | Processo onboarding documentato (checklist step-by-step) | `P1` | 2 | ⬜ | Registrazione WABA, verifica numero, setup template |
 | 6.2.2 | Contratto di servizio / T&C base | `P1` | 2 | ⬜ | Consulta commercialista per P.IVA |
-| 6.2.3 | Setup account cliente sulla piattaforma | `P0` | 1 | 🟡 | Form `/whatsapp` (Livewire `WhatsAppSettings`): il tenant collega il numero inserendo `phone_number_id`/`waba_id`/`access_token` (criptato), con "Verifica connessione" live sulla Graph API. Interim manuale verso l'Embedded Signup (ICE-11). 2026-06-20 |
+| 6.2.3 | Setup account cliente sulla piattaforma | `P0` | 1 | ✅ | Form `/whatsapp` (`WhatsAppSettings`) per collegare il numero (phone_number_id/waba_id/access_token criptato + verifica live). Censimento da admin: "Nuovo cliente" in `/admin/tenants` crea tenant + owner + licenza offline. 2026-06-20/21 |
 | 6.2.4 | Personalizzazione template messaggi per il cliente | `P1` | 1 | ⬜ | |
 | 6.2.5 | Raccolta feedback post-onboarding | `P2` | 1 | ⬜ | Base per testimonial |
 
