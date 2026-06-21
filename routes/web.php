@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\AcceptInvitation;
 use App\Livewire\Admin\Tenants;
 use App\Livewire\Appointments;
 use App\Livewire\Automations;
@@ -54,6 +55,11 @@ Route::view('profile', 'profile')
 Route::view('suspended', 'suspended')
     ->middleware(['auth'])
     ->name('suspended');
+
+// Attivazione account su invito (E5): URL firmato inviato via email dall'admin.
+Route::get('invito/{user}', AcceptInvitation::class)
+    ->middleware('signed')
+    ->name('invitation.accept');
 
 // Area super-admin (E4.1.4): gestione di tutti i tenant.
 Route::middleware(['auth', 'role:'.User::ROLE_SUPER_ADMIN])
