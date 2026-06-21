@@ -19,6 +19,8 @@ class Deadlines extends Component
 
     public string $due_date = '';
 
+    public string $sector = '';
+
     /** @var array<int, string> data (YYYY-MM-DD) per scadenza id, per la modifica inline */
     public array $dates = [];
 
@@ -34,16 +36,18 @@ class Deadlines extends Component
         $data = $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'due_date' => ['required', 'date'],
+            'sector' => ['nullable', 'in:'.implode(',', array_keys(config('sectors')))],
         ], attributes: ['due_date' => 'data']);
 
         Deadline::create([
             'tenant_id' => null,
+            'sector' => $data['sector'] ?: null,
             'name' => $data['name'],
             'due_date' => $data['due_date'],
             'active' => true,
         ]);
 
-        $this->reset('name', 'due_date');
+        $this->reset('name', 'due_date', 'sector');
         $this->dispatch('toast', type: 'success', message: 'Scadenza nazionale aggiunta.');
     }
 
@@ -74,6 +78,7 @@ class Deadlines extends Component
     {
         return view('livewire.admin.deadlines', [
             'deadlines' => Deadline::national()->orderBy('due_date')->get(),
+            'sectors' => config('sectors'),
         ]);
     }
 }

@@ -178,7 +178,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 | 3.2.3 | Invio reminder con bottoni "✅ Confermo" / "❌ Disdici" | `P0` | 2 | ✅ | `remind()` invia il template (i bottoni quick-reply fanno parte del template 3.2.1) e segna `reminded_at`. Fallimenti loggati senza marcare reminded_at → retry. 2026-06-10 |
 | 3.2.4 | Gestione risposta: aggiornare stato appuntamento su DB | `P1` | 2 | ✅ | `handleButtonReply()` su messaggi inbound tipo `button`: `CONFIRM`→confirmed / `CANCEL`→cancelled sul prossimo appuntamento scheduled del contatto. Agganciato a `ProcessWhatsAppWebhook`. 2026-06-10 |
 | 3.2.5 | Endpoint API per inserimento appuntamenti (da gestionale esterno) | `P1` | 2 | ⬜ | Differito: dipende da auth API (Sanctum, E4.3.1). Da fare insieme a E4.3 |
-| 3.2.6 | Generalizzare in "Promemoria & Scadenze": scadenze ricorrenti senza conferma (IMU/730/rinnovi) | `P1` | 3 | ✅ | `Deadline` (nazionali admin + proprie tenant) + `DeadlineReminder` + seeder 2026. Admin `/admin/deadlines`, tenant `/scadenze`, command `replisa:send-deadline-reminders` (avvia campagne agli opted-in). 2026-06-21 |
+| 3.2.6 | Generalizzare in "Promemoria & Scadenze": scadenze ricorrenti senza conferma (IMU/730/rinnovi) | `P1` | 3 | ✅ | `Deadline` (nazionali admin + proprie tenant) + `DeadlineReminder` + seeder 2026. Admin `/admin/deadlines`, tenant `/scadenze`, command `replisa:send-deadline-reminders` (avvia campagne agli opted-in). **Settori**: le nazionali sono filtrate per categoria attività (le fiscali solo ai commercialisti); `sector` su tenant/scadenza, richiesto in registrazione. 2026-06-21 |
 
 ### E3.3 — Richiesta Recensione (add-on)
 

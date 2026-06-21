@@ -136,6 +136,7 @@ it('il super-admin crea un nuovo cliente con owner, licenza offline e invio invi
 
     Livewire::test(Tenants::class)
         ->set('newBusinessName', 'Nuovo Studio')
+        ->set('newSector', 'commercialista')
         ->set('newOwnerName', 'Mario')
         ->set('newOwnerEmail', 'mario@example.com')
         ->set('newPlan', 'base')

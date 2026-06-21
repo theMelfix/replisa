@@ -17,6 +17,7 @@ class Deadline extends Model
 {
     protected $fillable = [
         'tenant_id',
+        'sector',
         'name',
         'due_date',
         'description',
@@ -54,9 +55,20 @@ class Deadline extends Model
         return $query->whereNull('tenant_id');
     }
 
-    /** Scadenze visibili a un tenant: nazionali + proprie. */
-    public function scopeVisibleTo(Builder $query, ?int $tenantId): Builder
+    /**
+     * Scadenze visibili a un tenant: le proprie + le nazionali pertinenti al suo
+     * settore (o senza settore = valide per tutti).
+     */
+    public function scopeVisibleTo(Builder $query, ?int $tenantId, ?string $sector): Builder
     {
-        return $query->where(fn (Builder $q) => $q->whereNull('tenant_id')->orWhere('tenant_id', $tenantId));
+        return $query->where(function (Builder $q) use ($tenantId, $sector): void {
+            if ($tenantId) {
+                $q->where('tenant_id', $tenantId);
+            }
+
+            $q->orWhere(fn (Builder $national) => $national
+                ->whereNull('tenant_id')
+                ->where(fn (Builder $s) => $s->whereNull('sector')->orWhere('sector', $sector)));
+        });
     }
 }
