@@ -38,11 +38,6 @@
                     <x-text-input wire:model="newOwnerEmail" id="newOwnerEmail" type="email" class="block mt-1 w-full" />
                     <x-input-error :messages="$errors->get('newOwnerEmail')" class="mt-2" />
                 </div>
-                <div>
-                    <x-input-label for="newPassword" value="Password" />
-                    <x-text-input wire:model="newPassword" id="newPassword" type="text" class="block mt-1 w-full" />
-                    <x-input-error :messages="$errors->get('newPassword')" class="mt-2" />
-                </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <x-input-label for="newPlan" value="Licenza offline" />
@@ -58,6 +53,9 @@
                         <x-text-input wire:model="newPlanExpiry" id="newPlanExpiry" type="date" class="block mt-1 w-full" />
                     </div>
                 </div>
+                <p class="sm:col-span-2 text-xs text-gray-500 dark:text-gray-400">
+                    Il cliente riceverà un'email per impostare la password e attivare l'account.
+                </p>
                 <div class="sm:col-span-2 flex justify-end gap-3">
                     <button type="button" @click="creating = false" class="rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">Annulla</button>
                     <x-primary-button>Crea cliente</x-primary-button>

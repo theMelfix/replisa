@@ -5,9 +5,11 @@ namespace Tests\Feature\Admin;
 use App\Livewire\Admin\Tenants;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Notifications\TenantInvitation;
 use App\Support\PlanLimits;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
@@ -128,14 +130,14 @@ it('un tenant attivo accede normalmente', function () {
     $this->get('/dashboard')->assertOk();
 });
 
-it('il super-admin crea un nuovo cliente con owner e licenza offline', function () {
+it('il super-admin crea un nuovo cliente con owner, licenza offline e invio invito', function () {
+    Notification::fake();
     $this->actingAs(makeUser(User::ROLE_SUPER_ADMIN));
 
     Livewire::test(Tenants::class)
         ->set('newBusinessName', 'Nuovo Studio')
         ->set('newOwnerName', 'Mario')
         ->set('newOwnerEmail', 'mario@example.com')
-        ->set('newPassword', 'password-123')
         ->set('newPlan', 'base')
         ->call('createTenant')
         ->assertDispatched('toast');
@@ -148,6 +150,8 @@ it('il super-admin crea un nuovo cliente con owner e licenza offline', function 
         ->and($owner)->not->toBeNull()
         ->and($owner->tenant_id)->toBe($tenant->id)
         ->and($owner->hasRole(User::ROLE_OWNER))->toBeTrue();
+
+    Notification::assertSentTo($owner, TenantInvitation::class);
 });
 
 it('la creazione cliente richiede ragione sociale ed email', function () {

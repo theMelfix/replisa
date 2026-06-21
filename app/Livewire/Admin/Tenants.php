@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\Tenant;
 use App\Models\User;
+use App\Notifications\TenantInvitation;
 use App\Rules\ItalianVatChecksum;
 use App\Support\ItalianVat;
 use App\Support\PlanLimits;
@@ -11,7 +12,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -38,8 +39,6 @@ class Tenants extends Component
 
     public string $newOwnerEmail = '';
 
-    public string $newPassword = '';
-
     public string $newPlan = '';
 
     public string $newPlanExpiry = '';
@@ -47,7 +46,8 @@ class Tenants extends Component
     /**
      * Censimento manuale di un nuovo cliente (E5): crea il tenant e il suo
      * utente owner, con eventuale licenza offline. La P.IVA è opzionale e, se
-     * presente, validata solo nel formato (l'admin è fidato: niente VIES).
+     * presente, validata solo nel formato (l'admin è fidato: niente VIES). Il
+     * cliente riceve un'email d'invito per impostare la propria password.
      */
     public function createTenant(): void
     {
@@ -58,7 +58,6 @@ class Tenants extends Component
             'newVatNumber' => ['nullable', 'string', new ItalianVatChecksum, 'unique:tenants,vat_number'],
             'newOwnerName' => ['required', 'string', 'max:255'],
             'newOwnerEmail' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class.',email'],
-            'newPassword' => ['required', 'string', Rules\Password::defaults()],
             'newPlan' => ['nullable', 'in:'.implode(',', array_keys(config('plans.plans')))],
             'newPlanExpiry' => ['nullable', 'date'],
         ], attributes: [
@@ -66,10 +65,9 @@ class Tenants extends Component
             'newVatNumber' => 'Partita IVA',
             'newOwnerName' => 'nome referente',
             'newOwnerEmail' => 'email',
-            'newPassword' => 'password',
         ]);
 
-        DB::transaction(function () use ($validated): void {
+        $user = DB::transaction(function () use ($validated): User {
             $tenant = Tenant::create([
                 'name' => $validated['newBusinessName'],
                 'vat_number' => $validated['newVatNumber'] ?: null,
@@ -79,17 +77,23 @@ class Tenants extends Component
                     : null,
             ]);
 
-            User::create([
+            // Password casuale: il cliente imposterà la sua tramite il link d'invito.
+            $user = User::create([
                 'tenant_id' => $tenant->id,
                 'name' => $validated['newOwnerName'],
                 'email' => $validated['newOwnerEmail'],
-                'password' => Hash::make($validated['newPassword']),
-            ])->assignRole(User::ROLE_OWNER);
+                'password' => Hash::make(Str::random(40)),
+            ]);
+            $user->assignRole(User::ROLE_OWNER);
+
+            return $user;
         });
 
-        $this->reset('newBusinessName', 'newVatNumber', 'newOwnerName', 'newOwnerEmail', 'newPassword', 'newPlan', 'newPlanExpiry');
+        $user->notify(new TenantInvitation);
+
+        $this->reset('newBusinessName', 'newVatNumber', 'newOwnerName', 'newOwnerEmail', 'newPlan', 'newPlanExpiry');
         $this->dispatch('tenant-created');
-        $this->dispatch('toast', type: 'success', message: 'Cliente creato.');
+        $this->dispatch('toast', type: 'success', message: "Cliente creato. Invito inviato a {$user->email}.");
     }
 
     public function toggle(int $tenantId): void
