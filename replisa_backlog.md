@@ -195,8 +195,8 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 3.4.1 | Prodotto/flusso "Campagne" in UI + landing | `P1` | 1 | 🟡 | `Automation::TYPE_CAMPAIGN`, card landing e toggle Automazioni. Engine a parte. 2026-06-21 |
-| 3.4.2 | Engine invio a liste/segmenti di contatti | `P1` | 5 | ⬜ | Compositore messaggio + selezione segmento (filtri su contatti) + invio batch via template MARKETING (opt-in) con throttling. Casi d'uso: avvisi/promozioni, scadenze collettive (es. IMU per CAF) |
+| 3.4.1 | Prodotto/flusso "Campagne" in UI + landing | `P1` | 1 | ✅ | `Automation::TYPE_CAMPAIGN`, card landing, pagina `/campaigns`. 2026-06-21 |
+| 3.4.2 | Engine invio a liste/segmenti di contatti | `P1` | 5 | 🟡 | Modello `Campaign` + job `SendCampaign` (coda): invio template MARKETING a tutti i contatti **opted-in** del tenant, con conteggi/stato e storico. Compositore in `/campaigns`. Manca: segmentazione avanzata (filtri), gating per piano, throttling fine. 2026-06-21 |
 | 3.4.3 | Segmentazione contatti (tag/filtri) | `P2` | 3 | ⬜ | Base per targettizzare le campagne |
 
 ---
