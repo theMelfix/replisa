@@ -54,9 +54,17 @@ new class extends Component
                         {{ __('Campagne') }}
                     </x-nav-link>
 
+                    <x-nav-link :href="route('deadlines')" :active="request()->routeIs('deadlines')" wire:navigate>
+                        {{ __('Scadenze') }}
+                    </x-nav-link>
+
                     @if (auth()->user()->isSuperAdmin())
                         <x-nav-link :href="route('admin.tenants')" :active="request()->routeIs('admin.tenants')" wire:navigate>
                             {{ __('Tenant') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('admin.deadlines')" :active="request()->routeIs('admin.deadlines')" wire:navigate>
+                            {{ __('Scadenze nazionali') }}
                         </x-nav-link>
                     @endif
                 </div>
