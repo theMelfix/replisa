@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\AcceptInvitation;
+use App\Livewire\Admin\Deadlines as AdminDeadlines;
 use App\Livewire\Admin\Tenants;
 use App\Livewire\Appointments;
 use App\Livewire\Automations;
@@ -8,6 +9,7 @@ use App\Livewire\Billing;
 use App\Livewire\Campaigns;
 use App\Livewire\Contacts;
 use App\Livewire\Dashboard;
+use App\Livewire\Deadlines;
 use App\Livewire\Messages;
 use App\Livewire\WhatsAppSettings;
 use App\Models\User;
@@ -31,6 +33,10 @@ Route::get('automations', Automations::class)
 Route::get('campaigns', Campaigns::class)
     ->middleware(['auth', 'verified', 'tenant.active'])
     ->name('campaigns');
+
+Route::get('scadenze', Deadlines::class)
+    ->middleware(['auth', 'verified', 'tenant.active'])
+    ->name('deadlines');
 
 Route::get('contacts', Contacts::class)
     ->middleware(['auth', 'verified', 'tenant.active'])
@@ -71,6 +77,7 @@ Route::middleware(['auth', 'role:'.User::ROLE_SUPER_ADMIN])
     ->prefix('admin')
     ->group(function () {
         Route::get('tenants', Tenants::class)->name('admin.tenants');
+        Route::get('deadlines', AdminDeadlines::class)->name('admin.deadlines');
     });
 
 require __DIR__.'/auth.php';

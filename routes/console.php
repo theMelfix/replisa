@@ -19,3 +19,9 @@ Schedule::command('replisa:send-reminders')
 Schedule::command('replisa:send-review-requests')
     ->hourly()
     ->withoutOverlapping();
+
+// Promemoria scadenze (E3.2.6): controlla ogni ora i promemoria scadenza dovuti
+// e li avvia come campagne. Stesso cron `schedule:run`.
+Schedule::command('replisa:send-deadline-reminders')
+    ->hourly()
+    ->withoutOverlapping();
