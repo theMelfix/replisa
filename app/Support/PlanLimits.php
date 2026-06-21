@@ -23,6 +23,12 @@ class PlanLimits
 
     public function planKey(): string
     {
+        // 1) Licenza offline assegnata dall'admin: ha priorità sullo Stripe.
+        if ($this->tenant->hasActiveOfflineLicense() && config('plans.plans.'.$this->tenant->manual_plan)) {
+            return $this->tenant->manual_plan;
+        }
+
+        // 2) Abbonamento Stripe attivo.
         $price = $this->tenant->subscription('default')?->stripe_price;
 
         if ($price) {
@@ -33,7 +39,24 @@ class PlanLimits
             }
         }
 
+        // 3) Default (onboarding/free tier).
         return config('plans.default', 'starter');
+    }
+
+    /** Origine del piano effettivo: 'offline' | 'stripe' | 'default'. */
+    public function planSource(): string
+    {
+        if ($this->tenant->hasActiveOfflineLicense() && config('plans.plans.'.$this->tenant->manual_plan)) {
+            return 'offline';
+        }
+
+        return $this->tenant->subscription('default')?->stripe_price ? 'stripe' : 'default';
+    }
+
+    /** Canone mensile del piano effettivo (per il calcolo MRR in admin). */
+    public function price(): int
+    {
+        return (int) config('plans.plans.'.$this->planKey().'.price', 0);
     }
 
     public function planName(): string
