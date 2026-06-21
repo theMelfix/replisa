@@ -5,6 +5,7 @@ namespace Tests\Feature\Admin;
 use App\Livewire\Admin\Tenants;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Support\PlanLimits;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -52,6 +53,79 @@ it('il super-admin può attivare/disattivare un tenant', function () {
     Livewire::test(Tenants::class)->call('toggle', $tenant->id);
 
     expect($tenant->fresh()->active)->toBeFalse();
+});
+
+it('il super-admin assegna una licenza offline con scadenza', function () {
+    $this->actingAs(makeUser(User::ROLE_SUPER_ADMIN));
+    $tenant = Tenant::create(['name' => 'A']);
+
+    Livewire::test(Tenants::class)
+        ->set("licensePlan.{$tenant->id}", 'pro')
+        ->set("licenseExpiry.{$tenant->id}", '2027-01-31')
+        ->call('assignLicense', $tenant->id)
+        ->assertDispatched('toast');
+
+    $tenant->refresh();
+    expect($tenant->manual_plan)->toBe('pro')
+        ->and($tenant->manual_plan_expires_at->format('Y-m-d'))->toBe('2027-01-31')
+        ->and(PlanLimits::for($tenant)->planKey())->toBe('pro')
+        ->and(PlanLimits::for($tenant)->planSource())->toBe('offline');
+});
+
+it('rifiuta un piano non valido per la licenza offline', function () {
+    $this->actingAs(makeUser(User::ROLE_SUPER_ADMIN));
+    $tenant = Tenant::create(['name' => 'A']);
+
+    Livewire::test(Tenants::class)
+        ->set("licensePlan.{$tenant->id}", 'inesistente')
+        ->call('assignLicense', $tenant->id)
+        ->assertDispatched('toast');
+
+    expect($tenant->fresh()->manual_plan)->toBeNull();
+});
+
+it('revoca la licenza offline', function () {
+    $this->actingAs(makeUser(User::ROLE_SUPER_ADMIN));
+    $tenant = Tenant::create(['name' => 'A', 'manual_plan' => 'pro']);
+
+    Livewire::test(Tenants::class)->call('revokeLicense', $tenant->id);
+
+    expect($tenant->fresh()->manual_plan)->toBeNull();
+});
+
+it('una licenza offline scaduta non è attiva', function () {
+    $tenant = Tenant::create(['name' => 'A', 'manual_plan' => 'pro', 'manual_plan_expires_at' => now()->subDay()]);
+
+    expect($tenant->hasActiveOfflineLicense())->toBeFalse()
+        ->and(PlanLimits::for($tenant)->planKey())->toBe('starter'); // default
+});
+
+it('disdetta senza abbonamento Stripe mostra un toast', function () {
+    $this->actingAs(makeUser(User::ROLE_SUPER_ADMIN));
+    $tenant = Tenant::create(['name' => 'A']);
+
+    Livewire::test(Tenants::class)->call('cancelSubscription', $tenant->id)->assertDispatched('toast');
+});
+
+it('rimborso senza cliente Stripe mostra un toast', function () {
+    $this->actingAs(makeUser(User::ROLE_SUPER_ADMIN));
+    $tenant = Tenant::create(['name' => 'A']);
+
+    Livewire::test(Tenants::class)->call('refundLast', $tenant->id)->assertDispatched('toast');
+});
+
+it('un tenant bloccato viene rediretto alla pagina sospeso', function () {
+    $tenant = Tenant::create(['name' => 'A', 'active' => false]);
+    $this->actingAs(makeUser(User::ROLE_OWNER, $tenant));
+
+    $this->get('/dashboard')->assertRedirect(route('suspended'));
+});
+
+it('un tenant attivo accede normalmente', function () {
+    $tenant = Tenant::create(['name' => 'A', 'active' => true]);
+    $this->actingAs(makeUser(User::ROLE_OWNER, $tenant));
+
+    $this->get('/dashboard')->assertOk();
 });
 
 it('il command crea un super-admin', function () {

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureTenantActive;
 use App\Http\Middleware\VerifyMetaWebhookSignature;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -21,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'meta.signature' => VerifyMetaWebhookSignature::class,
             'role' => RoleMiddleware::class,
+            'tenant.active' => EnsureTenantActive::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

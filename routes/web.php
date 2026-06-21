@@ -19,36 +19,41 @@ Route::view('/termini', 'legal.terms')->name('terms');
 Route::view('/eliminazione-dati', 'legal.data-deletion')->name('data-deletion');
 
 Route::get('dashboard', Dashboard::class)
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'tenant.active'])
     ->name('dashboard');
 
 Route::get('automations', Automations::class)
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'tenant.active'])
     ->name('automations');
 
 Route::get('contacts', Contacts::class)
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'tenant.active'])
     ->name('contacts');
 
 Route::get('messages', Messages::class)
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'tenant.active'])
     ->name('messages');
 
 Route::get('appointments', Appointments::class)
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'tenant.active'])
     ->name('appointments');
 
 Route::get('billing', Billing::class)
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'tenant.active'])
     ->name('billing');
 
 Route::get('whatsapp', WhatsAppSettings::class)
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'tenant.active'])
     ->name('whatsapp');
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
+
+// Pagina mostrata ai tenant bloccati dall'admin (vedi middleware tenant.active).
+Route::view('suspended', 'suspended')
+    ->middleware(['auth'])
+    ->name('suspended');
 
 // Area super-admin (E4.1.4): gestione di tutti i tenant.
 Route::middleware(['auth', 'role:'.User::ROLE_SUPER_ADMIN])

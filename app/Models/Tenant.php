@@ -29,6 +29,8 @@ class Tenant extends Model
         'waba_id',
         'access_token',
         'plan',
+        'manual_plan',
+        'manual_plan_expires_at',
         'active',
     ];
 
@@ -42,7 +44,19 @@ class Tenant extends Model
             'access_token' => 'encrypted', // ADR-003: criptato a riposo
             'active' => 'boolean',
             'vat_validated_at' => 'datetime',
+            'manual_plan_expires_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Licenza offline attiva: un piano assegnato a mano dall'admin
+     * (`manual_plan`), non scaduto. Ha priorità sull'abbonamento Stripe in
+     * {@see \App\Support\PlanLimits}.
+     */
+    public function hasActiveOfflineLicense(): bool
+    {
+        return ! empty($this->manual_plan)
+            && (is_null($this->manual_plan_expires_at) || $this->manual_plan_expires_at->isFuture());
     }
 
     /** @return HasMany<Contact, $this> */
