@@ -30,6 +30,28 @@ class Tenants extends Component
     /** @var array<int, string> scadenza opzionale (YYYY-MM-DD) della licenza, per tenant id */
     public array $licenseExpiry = [];
 
+    /** @var array<int, string> settore selezionato per tenant id (modifica inline) */
+    public array $sectorInput = [];
+
+    public function mount(): void
+    {
+        $this->sectorInput = Tenant::pluck('sector', 'id')->map(fn (?string $s) => $s ?? '')->all();
+    }
+
+    public function updateSector(int $tenantId): void
+    {
+        $sector = $this->sectorInput[$tenantId] ?? '';
+
+        if ($sector !== '' && ! array_key_exists($sector, config('sectors'))) {
+            $this->dispatch('toast', type: 'error', message: 'Settore non valido.');
+
+            return;
+        }
+
+        Tenant::findOrFail($tenantId)->update(['sector' => $sector ?: null]);
+        $this->dispatch('toast', type: 'success', message: 'Settore aggiornato.');
+    }
+
     // Form "Nuovo cliente" (censimento da admin).
     public string $newBusinessName = '';
 

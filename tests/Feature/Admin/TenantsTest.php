@@ -130,6 +130,18 @@ it('un tenant attivo accede normalmente', function () {
     $this->get('/dashboard')->assertOk();
 });
 
+it('il super-admin modifica il settore di un tenant', function () {
+    $this->actingAs(makeUser(User::ROLE_SUPER_ADMIN));
+    $tenant = Tenant::create(['name' => 'A']);
+
+    Livewire::test(Tenants::class)
+        ->set("sectorInput.{$tenant->id}", 'studio_medico')
+        ->call('updateSector', $tenant->id)
+        ->assertDispatched('toast');
+
+    expect($tenant->fresh()->sector)->toBe('studio_medico');
+});
+
 it('il super-admin crea un nuovo cliente con owner, licenza offline e invio invito', function () {
     Notification::fake();
     $this->actingAs(makeUser(User::ROLE_SUPER_ADMIN));
