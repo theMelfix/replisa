@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Deadline;
 use App\Models\DeadlineReminder;
+use App\Support\PlanLimits;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Layout;
@@ -71,6 +72,12 @@ class Deadlines extends Component
             return;
         }
 
+        if (! PlanLimits::for($tenant)->allows('deadlines')) {
+            $this->dispatch('toast', type: 'error', message: 'I promemoria scadenze sono inclusi dal piano Base in su. Aggiorna il piano per attivarli.');
+
+            return;
+        }
+
         $template = trim($this->reminderTemplate[$deadlineId] ?? '');
 
         if ($template === '') {
@@ -125,6 +132,7 @@ class Deadlines extends Component
         return view('livewire.deadlines', [
             'deadlines' => $deadlines,
             'reminders' => $this->tenantReminders(),
+            'allowed' => $tenant ? PlanLimits::for($tenant)->allows('deadlines') : false,
         ]);
     }
 }

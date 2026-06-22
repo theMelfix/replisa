@@ -17,7 +17,8 @@ uses(RefreshDatabase::class);
 beforeEach(function () {
     $this->seed(RoleSeeder::class);
 
-    $this->tenant = Tenant::create(['name' => 'A', 'phone_number_id' => 'PID', 'access_token' => 'TOK', 'active' => true]);
+    // manual_plan base → piano che include i promemoria scadenze (gating per piano).
+    $this->tenant = Tenant::create(['name' => 'A', 'phone_number_id' => 'PID', 'access_token' => 'TOK', 'active' => true, 'manual_plan' => 'base']);
     $this->owner = User::create([
         'tenant_id' => $this->tenant->id,
         'name' => 'Owner',
@@ -82,6 +83,19 @@ it('le scadenze nazionali sono filtrate per settore', function () {
 
     $this->actingAs($dentistaUser);
     $this->get('/scadenze')->assertOk()->assertSee('IMU acconto')->assertDontSee('730 scadenza');
+});
+
+it('un piano senza la funzione scadenze blocca il promemoria', function () {
+    $this->tenant->update(['manual_plan' => 'starter']); // Starter: niente promemoria scadenze
+    $this->actingAs($this->owner);
+
+    Livewire::test(Deadlines::class)
+        ->set("reminderTemplate.{$this->national->id}", 'imu')
+        ->set("reminderDays.{$this->national->id}", 5)
+        ->call('saveReminder', $this->national->id)
+        ->assertDispatched('toast');
+
+    expect(DeadlineReminder::withoutGlobalScopes()->count())->toBe(0);
 });
 
 it('il comando avvia una campagna per un promemoria dovuto', function () {

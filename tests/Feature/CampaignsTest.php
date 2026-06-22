@@ -16,7 +16,8 @@ uses(RefreshDatabase::class);
 beforeEach(function () {
     $this->seed(RoleSeeder::class);
 
-    $this->tenant = Tenant::create(['name' => 'A', 'phone_number_id' => 'PID', 'access_token' => 'TOK', 'active' => true]);
+    // manual_plan base → piano che include le campagne (gating per piano).
+    $this->tenant = Tenant::create(['name' => 'A', 'phone_number_id' => 'PID', 'access_token' => 'TOK', 'active' => true, 'manual_plan' => 'base']);
     $this->owner = User::create([
         'tenant_id' => $this->tenant->id,
         'name' => 'Owner',
@@ -59,6 +60,22 @@ it('non avvia una campagna senza contatti opt-in', function () {
     Livewire::test(Campaigns::class)
         ->set('name', 'Promo')
         ->set('template_name', 'promo_x')
+        ->call('send')
+        ->assertDispatched('toast');
+
+    expect(Campaign::withoutGlobalScopes()->count())->toBe(0);
+    Bus::assertNotDispatched(SendCampaign::class);
+});
+
+it('un piano senza campagne blocca l\'invio', function () {
+    Bus::fake();
+    $this->actingAs($this->owner);
+    $this->tenant->update(['manual_plan' => 'starter']); // Starter: niente campagne
+    $this->tenant->contacts()->create(['phone' => '391', 'name' => 'Anna', 'opted_in' => true]);
+
+    Livewire::test(Campaigns::class)
+        ->set('name', 'X')
+        ->set('template_name', 't')
         ->call('send')
         ->assertDispatched('toast');
 

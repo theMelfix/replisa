@@ -149,6 +149,16 @@ class Tenants extends Component
         $this->dispatch('toast', type: 'success', message: "Licenza {$plan} assegnata a {$tenant->name}.");
     }
 
+    public function toggleReviewsAddon(int $tenantId): void
+    {
+        $tenant = Tenant::findOrFail($tenantId);
+        $tenant->update(['reviews_addon' => ! $tenant->reviews_addon]);
+
+        $this->dispatch('toast', type: 'success', message: $tenant->reviews_addon
+            ? 'Add-on Recensioni attivato.'
+            : 'Add-on Recensioni disattivato.');
+    }
+
     public function revokeLicense(int $tenantId): void
     {
         Tenant::findOrFail($tenantId)->update(['manual_plan' => null, 'manual_plan_expires_at' => null]);

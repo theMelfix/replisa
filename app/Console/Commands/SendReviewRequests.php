@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Automation;
 use App\Models\Tenant;
 use App\Services\Automation\ReviewRequest;
+use App\Support\PlanLimits;
 use Illuminate\Console\Command;
 
 /**
@@ -27,6 +28,12 @@ class SendReviewRequests extends Command
                 ->where('type', Automation::TYPE_REVIEW_REQUEST)
                 ->where('active', true))
             ->each(function (Tenant $tenant) use (&$total) {
+                // Gating add-on: la Richiesta recensione richiede l'add-on Recensioni
+                // (incluso nel piano Business o concesso dall'admin).
+                if (! PlanLimits::for($tenant)->hasReviewsAddon()) {
+                    return;
+                }
+
                 $total += ReviewRequest::for($tenant)->dispatchDue();
             });
 

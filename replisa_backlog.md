@@ -182,7 +182,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 
 ### E3.3 — Richiesta Recensione (add-on)
 
-> **Nota (2026-06-21):** non più flusso core — venduto come **add-on Recensioni Google** (+€19/mese, incluso in Business). Da fare: gating dell'add-on (attivo solo se acquistato) e UI di acquisto.
+> **Nota (2026-06-21/22):** non più flusso core — venduto come **add-on Recensioni Google** (+€19/mese, incluso in Business). Gating fatto (`PlanLimits::hasReviewsAddon()`: Business o `reviews_addon` concesso dall'admin; gate nel command + card add-on in Automazioni). Manca: UI di acquisto self-service (Stripe).
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
@@ -223,7 +223,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 | 4.2.3 | Sezione Automazioni: attiva/disattiva flussi, configura parametri | `P1` | 3 | 🟡 | Livewire `Automations`: toggle on/off dei 3 flussi (crea/aggiorna `Automation` per-tenant). Hardening: backstop `tenant_id` (`TenantContextException`) + sistema toast in-app `<x-toast-hub />` per le eccezioni (niente più 500/`1364`). Manca la configurazione parametri (testi/offset/template). 2026-06-19 |
 | 4.2.4 | Sezione Appuntamenti: CRUD manuale + import CSV | `P2` | 3 | ✅ | Livewire `Appointments`: form nuovo (crea contatto), cambio stato, elimina, import CSV (telefono,nome,data). Scoped per-tenant. 2026-06-19 |
 | 4.2.5 | Log messaggi: cronologia completa con status (sent/delivered/read/failed) | `P1` | 2 | 🟡 | Livewire `Messages`: cronologia paginata, badge stato, ricerca contatto + filtri direzione/stato. Mancano filtri per data e tipo. 2026-06-19 |
-| 4.2.6 | Sezione Billing: piano attivo, conteggio messaggi, upgrade | `P2` | 3 | 🟡 | Stripe via **Laravel Cashier** (Billable su `Tenant`). Pagina `/billing`: 4 piani → Stripe Checkout ospitato + Billing Portal per gestione/disdetta; webhook auto-registrato. `config/plans.php` (Price ID da `.env`). Riquadro "Utilizzo" con conteggio messaggi inviati/ricevuti del mese + contatti vs limite. Enforcement limiti via `App\Support\PlanLimits` (automazioni attive + contatti nuovi su form/CSV; webhook inbound escluso). Manca: setup prodotti/prezzi lato Stripe. 2026-06-20 |
+| 4.2.6 | Sezione Billing: piano attivo, conteggio messaggi, upgrade | `P2` | 3 | 🟡 | Stripe via **Laravel Cashier** (Billable su `Tenant`). Pagina `/billing`: 4 piani → Stripe Checkout ospitato + Billing Portal per gestione/disdetta; webhook auto-registrato. `config/plans.php` (Price ID da `.env`). Riquadro "Utilizzo" con conteggio messaggi inviati/ricevuti del mese + contatti vs limite. Enforcement limiti via `App\Support\PlanLimits` (automazioni attive + contatti nuovi su form/CSV; webhook inbound escluso). **Gating per piano** (`allows()`: campagne/scadenze da Base) e **add-on Recensioni** (`hasReviewsAddon()`: Business o concesso). Manca: setup prodotti/prezzi lato Stripe. 2026-06-20/22 |
 
 ### E4.3 — API Pubblica per Integrazioni
 

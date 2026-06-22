@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Jobs\SendCampaign;
 use App\Models\Campaign;
 use App\Models\DeadlineReminder;
+use App\Support\PlanLimits;
 use Illuminate\Console\Command;
 
 /**
@@ -45,7 +46,7 @@ class SendDeadlineReminders extends Command
         foreach ($due as $reminder) {
             $tenant = $reminder->tenant;
 
-            if (! $tenant) {
+            if (! $tenant || ! PlanLimits::for($tenant)->allows('deadlines')) {
                 continue;
             }
 

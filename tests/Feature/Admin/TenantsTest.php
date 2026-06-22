@@ -130,6 +130,15 @@ it('un tenant attivo accede normalmente', function () {
     $this->get('/dashboard')->assertOk();
 });
 
+it('il super-admin attiva l\'add-on recensioni di un tenant', function () {
+    $this->actingAs(makeUser(User::ROLE_SUPER_ADMIN));
+    $tenant = Tenant::create(['name' => 'A']);
+
+    Livewire::test(Tenants::class)->call('toggleReviewsAddon', $tenant->id)->assertDispatched('toast');
+
+    expect($tenant->fresh()->reviews_addon)->toBeTrue();
+});
+
 it('il super-admin modifica il settore di un tenant', function () {
     $this->actingAs(makeUser(User::ROLE_SUPER_ADMIN));
     $tenant = Tenant::create(['name' => 'A']);

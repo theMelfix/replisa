@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Jobs\SendCampaign;
 use App\Models\Campaign;
+use App\Support\PlanLimits;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -33,6 +34,12 @@ class Campaigns extends Component
 
         if (! $tenant) {
             $this->dispatch('toast', type: 'error', message: 'Nessuna attività associata al tuo account.');
+
+            return;
+        }
+
+        if (! PlanLimits::for($tenant)->allows('campaigns')) {
+            $this->dispatch('toast', type: 'error', message: 'Le campagne sono incluse dal piano Base in su. Aggiorna il piano per inviarle.');
 
             return;
         }
@@ -76,6 +83,7 @@ class Campaigns extends Component
         return view('livewire.campaigns', [
             'campaigns' => Campaign::orderByDesc('created_at')->paginate(10),
             'optedInCount' => $tenant ? $tenant->contacts()->where('opted_in', true)->count() : 0,
+            'allowed' => $tenant ? PlanLimits::for($tenant)->allows('campaigns') : false,
         ]);
     }
 }

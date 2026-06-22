@@ -27,5 +27,34 @@
                 </div>
             @endforeach
         </div>
+
+        {{-- Add-on Recensioni --}}
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mt-10 mb-3">Add-on</h2>
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 flex items-center justify-between">
+            <div class="pr-6">
+                <div class="flex items-center gap-2">
+                    <h2 class="font-semibold text-gray-900 dark:text-gray-100">Richiesta recensione</h2>
+                    @if ($hasReviews && $reviewActive)
+                        <span class="text-xs font-semibold text-green-700 bg-green-100 rounded-full px-2 py-0.5">Attivo</span>
+                    @elseif (! $hasReviews)
+                        <span class="text-xs font-semibold text-amber-700 bg-amber-100 rounded-full px-2 py-0.5">Add-on</span>
+                    @endif
+                </div>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Richiesta recensione Google dopo un appuntamento completato.</p>
+                @unless ($hasReviews)
+                    <p class="mt-1 text-xs text-amber-700">Incluso nel piano Business o come add-on. <a href="{{ route('billing') }}" class="underline font-semibold" wire:navigate>Attiva</a>.</p>
+                @endunless
+            </div>
+
+            @if ($hasReviews)
+                <button type="button" wire:click="toggleReviews"
+                        class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors {{ $reviewActive ? 'bg-green-600' : 'bg-gray-300' }}"
+                        role="switch" aria-checked="{{ $reviewActive ? 'true' : 'false' }}">
+                    <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform {{ $reviewActive ? 'translate-x-6' : 'translate-x-1' }}"></span>
+                </button>
+            @else
+                <span class="text-gray-300" title="Add-on non attivo">🔒</span>
+            @endif
+        </div>
     </div>
 </div>

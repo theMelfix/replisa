@@ -59,6 +59,20 @@ class PlanLimits
         return (int) config('plans.plans.'.$this->planKey().'.price', 0);
     }
 
+    /** Il piano effettivo include la funzione richiesta (es. 'campaigns', 'deadlines')? */
+    public function allows(string $feature): bool
+    {
+        return (bool) config('plans.plans.'.$this->planKey().'.features.'.$feature, false);
+    }
+
+    /** Il tenant ha l'add-on Recensioni: incluso nel piano (Business) o concesso. */
+    public function hasReviewsAddon(): bool
+    {
+        $includedIn = config('plans.addons.reviews.included_in', []);
+
+        return in_array($this->planKey(), $includedIn, true) || (bool) $this->tenant->reviews_addon;
+    }
+
     public function planName(): string
     {
         return config('plans.plans.'.$this->planKey().'.name', ucfirst($this->planKey()));
