@@ -3,6 +3,13 @@
         <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-1">Campagne e comunicazioni</h1>
         <p class="text-gray-500 dark:text-gray-400 mb-8">Invia un messaggio a tutti i contatti con consenso (opt-in) tramite un template approvato.</p>
 
+        @unless ($allowed)
+            <div class="mb-6 rounded-lg bg-amber-50 ring-1 ring-amber-200 px-4 py-3 text-sm text-amber-800">
+                Le campagne sono incluse dal piano <strong>Base</strong> in su.
+                <a href="{{ route('billing') }}" class="underline font-semibold" wire:navigate>Aggiorna il piano</a> per inviarle.
+            </div>
+        @endunless
+
         {{-- Compositore --}}
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 mb-8">
             <form wire:submit="send" class="space-y-5">

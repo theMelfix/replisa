@@ -27,6 +27,10 @@ return [
                 'contacts' => 500,
                 'automations' => 1,
             ],
+            'features' => [
+                'campaigns' => false,
+                'deadlines' => false,
+            ],
         ],
 
         'base' => [
@@ -36,6 +40,10 @@ return [
             'limits' => [
                 'contacts' => 2000,
                 'automations' => null,
+            ],
+            'features' => [
+                'campaigns' => true,
+                'deadlines' => true,
             ],
         ],
 
@@ -47,6 +55,10 @@ return [
                 'contacts' => null,
                 'automations' => null,
             ],
+            'features' => [
+                'campaigns' => true,
+                'deadlines' => true,
+            ],
         ],
 
         'business' => [
@@ -56,6 +68,10 @@ return [
             'limits' => [
                 'contacts' => null,
                 'automations' => null,
+            ],
+            'features' => [
+                'campaigns' => true,
+                'deadlines' => true,
             ],
         ],
 

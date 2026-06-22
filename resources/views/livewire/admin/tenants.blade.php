@@ -174,6 +174,9 @@
                                     <button wire:click="refundLast({{ $tenant->id }})"
                                             wire:confirm="Rimborsare l'ultimo pagamento di {{ $tenant->name }}?"
                                             class="text-gray-600 hover:text-gray-900 dark:text-gray-300">Rimborsa</button>
+                                    <button wire:click="toggleReviewsAddon({{ $tenant->id }})" class="{{ $tenant->reviews_addon ? 'text-green-700 font-medium' : 'text-gray-600' }} hover:text-gray-900 dark:text-gray-300">
+                                        Recensioni: {{ $tenant->reviews_addon ? 'ON' : 'OFF' }}
+                                    </button>
                                 </div>
                             </td>
                         </tr>

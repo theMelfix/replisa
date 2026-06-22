@@ -91,6 +91,24 @@ it('blocca l\'attivazione oltre il limite di automazioni del piano', function ()
     expect(Automation::withoutGlobalScopes()->where('active', true)->count())->toBe(1);
 });
 
+it('il toggle recensioni è bloccato senza add-on', function () {
+    $this->actingAs($this->owner); // tenant default starter, nessun add-on
+
+    Livewire::test(Automations::class)->call('toggleReviews')->assertDispatched('toast');
+
+    expect(Automation::withoutGlobalScopes()->where('type', Automation::TYPE_REVIEW_REQUEST)->count())->toBe(0);
+});
+
+it('il toggle recensioni funziona con l\'add-on attivo', function () {
+    $this->tenant->update(['reviews_addon' => true]);
+    $this->actingAs($this->owner);
+
+    Livewire::test(Automations::class)->call('toggleReviews');
+
+    $automation = Automation::withoutGlobalScopes()->where('type', Automation::TYPE_REVIEW_REQUEST)->first();
+    expect($automation)->not->toBeNull()->and($automation->active)->toBeTrue();
+});
+
 it('ignora tipi di flusso sconosciuti', function () {
     $this->actingAs($this->owner);
 

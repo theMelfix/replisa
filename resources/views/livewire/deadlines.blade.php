@@ -3,6 +3,13 @@
         <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-1">Scadenze</h1>
         <p class="text-gray-500 dark:text-gray-400 mb-8">Attiva un promemoria automatico ai tuoi contatti (opt-in) prima di una scadenza nazionale o di una tua.</p>
 
+        @unless ($allowed)
+            <div class="mb-6 rounded-lg bg-amber-50 ring-1 ring-amber-200 px-4 py-3 text-sm text-amber-800">
+                I promemoria scadenze sono inclusi dal piano <strong>Base</strong> in su.
+                <a href="{{ route('billing') }}" class="underline font-semibold" wire:navigate>Aggiorna il piano</a> per attivarli.
+            </div>
+        @endunless
+
         {{-- Aggiungi scadenza propria --}}
         <form wire:submit="addDeadline" class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 mb-8 flex flex-wrap items-end gap-4">
             <div class="flex-1 min-w-48">

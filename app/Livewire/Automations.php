@@ -78,13 +78,51 @@ class Automations extends Component
         }
     }
 
+    /**
+     * Add-on Recensioni (E4.2.6): la Richiesta recensione non è un flusso core
+     * ma un add-on. Attivabile solo se il tenant ne ha diritto (piano Business
+     * o concesso). Non conta nel limite automazioni del piano.
+     */
+    public function toggleReviews(): void
+    {
+        $tenant = auth()->user()?->tenant;
+
+        if (! $tenant || ! PlanLimits::for($tenant)->hasReviewsAddon()) {
+            $this->dispatch('toast', type: 'error', message: 'La Richiesta recensione è un add-on: attivala dal piano Business o contatta l\'assistenza.');
+
+            return;
+        }
+
+        try {
+            $automation = Automation::where('type', Automation::TYPE_REVIEW_REQUEST)->first();
+
+            if ($automation) {
+                $automation->update(['active' => ! $automation->active]);
+
+                return;
+            }
+
+            Automation::create([
+                'type' => Automation::TYPE_REVIEW_REQUEST,
+                'trigger' => 'schedule',
+                'config' => [],
+                'active' => true,
+            ]);
+        } catch (TenantContextException $e) {
+            $this->dispatch('toast', type: 'error', message: $e->getMessage());
+        }
+    }
+
     public function render(): View
     {
         $active = Automation::pluck('active', 'type');
+        $tenant = auth()->user()?->tenant;
 
         return view('livewire.automations', [
             'flows' => self::FLOWS,
             'active' => $active,
+            'hasReviews' => $tenant ? PlanLimits::for($tenant)->hasReviewsAddon() : false,
+            'reviewActive' => (bool) ($active[Automation::TYPE_REVIEW_REQUEST] ?? false),
         ]);
     }
 }

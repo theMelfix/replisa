@@ -213,6 +213,7 @@ it('aggiunge il parametro del button URL quando configurato', function () {
 
 it('il comando schedulato invia le richieste dovute su tutti i tenant attivi', function () {
     activateReviewRequest($this->tenant);
+    $this->tenant->update(['reviews_addon' => true]); // gating add-on Recensioni
     $now = Carbon::parse('2026-06-12 10:00');
     Carbon::setTestNow($now);
 
