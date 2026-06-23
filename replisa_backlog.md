@@ -245,7 +245,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 5.1.1 | Pagina su replisa.com (dominio dedicato) | `P0` | 3 | ✅ | Landing v1: hero, 3 automazioni (Benvenuto/Promemoria&Scadenze/Campagne), prezzi aggiornati 29/69/129/249 + add-on Recensioni €19, CTA demo, footer legale. Tailwind/Vite. 2026-06-19 (prodotti/prezzi rivisti 2026-06-21) |
+| 5.1.1 | Pagina su replisa.com (dominio dedicato) | `P0` | 3 | ✅ | Landing v1: hero, 3 automazioni (Benvenuto/Promemoria&Scadenze/Campagne), prezzi **19/49/99/199** + toggle annuale -20% + prova 14gg + add-on Recensioni €19, CTA demo, footer legale. Tailwind/Vite. 2026-06-19 (prezzi rivisti 2026-06-23, vedi `docs/PRICING-REVIEW.md`) |
 | 5.1.2 | Form contatto / Calendly embed per prenotare chiamata | `P0` | 1 | ⬜ | Per ora CTA `mailto:` — da sostituire con form/Calendly |
 | 5.1.3 | SEO base: meta tags, Open Graph, structured data | `P1` | 1 | 🟡 | Title/description/OG fatti in landing; manca structured data (JSON-LD) |
 | 5.1.4 | Cookie banner GDPR | `P1` | 1 | ⬜ | Hai già esperienza da giovannimelfi.com |
