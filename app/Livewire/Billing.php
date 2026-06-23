@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Campaign;
 use App\Models\Message;
 use App\Models\Tenant;
 use App\Support\PlanLimits;
@@ -18,6 +19,9 @@ use Livewire\Component;
 #[Layout('layouts.app')]
 class Billing extends Component
 {
+    /** Periodo di fatturazione scelto per il checkout: 'monthly' | 'annual'. */
+    public string $period = 'monthly';
+
     public function mount(): void
     {
         $outcome = request()->string('checkout')->toString();
@@ -32,8 +36,11 @@ class Billing extends Component
     public function subscribe(string $plan): ?RedirectResponse
     {
         $config = config("plans.plans.$plan");
+        $priceId = $this->period === 'annual'
+            ? ($config['stripe_price_id_annual'] ?? null)
+            : ($config['stripe_price_id'] ?? null);
 
-        if (! $config || empty($config['stripe_price_id'])) {
+        if (! $config || empty($priceId)) {
             $this->dispatch('toast', type: 'error', message: 'Piano non disponibile al momento.');
 
             return null;
@@ -48,7 +55,7 @@ class Billing extends Component
         }
 
         try {
-            return $tenant->newSubscription('default', $config['stripe_price_id'])
+            return $tenant->newSubscription('default', $priceId)
                 ->checkout([
                     'success_url' => route('billing').'?checkout=success',
                     'cancel_url' => route('billing').'?checkout=cancelled',
@@ -98,6 +105,10 @@ class Billing extends Component
             'currentPriceId' => $subscription?->stripe_price,
             'usage' => $tenant ? $this->usage($tenant) : null,
             'contactsLimit' => $tenant ? PlanLimits::for($tenant)->contactsLimit() : null,
+            'campaignLimit' => $tenant ? PlanLimits::for($tenant)->campaignMessagesLimit() : null,
+            'campaignUsed' => $tenant ? Campaign::where('created_at', '>=', now()->startOfMonth())->sum('total') : 0,
+            'onTrial' => (bool) $tenant?->onGenericTrial(),
+            'trialEndsAt' => $tenant?->onGenericTrial() ? $tenant->trial_ends_at : null,
         ]);
     }
 

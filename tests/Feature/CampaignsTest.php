@@ -83,6 +83,23 @@ it('un piano senza campagne blocca l\'invio', function () {
     Bus::assertNotDispatched(SendCampaign::class);
 });
 
+it('blocca l\'invio oltre il pacchetto messaggi campagna del piano', function () {
+    config(['plans.plans.base.limits.campaign_messages' => 1]);
+    Bus::fake();
+    $this->actingAs($this->owner);
+    $this->tenant->contacts()->create(['phone' => '391', 'name' => 'A', 'opted_in' => true]);
+    $this->tenant->contacts()->create(['phone' => '392', 'name' => 'B', 'opted_in' => true]);
+
+    Livewire::test(Campaigns::class)
+        ->set('name', 'X')
+        ->set('template_name', 't')
+        ->call('send')
+        ->assertDispatched('toast');
+
+    expect(Campaign::withoutGlobalScopes()->count())->toBe(0);
+    Bus::assertNotDispatched(SendCampaign::class);
+});
+
 it('il job invia il template solo ai contatti opt-in e completa', function () {
     Http::fake(['graph.facebook.com/*' => Http::response(['messages' => [['id' => 'wamid.1']]], 200)]);
 

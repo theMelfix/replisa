@@ -28,29 +28,45 @@ class PlanLimits
             return $this->tenant->manual_plan;
         }
 
-        // 2) Abbonamento Stripe attivo.
+        // 2) Abbonamento Stripe attivo (anche in trial Stripe: il prezzo c'è).
         $price = $this->tenant->subscription('default')?->stripe_price;
 
         if ($price) {
             foreach (config('plans.plans', []) as $key => $plan) {
-                if (($plan['stripe_price_id'] ?? null) === $price) {
+                if (($plan['stripe_price_id'] ?? null) === $price
+                    || ($plan['stripe_price_id_annual'] ?? null) === $price) {
                     return $key;
                 }
             }
         }
 
-        // 3) Default (onboarding/free tier).
+        // 3) Prova gratuita senza carta (generic trial alla registrazione).
+        if ($this->tenant->onGenericTrial()) {
+            return config('plans.trial_plan', 'pro');
+        }
+
+        // 4) Default (free tier).
         return config('plans.default', 'starter');
     }
 
-    /** Origine del piano effettivo: 'offline' | 'stripe' | 'default'. */
+    /** Origine del piano effettivo: 'offline' | 'stripe' | 'trial' | 'default'. */
     public function planSource(): string
     {
         if ($this->tenant->hasActiveOfflineLicense() && config('plans.plans.'.$this->tenant->manual_plan)) {
             return 'offline';
         }
 
-        return $this->tenant->subscription('default')?->stripe_price ? 'stripe' : 'default';
+        if ($this->tenant->subscription('default')?->stripe_price) {
+            return 'stripe';
+        }
+
+        return $this->tenant->onGenericTrial() ? 'trial' : 'default';
+    }
+
+    /** Messaggi campagna inclusi al mese (null = illimitati). */
+    public function campaignMessagesLimit(): ?int
+    {
+        return $this->limit('campaign_messages');
     }
 
     /** Canone mensile del piano effettivo (per il calcolo MRR in admin). */

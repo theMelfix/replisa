@@ -65,6 +65,13 @@ it('conta i messaggi del mese e i contatti', function () {
         ->assertViewHas('usage', fn ($u) => $u['sent'] === 2 && $u['received'] === 1 && $u['contacts'] === 1);
 });
 
+it('un tenant in prova gratuita ha il piano trial', function () {
+    $tenant = Tenant::create(['name' => 'In prova', 'trial_ends_at' => now()->addDays(10)]);
+
+    expect(App\Support\PlanLimits::for($tenant)->planKey())->toBe(config('plans.trial_plan'))
+        ->and(App\Support\PlanLimits::for($tenant)->planSource())->toBe('trial');
+});
+
 it('non mostra il link abbonamento al super-admin', function () {
     $admin = User::create([
         'tenant_id' => null,
