@@ -33,6 +33,7 @@ class Tenant extends Model
         'manual_plan',
         'manual_plan_expires_at',
         'reviews_addon',
+        'trial_ends_at',
         'active',
     ];
 
@@ -48,6 +49,7 @@ class Tenant extends Model
             'vat_validated_at' => 'datetime',
             'manual_plan_expires_at' => 'datetime',
             'reviews_addon' => 'boolean',
+            'trial_ends_at' => 'datetime',
         ];
     }
 

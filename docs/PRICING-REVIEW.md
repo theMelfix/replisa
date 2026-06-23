@@ -1,7 +1,7 @@
 # Revisione prezzi Replisa — analisi concorrenza & piano
 
-> Stato: **bozza/analisi** (2026-06-21). Nessuna modifica prezzi ancora applicata.
-> Prezzi attuali in `config/plans.php`: Starter €29 · Base €69 · Pro €129 · Business €249 + add-on Recensioni €19.
+> Stato: **decisioni applicate** (2026-06-23).
+> Prezzi in `config/plans.php`: Starter €19 · Base €49 · Pro €99 · Business €199 (mensile) — annuale -20% · add-on Recensioni €19 · prova 14 giorni.
 
 ## 1. Benchmark concorrenza (giu 2026)
 
@@ -22,14 +22,18 @@ Costi conversazione Meta sempre **a parte** in tutti i tool orizzontali.
 4. **Leve di margine non sfruttate**: i concorrenti monetizzano i messaggi (Wati +20%, Callbell €0,02/contatto). Replisa passa Meta a costo → le **Campagne** sono il punto naturale per un markup o pacchetti messaggi.
 5. **Annuale -20/25%** è prassi di mercato.
 
-## 3. Decisioni da prendere (prima di toccare i prezzi)
+## 3. Decisioni prese (2026-06-23)
 
-- [ ] **Tier Free/Trial**: free permanente limitato (es. 1 automazione, 100 contatti, no campagne) oppure trial 14 giorni? Imposta l'imbuto di acquisizione.
-- [ ] **Monetizzazione campagne**: markup sui messaggi (stile Wati +X%), prezzo per contatto raggiunto (stile Callbell €0,02), o pacchetti messaggi inclusi per piano + extra a consumo?
-- [ ] **Modello multi-operatore**: flat per piano (Business) o add-on per-postazione (stile Callbell)?
-- [ ] **Annuale**: confermare sconto -20% e prezzi annuali.
-- [ ] **Prezzi finali**: confermare 29/69/129/249 o ritoccare alla luce di Spoki (€39 Marketing) e Wati (€110 Pro).
-- [ ] **Add-on**: Recensioni €19 — valutarne altri (es. operatore extra, pacchetto messaggi).
+- [x] **Tier Free/Trial** → **Prova 14 giorni** senza carta (piano Pro durante la prova).
+- [x] **Monetizzazione campagne** → **Pacchetti inclusi + extra a consumo**: messaggi campagna/mese per piano (Base 1.000, Pro 5.000, Business 20.000). Enforcement del pacchetto fatto; **overage a consumo = follow-up** (metered billing Stripe).
+- [x] **Annuale** → **Sì, -20%** (price_annual + toggle mensile/annuale).
+- [x] **Prezzi finali** → **19 / 49 / 99 / 199** (più aggressivi, vicini all'entry Spoki).
+- [x] **Add-on** → Recensioni €19 confermato.
+- [ ] **Modello multi-operatore**: ancora da definire (per ora "Multi-operatore" è una feature del piano Pro+, senza prezzo per-postazione).
+
+### Follow-up implementazione
+- **Overage campagne a consumo** (Stripe metered billing) oltre il pacchetto incluso.
+- **Price ID Stripe** mensili e **annuali** da creare e mettere in `.env` (`STRIPE_PRICE_*` e `STRIPE_PRICE_*_ANNUAL`).
 
 ## 4. Deliverable (una volta prese le decisioni)
 

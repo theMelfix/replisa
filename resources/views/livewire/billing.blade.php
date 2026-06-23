@@ -4,8 +4,20 @@
         <p class="text-gray-500 dark:text-gray-400 mb-8">Scegli il piano per la tua attività. I costi di conversazione WhatsApp di Meta sono a parte.</p>
 
         @php
-            $currentPlanKey = collect($plans)->search(fn ($p) => ! empty($p['stripe_price_id']) && $p['stripe_price_id'] === $currentPriceId);
+            $currentPlanKey = collect($plans)->search(fn ($p) => $currentPriceId && in_array($currentPriceId, [$p['stripe_price_id'] ?? null, $p['stripe_price_id_annual'] ?? null], true));
         @endphp
+
+        @if ($onTrial)
+            <div class="mb-8 rounded-lg bg-blue-50 ring-1 ring-blue-200 px-4 py-3 text-sm text-blue-800">
+                Sei in <strong>prova gratuita</strong> (piano {{ $plans[config('plans.trial_plan')]['name'] ?? '' }}){{ $trialEndsAt ? ' fino al '.$trialEndsAt->translatedFormat('d F Y') : '' }}. Scegli un piano per continuare senza interruzioni.
+            </div>
+        @endif
+
+        {{-- Toggle mensile / annuale --}}
+        <div class="mb-6 inline-flex rounded-lg border border-gray-200 dark:border-gray-700 p-1 text-sm">
+            <button type="button" wire:click="$set('period', 'monthly')" class="px-3 py-1 rounded-md {{ $period === 'monthly' ? 'bg-green-600 text-white' : 'text-gray-600 dark:text-gray-300' }}">Mensile</button>
+            <button type="button" wire:click="$set('period', 'annual')" class="px-3 py-1 rounded-md {{ $period === 'annual' ? 'bg-green-600 text-white' : 'text-gray-600 dark:text-gray-300' }}">Annuale <span class="text-xs">-20%</span></button>
+        </div>
 
         {{-- Stato abbonamento corrente --}}
         @if ($subscription && ($subscription->active() || $subscription->onGracePeriod()))
@@ -41,7 +53,7 @@
                     <h2 class="font-semibold text-gray-900 dark:text-gray-100">Utilizzo</h2>
                     <span class="text-sm text-gray-500 dark:text-gray-400 capitalize">{{ $usage['period_label'] }}</span>
                 </div>
-                <div class="grid grid-cols-3 gap-4 text-center">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
                     <div>
                         <div class="text-3xl font-bold text-gray-900 dark:text-gray-100">{{ number_format($usage['sent'], 0, ',', '.') }}</div>
                         <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">Messaggi inviati</div>
@@ -56,6 +68,12 @@
                         </div>
                         <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">Contatti</div>
                     </div>
+                    <div>
+                        <div class="text-3xl font-bold {{ $campaignLimit !== null && $campaignUsed > $campaignLimit ? 'text-amber-600' : 'text-gray-900 dark:text-gray-100' }}">
+                            {{ number_format($campaignUsed, 0, ',', '.') }}<span class="text-base font-medium text-gray-400">/{{ $campaignLimit !== null ? number_format($campaignLimit, 0, ',', '.') : '∞' }}</span>
+                        </div>
+                        <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">Messaggi campagna</div>
+                    </div>
                 </div>
             </div>
         @endif
@@ -67,8 +85,13 @@
                 <div class="rounded-2xl bg-white dark:bg-gray-800 border {{ $isCurrent ? 'border-green-500 ring-2 ring-green-500' : 'border-gray-200 dark:border-gray-700' }} p-6 flex flex-col" wire:key="plan-{{ $key }}">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ $plan['name'] }}</h3>
                     <p class="mt-4">
-                        <span class="text-4xl font-bold text-gray-900 dark:text-gray-100">€{{ $plan['price'] }}</span>
-                        <span class="text-gray-500 dark:text-gray-400">/mese</span>
+                        @if ($period === 'annual')
+                            <span class="text-4xl font-bold text-gray-900 dark:text-gray-100">€{{ $plan['price_annual'] }}</span>
+                            <span class="text-gray-500 dark:text-gray-400">/anno</span>
+                        @else
+                            <span class="text-4xl font-bold text-gray-900 dark:text-gray-100">€{{ $plan['price'] }}</span>
+                            <span class="text-gray-500 dark:text-gray-400">/mese</span>
+                        @endif
                     </p>
 
                     @if ($isCurrent)

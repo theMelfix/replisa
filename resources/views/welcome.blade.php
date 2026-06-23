@@ -89,25 +89,35 @@
     </section>
 
     {{-- Prezzi --}}
-    <section id="prezzi" class="bg-gray-50 border-y border-gray-100">
+    <section id="prezzi" class="bg-gray-50 border-y border-gray-100" x-data="{ annual: false }">
         <div class="max-w-6xl mx-auto px-6 py-20">
             <h2 class="text-3xl font-bold text-center text-gray-900">Prezzi semplici, senza sorprese</h2>
-            <p class="mt-3 text-center text-gray-600">Canone mensile. I costi di conversazione WhatsApp di Meta sono a parte.</p>
+            <p class="mt-3 text-center text-gray-600">Prova gratis 14 giorni. I costi di conversazione WhatsApp di Meta sono a parte.</p>
 
-            <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="mt-8 flex justify-center">
+                <div class="inline-flex rounded-lg border border-gray-200 bg-white p-1 text-sm">
+                    <button type="button" @click="annual = false" :class="!annual ? 'bg-green-600 text-white' : 'text-gray-600'" class="px-4 py-1.5 rounded-md font-semibold">Mensile</button>
+                    <button type="button" @click="annual = true" :class="annual ? 'bg-green-600 text-white' : 'text-gray-600'" class="px-4 py-1.5 rounded-md font-semibold">Annuale <span class="text-xs">-20%</span></button>
+                </div>
+            </div>
+
+            <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 @foreach ([
-                    ['Starter', 29, 'Per iniziare', ['1 automazione', 'Fino a 500 contatti', 'Supporto email']],
-                    ['Base', 69, 'Il più scelto', ['Tutte le automazioni', 'Fino a 2.000 contatti', 'Dashboard completa']],
-                    ['Pro', 129, 'Per chi cresce', ['Contatti illimitati', 'API integrazioni', 'Multi-operatore']],
-                    ['Business', 249, 'Su misura', ['Tutto del piano Pro', 'Recensioni Google incluse', 'Onboarding + SLA dedicati']],
-                ] as [$nome, $prezzo, $tag, $features])
+                    ['Starter', 19, 182, 'Per iniziare', ['1 automazione', 'Fino a 500 contatti', 'Supporto email']],
+                    ['Base', 49, 470, 'Il più scelto', ['Tutte le automazioni', '1.000 messaggi campagna/mese', 'Fino a 2.000 contatti']],
+                    ['Pro', 99, 950, 'Per chi cresce', ['Contatti illimitati', '5.000 messaggi campagna/mese', 'API + Multi-operatore']],
+                    ['Business', 199, 1910, 'Su misura', ['Tutto del piano Pro', 'Recensioni Google incluse', 'Onboarding + SLA dedicati']],
+                ] as [$nome, $prezzo, $prezzoAnnuo, $tag, $features])
                     <div class="rounded-2xl bg-white border @if($nome==='Base') border-green-500 ring-2 ring-green-500 @else border-gray-200 @endif p-6 flex flex-col">
                         <div class="flex items-center justify-between">
                             <h3 class="text-lg font-semibold text-gray-900">{{ $nome }}</h3>
                             @if($nome==='Base')<span class="text-xs font-semibold text-green-700 bg-green-100 rounded-full px-2 py-0.5">Popolare</span>@endif
                         </div>
                         <p class="mt-1 text-sm text-gray-500">{{ $tag }}</p>
-                        <p class="mt-4"><span class="text-4xl font-bold text-gray-900">€{{ $prezzo }}</span><span class="text-gray-500">/mese</span></p>
+                        <p class="mt-4">
+                            <span x-show="!annual"><span class="text-4xl font-bold text-gray-900">€{{ $prezzo }}</span><span class="text-gray-500">/mese</span></span>
+                            <span x-show="annual" x-cloak><span class="text-4xl font-bold text-gray-900">€{{ $prezzoAnnuo }}</span><span class="text-gray-500">/anno</span></span>
+                        </p>
                         <ul class="mt-6 space-y-2 text-sm text-gray-600 flex-1">
                             @foreach ($features as $f)
                                 <li class="flex items-start gap-2"><span class="text-green-600">✓</span>{{ $f }}</li>

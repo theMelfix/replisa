@@ -89,6 +89,7 @@ new #[Layout('layouts.guest')] class extends Component
                 'sdi_code' => $validated['sdi_code'] ?: null,
                 'pec' => $validated['pec'] ?: null,
                 'vat_validated_at' => $viesValid === true ? now() : null,
+                'trial_ends_at' => now()->addDays(config('plans.trial_days', 14)),
             ]);
 
             $user = User::create([

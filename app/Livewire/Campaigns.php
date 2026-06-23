@@ -61,6 +61,19 @@ class Campaigns extends Component
             return;
         }
 
+        // Pacchetto messaggi campagna inclusi nel mese (null = illimitati).
+        $messagesLimit = PlanLimits::for($tenant)->campaignMessagesLimit();
+
+        if ($messagesLimit !== null) {
+            $usedThisMonth = Campaign::where('created_at', '>=', now()->startOfMonth())->sum('total');
+
+            if ($usedThisMonth + $recipients > $messagesLimit) {
+                $this->dispatch('toast', type: 'error', message: 'Hai esaurito i messaggi campagna inclusi nel tuo piano questo mese.');
+
+                return;
+            }
+        }
+
         $campaign = Campaign::create([
             'name' => $data['name'],
             'template_name' => $data['template_name'],
