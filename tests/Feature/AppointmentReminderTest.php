@@ -153,6 +153,33 @@ it('disdice l\'appuntamento alla risposta "Disdici"', function () {
     expect($appointment->fresh()->status)->toBe(Appointment::STATUS_CANCELLED);
 });
 
+it('conferma con la label italiana del template ("Confermo", case-insensitive)', function () {
+    activateReminder($this->tenant);
+    $appointment = $this->tenant->appointments()->create([
+        'contact_id' => $this->contact->id,
+        'scheduled_at' => now()->addHours(2),
+        'status' => Appointment::STATUS_SCHEDULED,
+    ]);
+
+    $result = AppointmentReminder::for($this->tenant)->handleButtonReply($this->contact, 'confermo');
+
+    expect($result?->id)->toBe($appointment->id)
+        ->and($appointment->fresh()->status)->toBe(Appointment::STATUS_CONFIRMED);
+});
+
+it('disdice con la label italiana del template ("Disdico")', function () {
+    activateReminder($this->tenant);
+    $appointment = $this->tenant->appointments()->create([
+        'contact_id' => $this->contact->id,
+        'scheduled_at' => now()->addHours(2),
+        'status' => Appointment::STATUS_SCHEDULED,
+    ]);
+
+    AppointmentReminder::for($this->tenant)->handleButtonReply($this->contact, 'Disdico');
+
+    expect($appointment->fresh()->status)->toBe(Appointment::STATUS_CANCELLED);
+});
+
 it('ignora payload sconosciuti senza toccare lo stato', function () {
     activateReminder($this->tenant);
     $appointment = $this->tenant->appointments()->create([

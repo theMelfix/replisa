@@ -63,18 +63,14 @@ Per qualsiasi necessità rispondi pure a questo messaggio.
 | 0 | `Confermo` | `confirmed` |
 | 1 | `Disdico` | `cancelled` |
 
-> ⚠️ **Vincolo payload quick-reply.** Per i bottoni quick-reply *dei template*, il
-> webhook restituisce `button.payload` **uguale al testo del bottone**. Il codice
-> (`handleButtonReply()`) confronta il payload con i default **`CONFIRM` / `CANCEL`**.
-> Quindi, se il testo del bottone è `Confermo`/`Disdico`, bisogna **allineare** il
-> matching in uno dei due modi:
-> 1. impostare nell'`Automation.config` del tenant `confirm_payload = "Confermo"` e
->    `cancel_payload = "Disdico"`; **oppure**
-> 2. cambiare i default in `AppointmentReminder` (`DEFAULT_CONFIRM_PAYLOAD`/
->    `DEFAULT_CANCEL_PAYLOAD`).
->
-> In alternativa, usare come testo bottone letteralmente `CONFIRM`/`CANCEL` (brutto in
-> UI). **Raccomandato:** opzione 1/2 con label italiane. → vedi action item in fondo.
+> ✅ **Payload quick-reply allineati (2026-06-29).** Per i bottoni quick-reply *dei
+> template* il webhook restituisce `button.payload` **uguale al testo del bottone**.
+> Il codice (`handleButtonReply()`) ora ha come default proprio le label italiane
+> **`Confermo` / `Disdico`** (`DEFAULT_CONFIRM_PAYLOAD`/`DEFAULT_CANCEL_PAYLOAD`), con
+> match **case-insensitive**; restano accettati come fallback anche i vecchi
+> `CONFIRM`/`CANCEL`. Quindi un template con bottoni `Confermo`/`Disdico` funziona
+> **senza configurazione aggiuntiva**. Se usi label diverse, impostale comunque
+> nell'`Automation.config` del tenant (`confirm_payload`/`cancel_payload`).
 
 ---
 
@@ -206,10 +202,9 @@ Template di sistema preesistente di Meta, usato per il primo invio di prova in s
 
 ## Action item lato codice (collegati ai template)
 
-- [ ] **Payload quick-reply reminder:** allineare i default `CONFIRM`/`CANCEL` ai testi
-  bottone italiani (`Confermo`/`Disdico`) — o nel codice (`AppointmentReminder`) o via
-  `Automation.config` per-tenant. Senza questo, le risposte al reminder non aggiornano
-  lo stato dell'appuntamento. → vedi §1.
+- [x] **Payload quick-reply reminder:** ✅ fatto 2026-06-29 — default `AppointmentReminder`
+  portati a `Confermo`/`Disdico`, match case-insensitive con fallback `CONFIRM`/`CANCEL`.
+  Un template con bottoni `Confermo`/`Disdico` funziona out-of-the-box. → vedi §1.
 - [ ] **Review URL:** decidere variante statica vs dinamica del button `review_request`
   e, se dinamica, garantire che `review_url_param` sia sempre valorizzato prima
   dell'invio (validazione in `WhatsAppSettings`/`Automations`). → vedi §2.
