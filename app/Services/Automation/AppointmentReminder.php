@@ -28,9 +28,15 @@ class AppointmentReminder
 
     public const DEFAULT_TEMPLATE = 'appointment_reminder';
 
-    public const DEFAULT_CONFIRM_PAYLOAD = 'CONFIRM';
+    /**
+     * Testo del bottone quick-reply atteso in risposta al reminder. Per i bottoni
+     * quick-reply *dei template* Meta restituisce `button.payload` uguale al testo
+     * del bottone, quindi questi default coincidono con le label italiane del
+     * template `appointment_reminder` (vedi docs/META-TEMPLATES.md §1).
+     */
+    public const DEFAULT_CONFIRM_PAYLOAD = 'Confermo';
 
-    public const DEFAULT_CANCEL_PAYLOAD = 'CANCEL';
+    public const DEFAULT_CANCEL_PAYLOAD = 'Disdico';
 
     public function __construct(private readonly Tenant $tenant) {}
 
@@ -124,9 +130,16 @@ class AppointmentReminder
 
         $config = $automation->config ?? [];
 
-        $status = match ($payload) {
-            $config['confirm_payload'] ?? self::DEFAULT_CONFIRM_PAYLOAD => Appointment::STATUS_CONFIRMED,
-            $config['cancel_payload'] ?? self::DEFAULT_CANCEL_PAYLOAD => Appointment::STATUS_CANCELLED,
+        // Match case-insensitive sul testo del bottone. I default sono le label
+        // italiane del template; `confirm`/`cancel` restano accettati come fallback
+        // di retrocompatibilità (vecchi template/config con payload `CONFIRM`/`CANCEL`).
+        $normalized = mb_strtolower(trim($payload));
+        $confirm = mb_strtolower((string) ($config['confirm_payload'] ?? self::DEFAULT_CONFIRM_PAYLOAD));
+        $cancel = mb_strtolower((string) ($config['cancel_payload'] ?? self::DEFAULT_CANCEL_PAYLOAD));
+
+        $status = match (true) {
+            in_array($normalized, [$confirm, 'confirm'], true) => Appointment::STATUS_CONFIRMED,
+            in_array($normalized, [$cancel, 'cancel'], true) => Appointment::STATUS_CANCELLED,
             default => null,
         };
 
