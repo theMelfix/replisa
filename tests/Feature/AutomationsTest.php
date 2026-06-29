@@ -116,3 +116,97 @@ it('ignora tipi di flusso sconosciuti', function () {
 
     expect(Automation::withoutGlobalScopes()->count())->toBe(0);
 });
+
+/** Helper: crea l'Automation recensione attiva per il tenant del test. */
+function activateReviewAutomation($tenant, array $config = []): Automation
+{
+    return Automation::withoutGlobalScopes()->create([
+        'tenant_id' => $tenant->id,
+        'type' => Automation::TYPE_REVIEW_REQUEST,
+        'trigger' => 'schedule',
+        'config' => $config,
+        'active' => true,
+    ]);
+}
+
+it('salva il link recensione dinamico nella config dell\'automazione', function () {
+    $this->tenant->update(['reviews_addon' => true]);
+    activateReviewAutomation($this->tenant);
+    $this->actingAs($this->owner);
+
+    Livewire::test(Automations::class)
+        ->set('reviewUrlMode', 'dynamic')
+        ->set('reviewUrlParam', 'ChIJabc123')
+        ->call('saveReviewSettings')
+        ->assertDispatched('toast');
+
+    $automation = Automation::withoutGlobalScopes()->where('type', Automation::TYPE_REVIEW_REQUEST)->first();
+    expect($automation->config['review_url_param'])->toBe('ChIJabc123');
+});
+
+it('in modalità statico azzera il param anche se era valorizzato', function () {
+    $this->tenant->update(['reviews_addon' => true]);
+    activateReviewAutomation($this->tenant, ['review_url_param' => 'ChIJabc123']);
+    $this->actingAs($this->owner);
+
+    Livewire::test(Automations::class)
+        ->set('reviewUrlMode', 'static')
+        ->call('saveReviewSettings');
+
+    $automation = Automation::withoutGlobalScopes()->where('type', Automation::TYPE_REVIEW_REQUEST)->first();
+    expect($automation->config['review_url_param'])->toBeNull();
+});
+
+it('rifiuta la modalità dinamica con suffisso vuoto', function () {
+    $this->tenant->update(['reviews_addon' => true]);
+    activateReviewAutomation($this->tenant);
+    $this->actingAs($this->owner);
+
+    Livewire::test(Automations::class)
+        ->set('reviewUrlMode', 'dynamic')
+        ->set('reviewUrlParam', '')
+        ->call('saveReviewSettings')
+        ->assertHasErrors('reviewUrlParam');
+
+    $automation = Automation::withoutGlobalScopes()->where('type', Automation::TYPE_REVIEW_REQUEST)->first();
+    expect($automation->config['review_url_param'] ?? null)->toBeNull();
+});
+
+it('non salva il link recensione senza add-on', function () {
+    activateReviewAutomation($this->tenant); // automazione esiste ma niente add-on
+    $this->actingAs($this->owner);
+
+    Livewire::test(Automations::class)
+        ->set('reviewUrlMode', 'dynamic')
+        ->set('reviewUrlParam', 'ChIJabc123')
+        ->call('saveReviewSettings')
+        ->assertDispatched('toast');
+
+    $automation = Automation::withoutGlobalScopes()->where('type', Automation::TYPE_REVIEW_REQUEST)->first();
+    expect($automation->config['review_url_param'] ?? null)->toBeNull();
+});
+
+it('inferisce la modalità dinamica al mount se il param è già configurato', function () {
+    $this->tenant->update(['reviews_addon' => true]);
+    activateReviewAutomation($this->tenant, ['review_url_param' => 'ChIJabc123']);
+    $this->actingAs($this->owner);
+
+    Livewire::test(Automations::class)
+        ->assertSet('reviewUrlMode', 'dynamic')
+        ->assertSet('reviewUrlParam', 'ChIJabc123');
+});
+
+it('preserva le altre chiavi di config al salvataggio del link', function () {
+    $this->tenant->update(['reviews_addon' => true]);
+    activateReviewAutomation($this->tenant, ['delay_hours' => 48]);
+    $this->actingAs($this->owner);
+
+    Livewire::test(Automations::class)
+        ->set('reviewUrlMode', 'dynamic')
+        ->set('reviewUrlParam', 'ChIJabc123')
+        ->call('saveReviewSettings');
+
+    $automation = Automation::withoutGlobalScopes()->where('type', Automation::TYPE_REVIEW_REQUEST)->first();
+    expect($automation->config['delay_hours'])->toBe(48)
+        ->and($automation->config['review_url_param'])->toBe('ChIJabc123');
+});

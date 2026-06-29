@@ -99,21 +99,27 @@ Se ti va, lasciaci una recensione: bastano 30 secondi e per noi è preziosa. �
 
 **Button:** 1 × **Call-to-action → Visit website**
 
-Due varianti, a seconda della configurazione del tenant (`Automation.config.review_url_param`):
+La scelta tra le due varianti si fa **dall'app**, in `/automations` → card *Richiesta
+recensione* (visibile quando l'add-on è attivo), campo **"Link recensione nel template"**:
 
-- **Statico (consigliato per partire):** URL fisso alla pagina recensioni Google del
-  tenant, es. `https://g.page/r/IL_TUO_PLACE_ID/review`. **Nessun** componente button
-  passato dal codice (se `review_url_param` è vuoto). ✅ Più semplice, sempre valido.
+- **Statico (default, consigliato):** il bottone del template ha l'**URL completo e
+  fisso** della pagina recensioni Google dell'attività, es.
+  `https://g.page/r/IL_TUO_PLACE_ID/review`. In UI si lascia la modalità *statico* →
+  `Automation.config.review_url_param` resta **null** e il codice **non** passa alcun
+  componente button. ✅ Sempre valido, nessun parametro. Dato che i template sono
+  comunque per-WABA (ADR-003), un URL fisso per attività è la scelta naturale.
 
-- **Dinamico:** URL con suffisso variabile, es. base
-  `https://g.page/r/{{1}}/review`. Il codice passa `review_url_param` come `{{1}}` del
-  bottone (component `button`, `sub_type=url`, `index=0`).
-  ⚠️ Se scegli il template **dinamico**, il tenant **deve** avere `review_url_param`
-  valorizzato, altrimenti Meta rigetta l'invio (variabile button mancante).
+- **Dinamico:** template con suffisso variabile, es. base `https://g.page/r/{{1}}/review`.
+  In UI si seleziona *dinamico* e si inserisce il **suffisso** (es. il place id): il
+  codice lo passa come `{{1}}` del bottone (`button`, `sub_type=url`, `index=0`).
+  Permette un template unico riusabile cambiando solo il parametro per tenant.
 
-> **Nota multi-tenant:** essendo l'URL recensioni specifico di ogni attività, il
-> template statico va comunque personalizzato per-WABA. La variante dinamica permette
-> un template unico riusabile cambiando solo il parametro per tenant.
+> ✅ **Coerenza garantita dalla UI (2026-06-29).** La pagina Automazioni impedisce gli
+> stati incoerenti che fallirebbero a runtime: in *statico* il param è forzato a null
+> (niente "param di troppo"); in *dinamico* il suffisso è **obbligatorio** e validato
+> (niente "param mancante"). Vedi `Automations::saveReviewSettings()`. L'unico residuo
+> non verificabile lato app — modalità dichiarata diversa dal template reale su Meta —
+> richiederebbe l'introspezione del template via Graph API (follow-up).
 
 ---
 
@@ -205,6 +211,8 @@ Template di sistema preesistente di Meta, usato per il primo invio di prova in s
 - [x] **Payload quick-reply reminder:** ✅ fatto 2026-06-29 — default `AppointmentReminder`
   portati a `Confermo`/`Disdico`, match case-insensitive con fallback `CONFIRM`/`CANCEL`.
   Un template con bottoni `Confermo`/`Disdico` funziona out-of-the-box. → vedi §1.
-- [ ] **Review URL:** decidere variante statica vs dinamica del button `review_request`
-  e, se dinamica, garantire che `review_url_param` sia sempre valorizzato prima
-  dell'invio (validazione in `WhatsAppSettings`/`Automations`). → vedi §2.
+- [x] **Review URL:** ✅ fatto 2026-06-29 — scelta statico/dinamico esposta in
+  `/automations` (card Recensioni) con validazione in `Automations::saveReviewSettings()`:
+  statico → param null, dinamico → suffisso obbligatorio. Gli stati incoerenti
+  controllabili dall'app sono chiusi. Follow-up (opzione 3): introspezione del template
+  Meta via Graph API per validare la modalità rispetto al template reale. → vedi §2.

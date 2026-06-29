@@ -18,6 +18,12 @@ use Livewire\Component;
 #[Layout('layouts.app')]
 class Automations extends Component
 {
+    /** Modalità del link recensione: statico (nel template) o dinamico (param). */
+    public string $reviewUrlMode = 'static';
+
+    /** Suffisso del button URL dinamico del template recensione (solo modalità dinamica). */
+    public ?string $reviewUrlParam = null;
+
     /** @var array<string, array{label: string, desc: string, trigger: string}> */
     public const FLOWS = [
         Automation::TYPE_WELCOME => [
@@ -36,6 +42,17 @@ class Automations extends Component
             'trigger' => 'manual',
         ],
     ];
+
+    public function mount(): void
+    {
+        $review = Automation::where('type', Automation::TYPE_REVIEW_REQUEST)->first();
+        $param = $review?->config['review_url_param'] ?? null;
+
+        if (filled($param)) {
+            $this->reviewUrlMode = 'dynamic';
+            $this->reviewUrlParam = (string) $param;
+        }
+    }
 
     public function toggle(string $type): void
     {
@@ -111,6 +128,57 @@ class Automations extends Component
         } catch (TenantContextException $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
+    }
+
+    /**
+     * Salva la configurazione del link recensione sull'Automation `review_request`
+     * (E3.3): chiude gli stati incoerenti del button URL del template (vedi
+     * docs/META-TEMPLATES.md §2). Modalità `static` → nessun param (link nel
+     * template); `dynamic` → suffisso obbligatorio passato al button URL.
+     */
+    public function saveReviewSettings(): void
+    {
+        $tenant = auth()->user()?->tenant;
+
+        if (! $tenant || ! PlanLimits::for($tenant)->hasReviewsAddon()) {
+            $this->dispatch('toast', type: 'error', message: 'La Richiesta recensione è un add-on: attivala dal piano Business o contatta l\'assistenza.');
+
+            return;
+        }
+
+        $automation = Automation::where('type', Automation::TYPE_REVIEW_REQUEST)->first();
+
+        if (! $automation) {
+            $this->dispatch('toast', type: 'error', message: 'Attiva prima l\'add-on Richiesta recensione.');
+
+            return;
+        }
+
+        $this->validate([
+            'reviewUrlMode' => ['required', 'in:static,dynamic'],
+            // Suffisso del button URL, non un URL completo → niente regola `url`;
+            // obbligatorio e senza spazi solo in modalità dinamica.
+            'reviewUrlParam' => $this->reviewUrlMode === 'dynamic'
+                ? ['required', 'string', 'max:200', 'regex:/^\S+$/']
+                : ['nullable'],
+        ], attributes: [
+            'reviewUrlParam' => 'link recensione',
+        ]);
+
+        $param = $this->reviewUrlMode === 'dynamic' ? trim((string) $this->reviewUrlParam) : null;
+
+        try {
+            $automation->update([
+                'config' => array_merge($automation->config ?? [], ['review_url_param' => $param]),
+            ]);
+        } catch (TenantContextException $e) {
+            $this->dispatch('toast', type: 'error', message: $e->getMessage());
+
+            return;
+        }
+
+        $this->reviewUrlParam = $param;
+        $this->dispatch('toast', type: 'success', message: 'Impostazioni recensione salvate.');
     }
 
     public function render(): View
