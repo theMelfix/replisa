@@ -24,6 +24,15 @@ class WelcomeFlow
     /** Prefisso degli id bottone, per riconoscere i reply che competono a questo flusso. */
     public const BUTTON_PREFIX = 'welcome:';
 
+    public const DEFAULT_GREETING = 'Ciao! 👋 Grazie per averci scritto. Come possiamo aiutarti?';
+
+    /** @var array<int, array{id: string, title: string}> */
+    public const DEFAULT_BUTTONS = [
+        ['id' => 'info_servizi', 'title' => 'Info Servizi'],
+        ['id' => 'prenota', 'title' => 'Prenota'],
+        ['id' => 'parla_con_noi', 'title' => 'Parla con noi'],
+    ];
+
     public function __construct(private readonly Tenant $tenant) {}
 
     public static function for(Tenant $tenant): self
@@ -49,7 +58,7 @@ class WelcomeFlow
 
         return WhatsAppService::for($this->tenant)->sendButtons(
             $contact,
-            body: $config['greeting'] ?? $this->defaultGreeting(),
+            body: $config['greeting'] ?? self::DEFAULT_GREETING,
             buttons: $this->buttons($config),
             header: $config['header'] ?? null,
             footer: $config['footer'] ?? null,
@@ -118,26 +127,11 @@ class WelcomeFlow
      */
     private function buttons(array $config): array
     {
-        $buttons = $config['buttons'] ?? $this->defaultButtons();
+        $buttons = $config['buttons'] ?? self::DEFAULT_BUTTONS;
 
         return array_map(fn (array $b) => [
             'id' => self::BUTTON_PREFIX.$b['id'],
             'title' => $b['title'],
         ], array_values($buttons));
-    }
-
-    private function defaultGreeting(): string
-    {
-        return 'Ciao! 👋 Grazie per averci scritto. Come possiamo aiutarti?';
-    }
-
-    /** @return array<int, array{id: string, title: string}> */
-    private function defaultButtons(): array
-    {
-        return [
-            ['id' => 'info_servizi', 'title' => 'Info Servizi'],
-            ['id' => 'prenota', 'title' => 'Prenota'],
-            ['id' => 'parla_con_noi', 'title' => 'Parla con noi'],
-        ];
     }
 }

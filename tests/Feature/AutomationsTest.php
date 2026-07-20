@@ -2,10 +2,13 @@
 
 use App\Livewire\Automations;
 use App\Models\Automation;
+use App\Models\Contact;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Services\Automation\WelcomeFlow;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
@@ -209,4 +212,217 @@ it('preserva le altre chiavi di config al salvataggio del link', function () {
     $automation = Automation::withoutGlobalScopes()->where('type', Automation::TYPE_REVIEW_REQUEST)->first();
     expect($automation->config['delay_hours'])->toBe(48)
         ->and($automation->config['review_url_param'])->toBe('ChIJabc123');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Configurazione flussi Benvenuto e Promemoria (E4.2.3)
+|--------------------------------------------------------------------------
+*/
+
+/** Helper: crea un'Automation attiva del tipo dato per il tenant del test. */
+function activateAutomation($tenant, string $type, array $config = []): Automation
+{
+    return Automation::withoutGlobalScopes()->create([
+        'tenant_id' => $tenant->id,
+        'type' => $type,
+        'trigger' => Automations::FLOWS[$type]['trigger'],
+        'config' => $config,
+        'active' => true,
+    ]);
+}
+
+/** Helper: la config salvata sull'Automation del tipo dato. */
+function configOf(string $type): array
+{
+    return Automation::withoutGlobalScopes()->where('type', $type)->first()->config ?? [];
+}
+
+it('precompila il form benvenuto con i default del flusso', function () {
+    activateAutomation($this->tenant, Automation::TYPE_WELCOME);
+    $this->actingAs($this->owner);
+
+    Livewire::test(Automations::class)
+        ->assertSet('welcomeGreeting', WelcomeFlow::DEFAULT_GREETING)
+        ->assertSet('welcomeButtons.0.title', 'Info Servizi')
+        ->assertSet('welcomeButtons.0.id', 'info_servizi');
+});
+
+it('salva testi e bottoni del menu di benvenuto', function () {
+    activateAutomation($this->tenant, Automation::TYPE_WELCOME);
+    $this->actingAs($this->owner);
+
+    Livewire::test(Automations::class)
+        ->set('welcomeGreeting', 'Benvenuto in Studio A!')
+        ->set('welcomeHeader', 'Studio A')
+        ->set('welcomeFooter', 'Lun-Ven 9-18')
+        ->set('welcomeButtons.0.title', 'Orari')
+        ->set('welcomeButtons.0.reply', 'Siamo aperti dalle 9 alle 18.')
+        ->call('saveWelcomeSettings')
+        ->assertHasNoErrors()
+        ->assertDispatched('toast');
+
+    $config = configOf(Automation::TYPE_WELCOME);
+
+    expect($config['greeting'])->toBe('Benvenuto in Studio A!')
+        ->and($config['header'])->toBe('Studio A')
+        ->and($config['footer'])->toBe('Lun-Ven 9-18')
+        ->and($config['buttons'][0])->toBe(['id' => 'info_servizi', 'title' => 'Orari'])
+        ->and($config['replies']['info_servizi'])->toBe('Siamo aperti dalle 9 alle 18.');
+});
+
+it('scarta gli slot bottone lasciati senza titolo', function () {
+    activateAutomation($this->tenant, Automation::TYPE_WELCOME);
+    $this->actingAs($this->owner);
+
+    Livewire::test(Automations::class)
+        ->set('welcomeButtons.1.title', '')
+        ->set('welcomeButtons.2.title', '')
+        ->call('saveWelcomeSettings');
+
+    expect(configOf(Automation::TYPE_WELCOME)['buttons'])->toHaveCount(1);
+});
+
+it('rifiuta un menu di benvenuto senza nessun bottone', function () {
+    activateAutomation($this->tenant, Automation::TYPE_WELCOME);
+    $this->actingAs($this->owner);
+
+    Livewire::test(Automations::class)
+        ->set('welcomeButtons.0.title', '')
+        ->set('welcomeButtons.1.title', '')
+        ->set('welcomeButtons.2.title', '')
+        ->call('saveWelcomeSettings')
+        ->assertHasErrors('welcomeButtons.0.title');
+
+    expect(configOf(Automation::TYPE_WELCOME))->toBe([]);
+});
+
+it('non salva la configurazione se il flusso non è ancora attivo', function () {
+    $this->actingAs($this->owner);
+
+    Livewire::test(Automations::class)
+        ->call('saveWelcomeSettings')
+        ->assertDispatched('toast');
+
+    expect(Automation::withoutGlobalScopes()->count())->toBe(0);
+});
+
+it('salva i parametri dei promemoria ordinando gli anticipi', function () {
+    activateAutomation($this->tenant, Automation::TYPE_APPOINTMENT_REMINDER);
+    $this->actingAs($this->owner);
+
+    Livewire::test(Automations::class)
+        ->set('reminderTemplate', 'promemoria_studio')
+        ->set('reminderLanguage', 'it')
+        ->set('reminderOffsets', '2, 48, 24, 24')
+        ->set('reminderConfirm', 'Ci sarò')
+        ->set('reminderCancel', 'Disdico')
+        ->call('saveReminderSettings')
+        ->assertHasNoErrors()
+        ->assertSet('reminderOffsets', '48, 24, 2');
+
+    $config = configOf(Automation::TYPE_APPOINTMENT_REMINDER);
+
+    expect($config['template'])->toBe('promemoria_studio')
+        ->and($config['offsets'])->toBe([48, 24, 2])
+        ->and($config['confirm_payload'])->toBe('Ci sarò');
+});
+
+it('rifiuta anticipi non numerici o fuori scala', function (string $offsets) {
+    activateAutomation($this->tenant, Automation::TYPE_APPOINTMENT_REMINDER);
+    $this->actingAs($this->owner);
+
+    Livewire::test(Automations::class)
+        ->set('reminderOffsets', $offsets)
+        ->call('saveReminderSettings')
+        ->assertHasErrors('reminderOffsets');
+
+    expect(configOf(Automation::TYPE_APPOINTMENT_REMINDER))->toBe([]);
+})->with(['24, domani', '0', '1000', '-2']);
+
+it('rifiuta un nome template non conforme a Meta', function () {
+    activateAutomation($this->tenant, Automation::TYPE_APPOINTMENT_REMINDER);
+    $this->actingAs($this->owner);
+
+    Livewire::test(Automations::class)
+        ->set('reminderTemplate', 'Promemoria Studio')
+        ->call('saveReminderSettings')
+        ->assertHasErrors('reminderTemplate');
+});
+
+it('preserva le altre chiavi di config al salvataggio dei promemoria', function () {
+    activateAutomation($this->tenant, Automation::TYPE_APPOINTMENT_REMINDER, ['custom' => 'x']);
+    $this->actingAs($this->owner);
+
+    Livewire::test(Automations::class)
+        ->set('reminderOffsets', '12')
+        ->call('saveReminderSettings');
+
+    expect(configOf(Automation::TYPE_APPOINTMENT_REMINDER))
+        ->toMatchArray(['custom' => 'x', 'offsets' => [12]]);
+});
+
+it('mostra i pannelli di configurazione solo per i flussi attivi', function () {
+    $this->actingAs($this->owner);
+
+    $this->get('/automations')
+        ->assertOk()
+        ->assertDontSee('Messaggio di benvenuto')
+        ->assertDontSee('Template Meta');
+
+    activateAutomation($this->tenant, Automation::TYPE_WELCOME);
+    activateAutomation($this->tenant, Automation::TYPE_APPOINTMENT_REMINDER);
+    activateAutomation($this->tenant, Automation::TYPE_CAMPAIGN);
+
+    $this->get('/automations')
+        ->assertOk()
+        ->assertSee('Messaggio di benvenuto')
+        ->assertSee('Bottoni del menu')
+        ->assertSee('Template Meta')
+        ->assertSee('Quanto tempo prima')
+        ->assertSee(route('campaigns'));
+});
+
+it('il menu salvato dalla UI è quello che parte davvero su WhatsApp', function () {
+    Http::fake(['graph.facebook.com/*' => Http::response([
+        'messaging_product' => 'whatsapp',
+        'messages' => [['id' => 'wamid.OUT']],
+    ], 200)]);
+
+    activateAutomation($this->tenant, Automation::TYPE_WELCOME);
+    $this->actingAs($this->owner);
+
+    Livewire::test(Automations::class)
+        ->set('welcomeGreeting', 'Ciao dallo Studio A')
+        ->set('welcomeHeader', 'Studio A')
+        ->set('welcomeButtons.0.title', 'Orari')
+        ->set('welcomeButtons.0.reply', 'Apriamo alle 9.')
+        ->set('welcomeButtons.1.title', '')
+        ->set('welcomeButtons.2.title', '')
+        ->call('saveWelcomeSettings');
+
+    $contact = Contact::withoutGlobalScopes()->create([
+        'tenant_id' => $this->tenant->id,
+        'phone' => '393334445556',
+        'name' => 'Cliente',
+    ]);
+
+    WelcomeFlow::for($this->tenant->fresh())->greet($contact);
+
+    Http::assertSent(function ($request) {
+        $interactive = $request->data()['interactive'];
+
+        return $interactive['body']['text'] === 'Ciao dallo Studio A'
+            && $interactive['header']['text'] === 'Studio A'
+            && $interactive['action']['buttons'] === [[
+                'type' => 'reply',
+                'reply' => ['id' => 'welcome:info_servizi', 'title' => 'Orari'],
+            ]];
+    });
+
+    // Il tocco sul bottone deve trovare la risposta salvata sotto lo stesso id.
+    $reply = WelcomeFlow::for($this->tenant->fresh())->handleButtonReply($contact, 'welcome:info_servizi');
+
+    expect($reply)->not->toBeNull()
+        ->and($reply->content['body'])->toBe('Apriamo alle 9.');
 });
