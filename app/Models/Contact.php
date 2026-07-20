@@ -32,6 +32,17 @@ class Contact extends Model
         ];
     }
 
+    /**
+     * Normalizza un numero a E.164 senza `+`, il formato richiesto dalla
+     * Cloud API e quello con cui i numeri sono salvati (l'unique è
+     * `tenant_id`+`phone`: senza normalizzazione lo stesso numero scritto in
+     * due formati creerebbe due contatti).
+     */
+    public static function normalizePhone(string $phone): string
+    {
+        return preg_replace('/\D+/', '', $phone) ?? '';
+    }
+
     /** @return BelongsTo<Tenant, $this> */
     public function tenant(): BelongsTo
     {

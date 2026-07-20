@@ -246,13 +246,7 @@ class WhatsAppService
         }
 
         return $this->tenant->contacts()->firstOrCreate(
-            ['phone' => $this->normalizePhone($to)],
+            ['phone' => Contact::normalizePhone($to)],
         );
-    }
-
-    /** Normalizza a E.164 senza `+` (formato richiesto dalla Cloud API). */
-    private function normalizePhone(string $phone): string
-    {
-        return preg_replace('/\D+/', '', $phone) ?? '';
     }
 }

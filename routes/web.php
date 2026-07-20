@@ -3,6 +3,7 @@
 use App\Livewire\AcceptInvitation;
 use App\Livewire\Admin\Deadlines as AdminDeadlines;
 use App\Livewire\Admin\Tenants;
+use App\Livewire\ApiTokens;
 use App\Livewire\Appointments;
 use App\Livewire\Automations;
 use App\Livewire\Billing;
@@ -57,6 +58,15 @@ Route::get('billing', Billing::class)
 Route::get('whatsapp', WhatsAppSettings::class)
     ->middleware(['auth', 'verified', 'tenant.active'])
     ->name('whatsapp');
+
+// API pubblica (E4.3): gestione chiavi + documentazione per integrazioni.
+Route::get('api-tokens', ApiTokens::class)
+    ->middleware(['auth', 'verified', 'tenant.active'])
+    ->name('api-tokens');
+
+Route::view('api-docs', 'pages.api-docs')
+    ->middleware(['auth', 'verified'])
+    ->name('api.docs');
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\PlanLimits;
 use Database\Factories\TenantFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -56,12 +57,21 @@ class Tenant extends Model
     /**
      * Licenza offline attiva: un piano assegnato a mano dall'admin
      * (`manual_plan`), non scaduto. Ha priorità sull'abbonamento Stripe in
-     * {@see \App\Support\PlanLimits}.
+     * {@see PlanLimits}.
      */
     public function hasActiveOfflineLicense(): bool
     {
         return ! empty($this->manual_plan)
             && (is_null($this->manual_plan_expires_at) || $this->manual_plan_expires_at->isFuture());
+    }
+
+    /**
+     * Il tenant ha collegato il proprio numero WhatsApp (E6.2.3): senza
+     * `phone_number_id` e `access_token` la Cloud API non può inviare nulla.
+     */
+    public function hasWhatsAppConfigured(): bool
+    {
+        return filled($this->phone_number_id) && filled($this->access_token);
     }
 
     /** @return HasMany<Contact, $this> */
