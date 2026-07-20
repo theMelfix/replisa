@@ -41,7 +41,7 @@ class Appointments extends Component
             'scheduled_at' => ['required', 'date'],
         ]);
 
-        $phone = preg_replace('/\D+/', '', $data['phone']);
+        $phone = Contact::normalizePhone($data['phone']);
         $contact = Contact::where('phone', $phone)->first();
 
         // Enforcement limiti di piano (E4.2.6): un contatto nuovo oltre il limite
@@ -108,7 +108,7 @@ class Appointments extends Component
         $limits = $tenant ? PlanLimits::for($tenant) : null;
 
         foreach ($rows as $row) {
-            $phone = preg_replace('/\D+/', '', $row[0] ?? '');
+            $phone = Contact::normalizePhone($row[0] ?? '');
             if ($phone === '' || ! is_numeric($phone)) {
                 continue; // salta header o righe non valide
             }

@@ -8,7 +8,7 @@
 > **Pricing:** Starter €14 | Base €39 | Pro €79 | Business €149 /mese
 > **PM / Scrum Master:** Claude (AI) · **Dev / Product Owner:** Giovanni Melfi
 > **Data inizio progetto:** 14/05/2026
-> **Ultimo aggiornamento:** 20/07/2026 — E4.2.3 completa: configurazione parametri dei flussi da UI (su `develop`)
+> **Ultimo aggiornamento:** 20/07/2026 — E4.3 completa: API pubblica v1 (Sanctum) + docs; chiude anche 3.2.5 (su `develop`)
 
 ---
 
@@ -177,7 +177,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 | 3.2.2 | Laravel Scheduler: job che gira ogni ora, trova appuntamenti a -24h e -2h | `P0` | 3 | ✅ | Command `replisa:send-reminders` + `AppointmentReminder::dispatchDue()`. Logica due idempotente a due finestre sull'unica colonna `reminded_at`. Schedule `->hourly()` in `routes/console.php`. ⚠️ Serve cron `schedule:run` sul VPS (vedi deploy/README). 2026-06-10, commit `e45e73b` |
 | 3.2.3 | Invio reminder con bottoni "✅ Confermo" / "❌ Disdici" | `P0` | 2 | ✅ | `remind()` invia il template (i bottoni quick-reply fanno parte del template 3.2.1) e segna `reminded_at`. Fallimenti loggati senza marcare reminded_at → retry. 2026-06-10 |
 | 3.2.4 | Gestione risposta: aggiornare stato appuntamento su DB | `P1` | 2 | ✅ | `handleButtonReply()` su messaggi inbound tipo `button`: `Confermo`→confirmed / `Disdico`→cancelled sul prossimo appuntamento scheduled del contatto. Match case-insensitive + fallback `CONFIRM`/`CANCEL`. Agganciato a `ProcessWhatsAppWebhook`. 2026-06-10; payload allineati alle label template 2026-06-29 |
-| 3.2.5 | Endpoint API per inserimento appuntamenti (da gestionale esterno) | `P1` | 2 | ⬜ | Differito: dipende da auth API (Sanctum, E4.3.1). Da fare insieme a E4.3 |
+| 3.2.5 | Endpoint API per inserimento appuntamenti (da gestionale esterno) | `P1` | 2 | ✅ | Realizzato con E4.3.3: `POST /api/v1/appointments` (auth Sanctum). 2026-07-20 |
 | 3.2.6 | Generalizzare in "Promemoria & Scadenze": scadenze ricorrenti senza conferma (IMU/730/rinnovi) | `P1` | 3 | ✅ | `Deadline` (nazionali admin + proprie tenant) + `DeadlineReminder` + seeder 2026. Admin `/admin/deadlines`, tenant `/scadenze`, command `replisa:send-deadline-reminders` (avvia campagne agli opted-in). **Settori**: le nazionali sono filtrate per categoria attività (le fiscali solo ai commercialisti); `sector` su tenant/scadenza, richiesto in registrazione. 2026-06-21 |
 
 ### E3.3 — Richiesta Recensione (add-on)
@@ -229,11 +229,11 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 4.3.1 | Autenticazione API con API Key per tenant | `P1` | 2 | ⬜ | Laravel Sanctum |
-| 4.3.2 | `POST /api/v1/messages/send` — invio messaggio singolo | `P1` | 2 | ⬜ | Per integrazioni gestionali |
-| 4.3.3 | `POST /api/v1/appointments` — creare appuntamento | `P1` | 1 | ⬜ | Trigger reminder automatico |
-| 4.3.4 | `GET /api/v1/messages` — lista messaggi con paginazione | `P2` | 1 | ⬜ | |
-| 4.3.5 | Documentazione API (Swagger/OpenAPI) | `P2` | 2 | ⬜ | Utile per vendere a PMI con dev |
+| 4.3.1 | Autenticazione API con API Key per tenant | `P1` | 2 | ✅ | Laravel Sanctum, token personali su `User` (l'isolamento resta sul `TenantScope` già testato). UI `ApiTokens` (`/api-tokens`, "API & Integrazioni" nel menu): genera/revoca chiavi, token in chiaro mostrato una sola volta. 2026-07-20 |
+| 4.3.2 | `POST /api/v1/messages/send` — invio messaggio singolo | `P1` | 2 | ✅ | `Api\V1\MessageController@send`: `type` text/template. Riusa `WhatsAppService`; contatto risolto nel controller per rispettare il limite contatti del piano (no bypass via API). Errore Meta → 502 con `meta_code`. 2026-07-20 |
+| 4.3.3 | `POST /api/v1/appointments` — creare appuntamento | `P1` | 1 | ✅ | `Api\V1\AppointmentController@store`: crea appuntamento (+contatto se nuovo, nei limiti del piano); `scheduled_at` deve essere futuro. Il reminder parte poi dallo scheduler E3.2. Chiude anche il task 3.2.5. 2026-07-20 |
+| 4.3.4 | `GET /api/v1/messages` — lista messaggi con paginazione | `P2` | 1 | ✅ | `MessageController@index`: paginato, filtri `direction`/`status`/`per_page` (max 100), isolato dal TenantScope. `MessageResource`. 2026-07-20 |
+| 4.3.5 | Documentazione API (Swagger/OpenAPI) | `P2` | 2 | ✅ | Pagina `/api-docs` (guida in italiano con esempi cURL per i 3 endpoint) invece di Swagger — target PMI con un dev. Auth base, URL base dinamico. 2026-07-20 |
 
 ---
 

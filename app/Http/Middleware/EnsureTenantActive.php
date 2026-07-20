@@ -18,6 +18,14 @@ class EnsureTenantActive
         $tenant = $request->user()?->tenant;
 
         if ($tenant && ! $tenant->active) {
+            // Sull'API il redirect a una pagina HTML sarebbe illeggibile per un
+            // client: stesso blocco, risposta nel formato che il chiamante attende.
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Account sospeso: contatta l\'assistenza per riattivare il servizio.',
+                ], 403);
+            }
+
             return redirect()->route('suspended');
         }
 
