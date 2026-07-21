@@ -2,6 +2,7 @@
 
 use App\Livewire\AcceptInvitation;
 use App\Livewire\Admin\Deadlines as AdminDeadlines;
+use App\Livewire\Admin\Leads as AdminLeads;
 use App\Livewire\Admin\Tenants;
 use App\Livewire\ApiTokens;
 use App\Livewire\Appointments;
@@ -88,6 +89,7 @@ Route::middleware(['auth', 'role:'.User::ROLE_SUPER_ADMIN])
     ->group(function () {
         Route::get('tenants', Tenants::class)->name('admin.tenants');
         Route::get('deadlines', AdminDeadlines::class)->name('admin.deadlines');
+        Route::get('leads', AdminLeads::class)->name('admin.leads');
     });
 
 require __DIR__.'/auth.php';
