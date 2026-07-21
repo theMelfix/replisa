@@ -51,4 +51,10 @@ return [
         ],
     ],
 
+    // Destinatario delle richieste di contatto/demo dalla landing (E5.1.2).
+    // Default all'indirizzo di supporto già usato nelle pagine legali.
+    'contact' => [
+        'notify_email' => env('CONTACT_NOTIFY_EMAIL', 'info@giovannimelfi.it'),
+    ],
+
 ];
