@@ -43,6 +43,8 @@
 
         <x-toast-hub />
 
+        <x-cookie-banner />
+
         @livewireScriptConfig
     </body>
 </html>

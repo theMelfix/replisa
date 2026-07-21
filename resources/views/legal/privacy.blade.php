@@ -92,10 +92,14 @@
         reclamo al Garante per la protezione dei dati personali (<a href="https://www.garanteprivacy.it">garanteprivacy.it</a>).
     </p>
 
-    <h2>8. Cookie</h2>
+    <h2 id="cookie">8. Cookie</h2>
     <p>
-        Il sito utilizza esclusivamente cookie tecnici necessari al funzionamento. Eventuali
-        cookie di terze parti o di misurazione saranno gestiti tramite apposito banner di consenso.
+        Il sito utilizza esclusivamente cookie tecnici necessari al funzionamento (gestione della
+        sessione e sicurezza), che non richiedono consenso preventivo ai sensi dell'art. 122 del
+        Codice Privacy. Non utilizziamo cookie di profilazione né cookie di terze parti. Al primo
+        accesso mostriamo un banner informativo con presa visione. Qualora in futuro introducessimo
+        cookie di misurazione o di terze parti, questi saranno subordinati al tuo consenso, gestito
+        tramite apposito banner con scelta granulare.
     </p>
 
     <h2>9. Modifiche</h2>
