@@ -60,5 +60,7 @@
             <p>Replisa — Automazione WhatsApp per PMI · <a href="https://replisa.com">replisa.com</a></p>
         </footer>
     </div>
+
+    <x-cookie-banner />
 </body>
 </html>
