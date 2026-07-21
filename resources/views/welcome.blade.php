@@ -6,10 +6,19 @@
 
     <title>Replisa — Automazione WhatsApp per la tua attività</title>
     <meta name="description" content="Replisa automatizza WhatsApp per PMI: messaggi di benvenuto, promemoria appuntamenti e richieste di recensione. Meno lavoro manuale, più clienti che tornano.">
+    <link rel="canonical" href="{{ url('/') }}">
 
     <meta property="og:title" content="Replisa — Automazione WhatsApp per PMI">
     <meta property="og:description" content="Benvenuti automatici, promemoria appuntamenti e richieste di recensione su WhatsApp.">
     <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url('/') }}">
+    <meta property="og:site_name" content="Replisa">
+    <meta property="og:locale" content="it_IT">
+    <meta property="og:image" content="{{ url('/apple-touch-icon.png') }}">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Replisa — Automazione WhatsApp per PMI">
+    <meta name="twitter:description" content="Benvenuti automatici, promemoria appuntamenti e richieste di recensione su WhatsApp.">
+    <meta name="twitter:image" content="{{ url('/apple-touch-icon.png') }}">
 
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -19,6 +28,63 @@
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
+
+    {{-- Dati strutturati JSON-LD (E5.1.3): Organization + SoftwareApplication
+         con le offerte dei piani (prezzi da config/plans.php, single source). --}}
+    @php
+        $home = url('/');
+        $offers = collect(config('plans.plans'))->map(fn ($p) => [
+            '@type' => 'Offer',
+            'name' => $p['name'],
+            'price' => (string) $p['price'],
+            'priceCurrency' => 'EUR',
+            'url' => $home.'#prezzi',
+            'availability' => 'https://schema.org/InStock',
+        ])->values()->all();
+
+        $jsonLd = [
+            '@context' => 'https://schema.org',
+            '@graph' => [
+                [
+                    '@type' => 'Organization',
+                    '@id' => $home.'#organization',
+                    'name' => 'Replisa',
+                    'url' => $home,
+                    'logo' => url('/apple-touch-icon.png'),
+                    'email' => config('services.contact.notify_email'),
+                    'founder' => ['@type' => 'Person', 'name' => 'Giovanni Melfi'],
+                    'sameAs' => ['https://giovannimelfi.com'],
+                ],
+                [
+                    '@type' => 'WebSite',
+                    '@id' => $home.'#website',
+                    'url' => $home,
+                    'name' => 'Replisa',
+                    'inLanguage' => 'it-IT',
+                    'publisher' => ['@id' => $home.'#organization'],
+                ],
+                [
+                    '@type' => 'SoftwareApplication',
+                    'name' => 'Replisa',
+                    'applicationCategory' => 'BusinessApplication',
+                    'operatingSystem' => 'Web',
+                    'url' => $home,
+                    'description' => 'Automazione WhatsApp per PMI: messaggi di benvenuto, promemoria appuntamenti e scadenze, campagne e richieste di recensione tramite WhatsApp Business Platform.',
+                    'inLanguage' => 'it-IT',
+                    'publisher' => ['@id' => $home.'#organization'],
+                    'offers' => [
+                        '@type' => 'AggregateOffer',
+                        'priceCurrency' => 'EUR',
+                        'lowPrice' => (string) collect(config('plans.plans'))->min('price'),
+                        'highPrice' => (string) collect(config('plans.plans'))->max('price'),
+                        'offerCount' => (string) count($offers),
+                        'offers' => $offers,
+                    ],
+                ],
+            ],
+        ];
+    @endphp
+    <script type="application/ld+json">{!! json_encode($jsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
