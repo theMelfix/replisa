@@ -8,7 +8,7 @@
 > **Pricing:** Starter €14 | Base €39 | Pro €79 | Business €149 /mese
 > **PM / Scrum Master:** Claude (AI) · **Dev / Product Owner:** Giovanni Melfi
 > **Data inizio progetto:** 14/05/2026
-> **Ultimo aggiornamento:** 20/07/2026 — E4.3 completa: API pubblica v1 (Sanctum) + docs; chiude anche 3.2.5 (su `develop`)
+> **Ultimo aggiornamento:** 21/07/2026 — E5.1.2 completa: form contatto/demo sulla landing (su `develop`)
 
 ---
 
@@ -246,7 +246,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
 | 5.1.1 | Pagina su replisa.com (dominio dedicato) | `P0` | 3 | ✅ | Landing v1: hero, 3 automazioni (Benvenuto/Promemoria&Scadenze/Campagne), prezzi **19/49/99/199** + toggle annuale -20% + prova 14gg + add-on Recensioni €19, CTA demo, footer legale. Tailwind/Vite. 2026-06-19 (prezzi rivisti 2026-06-23, vedi `docs/PRICING-REVIEW.md`) |
-| 5.1.2 | Form contatto / Calendly embed per prenotare chiamata | `P0` | 1 | ⬜ | Per ora CTA `mailto:` — da sostituire con form/Calendly |
+| 5.1.2 | Form contatto / Calendly embed per prenotare chiamata | `P0` | 1 | ✅ | Livewire `ContactForm` nella sezione `#demo` della landing (sostituisce il CTA `mailto:`). Salva un `Lead` (non tenant-owned) e notifica il team via email on-demand a `services.contact.notify_email`. Honeypot anti-bot. 2026-07-21 |
 | 5.1.3 | SEO base: meta tags, Open Graph, structured data | `P1` | 1 | 🟡 | Title/description/OG fatti in landing; manca structured data (JSON-LD) |
 | 5.1.4 | Cookie banner GDPR | `P1` | 1 | ⬜ | Hai già esperienza da giovannimelfi.com |
 

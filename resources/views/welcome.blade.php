@@ -31,6 +31,7 @@
             <div class="hidden sm:flex items-center gap-8 text-sm font-medium text-gray-600">
                 <a href="#funzioni" class="hover:text-gray-900">Funzioni</a>
                 <a href="#prezzi" class="hover:text-gray-900">Prezzi</a>
+                <a href="#demo" class="hover:text-gray-900">Demo</a>
                 @if (Route::has('login'))
                     @auth
                         <a href="{{ url('/dashboard') }}" class="hover:text-gray-900">Dashboard</a>
@@ -134,13 +135,19 @@
         </div>
     </section>
 
-    {{-- CTA finale --}}
-    <section class="max-w-6xl mx-auto px-6 py-20 text-center">
-        <h2 class="text-3xl font-bold text-gray-900">Pronto a far lavorare WhatsApp per te?</h2>
-        <p class="mt-3 text-gray-600">Attiva Replisa oggi o prenota una demo di 15 minuti.</p>
-        <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-            <a href="{{ Route::has('register') ? route('register') : '#' }}" class="inline-flex items-center justify-center rounded-lg bg-green-600 px-6 py-3 text-white font-semibold hover:bg-green-700">Inizia ora</a>
-            <a href="mailto:info@giovannimelfi.it?subject=Demo%20Replisa" class="inline-flex items-center justify-center rounded-lg border border-gray-300 px-6 py-3 font-semibold text-gray-700 hover:bg-gray-50">Prenota una demo</a>
+    {{-- CTA finale + form contatto/demo (E5.1.2) --}}
+    <section id="demo" class="bg-gray-50 border-t border-gray-100">
+        <div class="max-w-3xl mx-auto px-6 py-20">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-gray-900">Pronto a far lavorare WhatsApp per te?</h2>
+                <p class="mt-3 text-gray-600">Attiva Replisa oggi o prenota una demo di 15 minuti. Lasciaci i tuoi dati, ti ricontattiamo noi.</p>
+                <div class="mt-6">
+                    <a href="{{ Route::has('register') ? route('register') : '#' }}" class="inline-flex items-center justify-center rounded-lg bg-green-600 px-6 py-3 text-white font-semibold hover:bg-green-700">Inizia ora</a>
+                </div>
+            </div>
+            <div class="mt-10">
+                <livewire:contact-form />
+            </div>
         </div>
     </section>
 
