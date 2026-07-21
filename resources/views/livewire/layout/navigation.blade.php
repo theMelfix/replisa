@@ -66,6 +66,10 @@ new class extends Component
                         <x-nav-link :href="route('admin.deadlines')" :active="request()->routeIs('admin.deadlines')" wire:navigate>
                             {{ __('Scadenze nazionali') }}
                         </x-nav-link>
+
+                        <x-nav-link :href="route('admin.leads')" :active="request()->routeIs('admin.leads')" wire:navigate>
+                            {{ __('Richieste demo') }}
+                        </x-nav-link>
                     @endif
                 </div>
             </div>
