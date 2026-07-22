@@ -8,7 +8,7 @@
 > **Pricing:** Starter €14 | Base €39 | Pro €79 | Business €149 /mese
 > **PM / Scrum Master:** Claude (AI) · **Dev / Product Owner:** Giovanni Melfi
 > **Data inizio progetto:** 14/05/2026
-> **Ultimo aggiornamento:** 22/07/2026 — E6.1.1: griglia PMI target pronta da compilare (`docs/PMI-TARGET.md` + `.csv`) (su `develop`)
+> **Ultimo aggiornamento:** 22/07/2026 — E6.2.1 completa: checklist onboarding primo cliente (`docs/ONBOARDING-CHECKLIST.md`) (su `develop`)
 
 ---
 
@@ -278,7 +278,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 6.2.1 | Processo onboarding documentato (checklist step-by-step) | `P1` | 2 | ⬜ | Registrazione WABA, verifica numero, setup template |
+| 6.2.1 | Processo onboarding documentato (checklist step-by-step) | `P1` | 2 | ✅ | `docs/ONBOARDING-CHECKLIST.md`: 6 fasi (crea account admin/self-service → dati Meta → collega numero → template → configura flussi → test e2e) + checklist rapida copia-incolla. Collega DEMO-SCRIPT/META-TEMPLATES-SUBMISSION/GO-LIVE. 2026-07-22 |
 | 6.2.2 | Contratto di servizio / T&C base | `P1` | 2 | ⬜ | Consulta commercialista per P.IVA |
 | 6.2.3 | Setup account cliente sulla piattaforma | `P0` | 1 | ✅ | Form `/whatsapp` (`WhatsAppSettings`) per collegare il numero (phone_number_id/waba_id/access_token criptato + verifica live). Censimento da admin: "Nuovo cliente" in `/admin/tenants` crea tenant + owner + licenza offline. 2026-06-20/21 |
 | 6.2.4 | Personalizzazione template messaggi per il cliente | `P1` | 1 | ⬜ | |
