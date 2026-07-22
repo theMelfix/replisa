@@ -32,6 +32,19 @@
                     </div>
                 </div>
 
+                <div>
+                    <x-input-label for="tag_id" value="Segmento (etichetta)" />
+                    <select wire:model.live="tag_id" id="tag_id"
+                            class="block mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm">
+                        <option value="">Tutti i contatti opt-in</option>
+                        @foreach ($tags as $tag)
+                            <option value="{{ $tag->id }}">{{ $tag->name }} ({{ $tag->contacts_count }} opt-in)</option>
+                        @endforeach
+                    </select>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Le etichette si assegnano ai contatti dalla sezione <a href="{{ route('contacts') }}" class="underline" wire:navigate>Contatti</a>.</p>
+                    <x-input-error :messages="$errors->get('tag_id')" class="mt-2" />
+                </div>
+
                 <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                     <input type="checkbox" wire:model="include_name" class="rounded border-gray-300 text-green-600 focus:ring-green-500">
                     Personalizza con il nome del contatto (parametro @{{1}} del template)
@@ -55,6 +68,7 @@
                 <thead class="text-xs uppercase text-gray-500 border-b dark:border-gray-700">
                     <tr>
                         <th class="py-3 px-4">Campagna</th>
+                        <th class="py-3 px-4">Segmento</th>
                         <th class="py-3 px-4">Template</th>
                         <th class="py-3 px-4">Stato</th>
                         <th class="py-3 px-4 text-right">Inviati</th>
@@ -66,6 +80,7 @@
                     @forelse ($campaigns as $campaign)
                         <tr class="border-b dark:border-gray-700" wire:key="campaign-{{ $campaign->id }}">
                             <td class="py-3 px-4 font-medium">{{ $campaign->name }}</td>
+                            <td class="py-3 px-4 text-gray-600 dark:text-gray-300">{{ $campaign->tag?->name ?? 'Tutti' }}</td>
                             <td class="py-3 px-4 font-mono text-xs">{{ $campaign->template_name }}</td>
                             <td class="py-3 px-4">
                                 @php($map = [
@@ -82,7 +97,7 @@
                             <td class="py-3 px-4 text-gray-500">{{ $campaign->created_at->format('d/m/Y H:i') }}</td>
                         </tr>
                     @empty
-                        <tr><td colspan="6" class="py-4 text-center text-gray-500">Nessuna campagna inviata.</td></tr>
+                        <tr><td colspan="7" class="py-4 text-center text-gray-500">Nessuna campagna inviata.</td></tr>
                     @endforelse
                 </tbody>
             </table>

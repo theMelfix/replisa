@@ -21,6 +21,7 @@ class Campaign extends Model
 
     protected $fillable = [
         'tenant_id',
+        'tag_id',
         'name',
         'template_name',
         'language',
@@ -46,5 +47,11 @@ class Campaign extends Model
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
+    }
+
+    /** Il segmento (etichetta) della campagna; null = tutti gli opted-in. */
+    public function tag(): BelongsTo
+    {
+        return $this->belongsTo(Tag::class);
     }
 }
