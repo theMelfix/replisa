@@ -8,7 +8,7 @@
 > **Pricing:** Starter €14 | Base €39 | Pro €79 | Business €149 /mese
 > **PM / Scrum Master:** Claude (AI) · **Dev / Product Owner:** Giovanni Melfi
 > **Data inizio progetto:** 14/05/2026
-> **Ultimo aggiornamento:** 22/07/2026 — E5.2.1 completa: brochure PDF (`brand/brochure.html`) (su `develop`)
+> **Ultimo aggiornamento:** 22/07/2026 — E6.1.1: griglia PMI target pronta da compilare (`docs/PMI-TARGET.md` + `.csv`) (su `develop`)
 
 ---
 
@@ -269,7 +269,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
-| 6.1.1 | Lista 20-30 PMI target nella tua zona (Vittoria + provincia) | `P0` | 2 | ⬜ | Ristoranti, studi medici, palestre, assicurazioni |
+| 6.1.1 | Lista 20-30 PMI target nella tua zona (Vittoria + provincia) | `P0` | 2 | 🟡 | Griglia pronta da compilare: `docs/PMI-TARGET.md` (guida + tabella con colonne allineate agli stati `/admin/leads`) + `docs/pmi-target.csv` (per foglio di calcolo). **Resta da compilare col territorio** (conoscenza dell'utente). 2026-07-22 |
 | 6.1.2 | Invio primo batch di outreach (10 contatti) | `P0` | 1 | ⬜ | |
 | 6.1.3 | Follow-up dopo 3-5 giorni sui non-rispondenti | `P1` | 1 | ⬜ | |
 | 6.1.4 | Demo live al primo interessato | `P0` | 1 | ⬜ | Usare lo script E5.2.3 |
