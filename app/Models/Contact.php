@@ -4,9 +4,11 @@ namespace App\Models;
 
 use App\Models\Concerns\BelongsToTenant;
 use Database\Factories\ContactFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Contact extends Model
@@ -65,5 +67,24 @@ class Contact extends Model
     public function conversations(): HasMany
     {
         return $this->hasMany(Conversation::class);
+    }
+
+    /** @return BelongsToMany<Tag, $this> */
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class);
+    }
+
+    /**
+     * Contatti destinatari di una campagna (E3.4.3): opted-in, opzionalmente
+     * ristretti a chi ha l'etichetta `$tagId`. Usato sia dal compositore (per il
+     * conteggio) sia dal job d'invio, così contano gli stessi contatti.
+     *
+     * @param  Builder<Contact>  $query
+     */
+    public function scopeCampaignRecipients(Builder $query, ?int $tagId = null): void
+    {
+        $query->where('opted_in', true)
+            ->when($tagId, fn (Builder $q) => $q->whereHas('tags', fn (Builder $t) => $t->whereKey($tagId)));
     }
 }

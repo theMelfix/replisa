@@ -8,7 +8,7 @@
 > **Pricing:** Starter €14 | Base €39 | Pro €79 | Business €149 /mese
 > **PM / Scrum Master:** Claude (AI) · **Dev / Product Owner:** Giovanni Melfi
 > **Data inizio progetto:** 14/05/2026
-> **Ultimo aggiornamento:** 22/07/2026 — E6.2.1 completa: checklist onboarding primo cliente (`docs/ONBOARDING-CHECKLIST.md`) (su `develop`)
+> **Ultimo aggiornamento:** 22/07/2026 — E3.4.3 completa: segmentazione contatti (etichette) per le campagne (su `develop`)
 
 ---
 
@@ -197,7 +197,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 |---|------|:--------:|:--:|:-----:|------|
 | 3.4.1 | Prodotto/flusso "Campagne" in UI + landing | `P1` | 1 | ✅ | `Automation::TYPE_CAMPAIGN`, card landing, pagina `/campaigns`. 2026-06-21 |
 | 3.4.2 | Engine invio a liste/segmenti di contatti | `P1` | 5 | 🟡 | Modello `Campaign` + job `SendCampaign` (coda): invio template MARKETING a tutti i contatti **opted-in** del tenant, con conteggi/stato e storico. Compositore in `/campaigns`. Manca: segmentazione avanzata (filtri), gating per piano, throttling fine. 2026-06-21 |
-| 3.4.3 | Segmentazione contatti (tag/filtri) | `P2` | 3 | ⬜ | Base per targettizzare le campagne |
+| 3.4.3 | Segmentazione contatti (tag/filtri) | `P2` | 3 | ✅ | Etichette per-tenant (`Tag` + pivot `contact_tag`): assegna/rimuovi dal dettaglio contatto, filtro per etichetta nella lista Contatti. Le campagne hanno un **segmento** (`campaigns.tag_id`, null=tutti gli opt-in): conteggio live nel compositore e `Contact::scopeCampaignRecipients()` condiviso tra compositore e job. 2026-07-22 |
 
 ---
 

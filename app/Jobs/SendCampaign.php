@@ -38,8 +38,9 @@ class SendCampaign implements ShouldQueue
         $sent = 0;
         $failed = 0;
 
-        // Solo contatti con opt-in (marketing). Relazione del tenant → scoped.
-        $tenant->contacts()->where('opted_in', true)
+        // Destinatari del segmento della campagna (opt-in + eventuale etichetta).
+        // Stessa query del conteggio nel compositore (Contact::scopeCampaignRecipients).
+        $tenant->contacts()->campaignRecipients($campaign->tag_id)
             ->chunkById(200, function ($contacts) use ($campaign, $service, &$sent, &$failed): void {
                 foreach ($contacts as $contact) {
                     try {

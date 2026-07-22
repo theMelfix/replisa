@@ -2,6 +2,7 @@
 
 use App\Livewire\Contacts;
 use App\Models\Contact;
+use App\Models\Tag;
 use App\Models\Tenant;
 use App\Models\User;
 use Database\Seeders\RoleSeeder;
@@ -134,4 +135,57 @@ it('rende leggibili i vari tipi di contenuto', function () {
         ->call('showConversation', $anna->id)
         ->assertSee('Modello: appointment_reminder')
         ->assertSee('Confermo');
+});
+
+it('assegna una nuova etichetta al contatto aperto', function () {
+    $this->actingAs($this->owner);
+    $anna = $this->tenant->contacts()->where('name', 'Anna')->first();
+
+    Livewire::test(Contacts::class)
+        ->call('showConversation', $anna->id)
+        ->set('newTag', 'VIP')
+        ->call('addTag')
+        ->assertSet('newTag', '');
+
+    expect($anna->fresh()->tags->pluck('name')->all())->toBe(['VIP']);
+    expect(Tag::withoutGlobalScopes()->where('name', 'VIP')->where('tenant_id', $this->tenant->id)->exists())->toBeTrue();
+});
+
+it('riusa un\'etichetta esistente invece di duplicarla', function () {
+    $this->actingAs($this->owner);
+    $tag = Tag::create(['name' => 'Cliente']);
+    $anna = $this->tenant->contacts()->where('name', 'Anna')->first();
+
+    Livewire::test(Contacts::class)
+        ->call('showConversation', $anna->id)
+        ->set('newTag', 'Cliente')
+        ->call('addTag');
+
+    expect(Tag::withoutGlobalScopes()->where('tenant_id', $this->tenant->id)->count())->toBe(1);
+    expect($anna->fresh()->tags->pluck('id')->all())->toBe([$tag->id]);
+});
+
+it('rimuove un\'etichetta dal contatto', function () {
+    $this->actingAs($this->owner);
+    $tag = Tag::create(['name' => 'Temp']);
+    $anna = $this->tenant->contacts()->where('name', 'Anna')->first();
+    $anna->tags()->attach($tag->id);
+
+    Livewire::test(Contacts::class)
+        ->call('showConversation', $anna->id)
+        ->call('removeTag', $tag->id);
+
+    expect($anna->fresh()->tags)->toHaveCount(0);
+});
+
+it('filtra la lista contatti per etichetta', function () {
+    $this->actingAs($this->owner);
+    $tag = Tag::create(['name' => 'VIP']);
+    $anna = $this->tenant->contacts()->where('name', 'Anna')->first();
+    $anna->tags()->attach($tag->id);
+
+    Livewire::test(Contacts::class)
+        ->set('tagFilter', (string) $tag->id)
+        ->assertSee('Anna')
+        ->assertDontSee('Marco');
 });
