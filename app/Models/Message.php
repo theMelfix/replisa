@@ -67,4 +67,22 @@ class Message extends Model
     {
         return $this->belongsTo(Contact::class);
     }
+
+    /**
+     * Testo leggibile del messaggio per l'interfaccia (log + conversazione),
+     * normalizzato dai diversi formati di `content` (outbound testo/template/
+     * interattivo; inbound testo/reply bottone/quick-reply template).
+     */
+    public function displayText(): string
+    {
+        $c = $this->content ?? [];
+
+        return match (true) {
+            filled($c['body'] ?? null) => $c['body'],           // testo, o corpo interattivo outbound
+            filled($c['title'] ?? null) => $c['title'],         // reply a un bottone/lista (inbound)
+            filled($c['text'] ?? null) => $c['text'],           // quick-reply template (inbound)
+            filled($c['template'] ?? null) => 'Modello: '.$c['template'],
+            default => '—',
+        };
+    }
 }

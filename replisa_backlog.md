@@ -8,7 +8,7 @@
 > **Pricing:** Starter €14 | Base €39 | Pro €79 | Business €149 /mese
 > **PM / Scrum Master:** Claude (AI) · **Dev / Product Owner:** Giovanni Melfi
 > **Data inizio progetto:** 14/05/2026
-> **Ultimo aggiornamento:** 21/07/2026 — E5.1.3 completa: SEO structured data JSON-LD; **E5.1 chiusa** (su `develop`)
+> **Ultimo aggiornamento:** 22/07/2026 — E4.2.2 completa: dettaglio conversazione nei Contatti (su `develop`)
 
 ---
 
@@ -219,7 +219,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 | # | Task | Priorità | SP | Stato | Note |
 |---|------|:--------:|:--:|:-----:|------|
 | 4.2.1 | Overview: messaggi inviati/ricevuti, conversazioni attive, costi stimati | `P1` | 3 | 🟡 | Livewire `Dashboard` con card (inviati/ricevuti/contatti/conversazioni attive/appuntamenti). Mancano grafici e costi stimati. 2026-06-19 |
-| 4.2.2 | Sezione Contatti: lista, ricerca, dettaglio conversazione | `P1` | 3 | 🟡 | Livewire `Contacts`: lista paginata + ricerca nome/telefono + conteggio messaggi. Manca il dettaglio conversazione. 2026-06-19 |
+| 4.2.2 | Sezione Contatti: lista, ricerca, dettaglio conversazione | `P1` | 3 | ✅ | Livewire `Contacts`: lista paginata + ricerca nome/telefono + conteggio messaggi. **Dettaglio conversazione** (2026-07-22): click su una riga apre un pannello laterale con la cronologia messaggi in bolle chat (inbound/outbound, timestamp+stato), ultimi 200, sola lettura. `Message::displayText()` normalizza i tipi di contenuto (riusato anche nel Log). Apertura scoped dal TenantScope. 2026-06-19 / 2026-07-22 |
 | 4.2.3 | Sezione Automazioni: attiva/disattiva flussi, configura parametri | `P1` | 3 | ✅ | Livewire `Automations`: toggle on/off dei 3 flussi (crea/aggiorna `Automation` per-tenant). Hardening: backstop `tenant_id` (`TenantContextException`) + sistema toast in-app `<x-toast-hub />` per le eccezioni (niente più 500/`1364`). **Configurazione parametri** (2026-07-20): pannello inline per flusso attivo — Benvenuto (saluto, header/footer, 3 bottoni + risposte, id stabili) e Promemoria (template Meta, lingua, anticipi in ore, label conferma/disdetta); Campagne rimanda alla sua sezione. Scrittura config unificata in `updateConfig()`. 2026-06-19 / 2026-07-20 |
 | 4.2.4 | Sezione Appuntamenti: CRUD manuale + import CSV | `P2` | 3 | ✅ | Livewire `Appointments`: form nuovo (crea contatto), cambio stato, elimina, import CSV (telefono,nome,data). Scoped per-tenant. 2026-06-19 |
 | 4.2.5 | Log messaggi: cronologia completa con status (sent/delivered/read/failed) | `P1` | 2 | 🟡 | Livewire `Messages`: cronologia paginata, badge stato, ricerca contatto + filtri direzione/stato. Mancano filtri per data e tipo. 2026-06-19 |
