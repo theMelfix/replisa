@@ -8,7 +8,7 @@
 > **Pricing:** Starter €14 | Base €39 | Pro €79 | Business €149 /mese
 > **PM / Scrum Master:** Claude (AI) · **Dev / Product Owner:** Giovanni Melfi
 > **Data inizio progetto:** 14/05/2026
-> **Ultimo aggiornamento:** 22/07/2026 — E4.2.5 completa: filtri data/tipo nel Log messaggi (E4.2 tutta ✅ lato codice; 4.2.6 attende solo il setup prodotti/prezzi su Stripe) (su `develop`)
+> **Ultimo aggiornamento:** 22/07/2026 — E5.2.3 completa: script demo live (`docs/DEMO-SCRIPT.md`) (su `develop`)
 
 ---
 
@@ -256,7 +256,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 |---|------|:--------:|:--:|:-----:|------|
 | 5.2.1 | Brochure PDF aggiornata (4 piani tariffari, costi Meta inclusi) | `P1` | 2 | ⬜ | Versione precedente già creata, da aggiornare |
 | 5.2.2 | Template messaggio outreach (email + DM Instagram) | `P1` | 1 | ⬜ | |
-| 5.2.3 | Script demo live 5 minuti (cosa mostrare, in che ordine) | `P1` | 1 | ⬜ | Welcome → Reminder → Recensione |
+| 5.2.3 | Script demo live 5 minuti (cosa mostrare, in che ordine) | `P1` | 1 | ✅ | `docs/DEMO-SCRIPT.md`: checklist pre-demo, sceneggiatura minuto-per-minuto (Benvenuto → Promemoria & Scadenze → Campagne + dashboard + chiusura CTA), piano B se qualcosa va storto, cosa NON fare. Allineato ai flussi attuali. 2026-07-22 |
 | 5.2.4 | Video demo registrato (screen recording con voice-over) | `P3` | 1 | ⬜ | Post-MVP, quando i flussi girano |
 
 ---
