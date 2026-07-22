@@ -82,8 +82,9 @@
                                 class="mt-1 block w-full sm:max-w-md rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm">
                             <option value="static">Il link è già scritto nel template (consigliato)</option>
                             <option value="dynamic">Il template usa un link dinamico (@{{1}})</option>
+                            <option value="tracked">Link tracciato Replisa — conta i click (@{{1}})</option>
                         </select>
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Scegli "dinamico" solo se il bottone del tuo template Meta contiene un segnaposto variabile nell'URL.</p>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Scegli "dinamico" o "tracciato" solo se il bottone del tuo template Meta contiene un segnaposto variabile nell'URL.</p>
                     </div>
 
                     @if ($reviewUrlMode === 'dynamic')
@@ -97,6 +98,39 @@
                                 <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
+                    @endif
+
+                    @if ($reviewUrlMode === 'tracked')
+                        <div>
+                            <label for="reviewDestinationUrl" class="block text-sm font-medium text-gray-700 dark:text-gray-300">URL recensioni Google</label>
+                            <input id="reviewDestinationUrl" type="url" wire:model="reviewDestinationUrl"
+                                   class="mt-1 block w-full sm:max-w-md rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm"
+                                   placeholder="https://g.page/r/…/review" />
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                Imposta il bottone del template Meta sulla base <code>{{ url('/r/') }}/</code> con segnaposto <code>@{{1}}</code>.
+                                Replisa genera un link unico per ogni invio, conta i click e reindirizza qui.
+                            </p>
+                            @error('reviewDestinationUrl')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        @if ($reviewStats && $reviewStats['links'] > 0)
+                            <div class="rounded-lg bg-gray-50 dark:bg-gray-900/40 p-4 grid grid-cols-3 gap-3 text-center">
+                                <div>
+                                    <div class="text-xl font-bold text-gray-900 dark:text-gray-100">{{ $reviewStats['links'] }}</div>
+                                    <div class="text-xs text-gray-500">Richieste inviate</div>
+                                </div>
+                                <div>
+                                    <div class="text-xl font-bold text-green-600">{{ $reviewStats['clicked'] }}</div>
+                                    <div class="text-xs text-gray-500">Hanno cliccato</div>
+                                </div>
+                                <div>
+                                    <div class="text-xl font-bold text-gray-900 dark:text-gray-100">{{ $reviewStats['total_clicks'] }}</div>
+                                    <div class="text-xs text-gray-500">Click totali</div>
+                                </div>
+                            </div>
+                        @endif
                     @endif
 
                     <button type="button" wire:click="saveReviewSettings"

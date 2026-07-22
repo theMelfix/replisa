@@ -8,7 +8,7 @@
 > **Pricing:** Starter €14 | Base €39 | Pro €79 | Business €149 /mese
 > **PM / Scrum Master:** Claude (AI) · **Dev / Product Owner:** Giovanni Melfi
 > **Data inizio progetto:** 14/05/2026
-> **Ultimo aggiornamento:** 22/07/2026 — E3.4.3 completa: segmentazione contatti (etichette) per le campagne (su `develop`)
+> **Ultimo aggiornamento:** 22/07/2026 — E3.3.3 completa: tracking click recensioni via short-link (su `develop`)
 
 ---
 
@@ -188,7 +188,7 @@ Il progetto è suddiviso in **6 Epic** che coprono l'intero ciclo di vita dalla 
 |---|------|:--------:|:--:|:-----:|------|
 | 3.3.1 | Creare template Meta "review_request" con link Google Reviews | `P0` | 2 | 🟡 | **Specifica pronta** in `docs/META-TEMPLATES.md §2` (MARKETING, `it`, body {{1}}nome, button URL statico **o** dinamico via `review_url_param`). Scelta statico/dinamico + suffisso ora **configurabili da UI** (`/automations` → card Recensioni, `Automations::saveReviewSettings()`, con validazione anti-incoerenza, 6 test). Resta l'azione manuale su WhatsApp Manager (per-WABA); follow-up: introspezione template via Graph API. 2026-06-29 |
 | 3.3.2 | Job schedulato: invia richiesta 24h dopo visita/appuntamento completato | `P0` | 2 | ✅ | `App\Services\Automation\ReviewRequest` + command `replisa:send-review-requests` schedulato `->hourly()`. `dispatchDue()` trova gli appuntamenti `completed` con `review_requested=false` e `scheduled_at <= now-delay` (delay default 24h, configurabile). Solo verso contatti `opted_in`. 2026-06-17 |
-| 3.3.3 | Gestione risposta: tracking chi ha cliccato / risposto | `P2` | 1 | ⬜ | Differito: i click sul button URL del template non passano dal webhook Meta. Servirà uno short-link tracciato (o quick-reply) — rivalutare con analytics E4.2.1 |
+| 3.3.3 | Gestione risposta: tracking chi ha cliccato / risposto | `P2` | 1 | ✅ | Short-link tracciato: nuova **modalità "tracciato"** del link recensione (`ReviewClick` + rotta pubblica `/r/{token}`). Il template punta a `{APP_URL}/r/{{1}}`, il codice genera un token per invio, la rotta registra il click e reindirizza all'URL Google. Statistiche (inviate/cliccato/click totali) in `/automations`. 2026-07-22 |
 | 3.3.4 | Rate limiting: non inviare più di 1 richiesta recensione per contatto ogni 30 giorni | `P1` | 1 | ✅ | `recentlyRequested()`: nessuna nuova richiesta se un template recensione (non `failed`) è già partito al contatto entro `rate_limit_days` (default 30). Appuntamento saltato comunque marcato `review_requested` per non rivalutarlo. 2026-06-17 |
 
 ### E3.4 — Campagne e comunicazioni (nuovo prodotto core)

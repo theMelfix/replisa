@@ -20,11 +20,14 @@ use Livewire\Component;
 #[Layout('layouts.app')]
 class Automations extends Component
 {
-    /** Modalità del link recensione: statico (nel template) o dinamico (param). */
+    /** Modalità del link recensione: statico, dinamico (param) o tracciato (short-link). */
     public string $reviewUrlMode = 'static';
 
     /** Suffisso del button URL dinamico del template recensione (solo modalità dinamica). */
     public ?string $reviewUrlParam = null;
+
+    /** URL recensioni Google verso cui reindirizza lo short-link (solo modalità tracciata). */
+    public ?string $reviewDestinationUrl = null;
 
     /** Numero di slot bottone del menu di benvenuto (limite Meta sui reply button). */
     public const WELCOME_BUTTON_SLOTS = 3;
@@ -80,8 +83,14 @@ class Automations extends Component
 
         $review = $configs[Automation::TYPE_REVIEW_REQUEST] ?? [];
         $param = $review['review_url_param'] ?? null;
+        $destination = $review['review_destination_url'] ?? null;
 
-        if (filled($param)) {
+        // La modalità si inferisce dalla config: destinazione → tracciato,
+        // altrimenti suffisso → dinamico, altrimenti statico.
+        if (filled($destination)) {
+            $this->reviewUrlMode = 'tracked';
+            $this->reviewDestinationUrl = (string) $destination;
+        } elseif (filled($param)) {
             $this->reviewUrlMode = 'dynamic';
             $this->reviewUrlParam = (string) $param;
         }
@@ -372,20 +381,34 @@ class Automations extends Component
         }
 
         $this->validate([
-            'reviewUrlMode' => ['required', 'in:static,dynamic'],
+            'reviewUrlMode' => ['required', 'in:static,dynamic,tracked'],
             // Suffisso del button URL, non un URL completo → niente regola `url`;
             // obbligatorio e senza spazi solo in modalità dinamica.
             'reviewUrlParam' => $this->reviewUrlMode === 'dynamic'
                 ? ['required', 'string', 'max:200', 'regex:/^\S+$/']
                 : ['nullable'],
+            // Modalità tracciata: URL completo Google verso cui reindirizza lo short-link.
+            'reviewDestinationUrl' => $this->reviewUrlMode === 'tracked'
+                ? ['required', 'url', 'max:2048']
+                : ['nullable'],
         ], attributes: [
             'reviewUrlParam' => 'link recensione',
+            'reviewDestinationUrl' => 'URL recensioni Google',
         ]);
 
+        // Un solo campo di config attivo per modalità: gli altri tornano null,
+        // così non restano configurazioni incoerenti di modalità precedenti.
         $param = $this->reviewUrlMode === 'dynamic' ? trim((string) $this->reviewUrlParam) : null;
+        $destination = $this->reviewUrlMode === 'tracked' ? trim((string) $this->reviewDestinationUrl) : null;
 
-        if ($this->updateConfig(Automation::TYPE_REVIEW_REQUEST, ['review_url_param' => $param])) {
+        $saved = $this->updateConfig(Automation::TYPE_REVIEW_REQUEST, [
+            'review_url_param' => $param,
+            'review_destination_url' => $destination,
+        ]);
+
+        if ($saved) {
             $this->reviewUrlParam = $param;
+            $this->reviewDestinationUrl = $destination;
             $this->dispatch('toast', type: 'success', message: 'Impostazioni recensione salvate.');
         }
     }
@@ -394,12 +417,24 @@ class Automations extends Component
     {
         $active = Automation::pluck('active', 'type');
         $tenant = auth()->user()?->tenant;
+        $hasReviews = $tenant ? PlanLimits::for($tenant)->hasReviewsAddon() : false;
+
+        // Statistiche short-link recensioni (E3.3.3), mostrate in modalità tracciata.
+        $reviewStats = null;
+        if ($hasReviews && $tenant) {
+            $reviewStats = [
+                'links' => $tenant->reviewClicks()->count(),
+                'clicked' => $tenant->reviewClicks()->where('clicks', '>', 0)->count(),
+                'total_clicks' => (int) $tenant->reviewClicks()->sum('clicks'),
+            ];
+        }
 
         return view('livewire.automations', [
             'flows' => self::FLOWS,
             'active' => $active,
-            'hasReviews' => $tenant ? PlanLimits::for($tenant)->hasReviewsAddon() : false,
+            'hasReviews' => $hasReviews,
             'reviewActive' => (bool) ($active[Automation::TYPE_REVIEW_REQUEST] ?? false),
+            'reviewStats' => $reviewStats,
         ]);
     }
 }

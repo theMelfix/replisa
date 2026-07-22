@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ReviewRedirectController;
 use App\Livewire\AcceptInvitation;
 use App\Livewire\Admin\Deadlines as AdminDeadlines;
 use App\Livewire\Admin\Leads as AdminLeads;
@@ -18,6 +19,11 @@ use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome');
+
+// Short-link tracciato per le richieste recensione (E3.3.3): pubblico, registra
+// il click e reindirizza all'URL recensioni Google del tenant.
+Route::get('r/{token}', ReviewRedirectController::class)
+    ->name('review.redirect');
 
 // Pagine legali (richieste da Meta per la configurazione dell'app).
 Route::view('/privacy', 'legal.privacy')->name('privacy');

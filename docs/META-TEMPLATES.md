@@ -114,6 +114,13 @@ recensione* (visibile quando l'add-on è attivo), campo **"Link recensione nel t
   codice lo passa come `{{1}}` del bottone (`button`, `sub_type=url`, `index=0`).
   Permette un template unico riusabile cambiando solo il parametro per tenant.
 
+- **Tracciato (E3.3.3):** per **contare i click** (che sui button URL non passano dal
+  webhook). Il bottone del template ha base **`{APP_URL}/r/{{1}}`** (short-link Replisa);
+  in UI si sceglie *tracciato* e si inserisce l'**URL recensioni Google completo**. Per
+  ogni invio il codice genera un token univoco (`ReviewClick`), lo passa come `{{1}}`, e la
+  rotta pubblica `/r/{token}` registra il click e reindirizza all'URL Google. Le statistiche
+  (richieste inviate / hanno cliccato / click totali) sono in `/automations`.
+
 > ✅ **Coerenza garantita dalla UI (2026-06-29).** La pagina Automazioni impedisce gli
 > stati incoerenti che fallirebbero a runtime: in *statico* il param è forzato a null
 > (niente "param di troppo"); in *dinamico* il suffisso è **obbligatorio** e validato
