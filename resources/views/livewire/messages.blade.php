@@ -44,7 +44,7 @@
                             </td>
                             <td class="px-4 py-3 text-gray-500">{{ $m->type }}</td>
                             <td class="px-4 py-3 max-w-xs truncate text-gray-700 dark:text-gray-300">
-                                {{ $m->content['body'] ?? $m->content['template'] ?? $m->content['title'] ?? '—' }}
+                                {{ $m->displayText() }}
                             </td>
                             <td class="px-4 py-3">
                                 @php($colors = ['delivered'=>'bg-green-100 text-green-800','read'=>'bg-emerald-100 text-emerald-800','sent'=>'bg-blue-100 text-blue-800','failed'=>'bg-red-100 text-red-800','received'=>'bg-gray-100 text-gray-700','queued'=>'bg-amber-100 text-amber-800'])

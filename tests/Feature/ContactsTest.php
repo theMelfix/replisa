@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\Contacts;
+use App\Models\Contact;
 use App\Models\Tenant;
 use App\Models\User;
 use Database\Seeders\RoleSeeder;
@@ -48,4 +49,89 @@ it('filtra per ricerca senza far trapelare altri tenant', function () {
         ->set('search', 'Anna')
         ->assertSee('Anna')
         ->assertDontSee('Marco');
+});
+
+it('apre la conversazione di un contatto e ne mostra i messaggi', function () {
+    $this->actingAs($this->owner);
+
+    $anna = $this->tenant->contacts()->where('name', 'Anna')->first();
+    $anna->messages()->create([
+        'tenant_id' => $this->tenant->id,
+        'direction' => 'inbound', 'type' => 'text',
+        'content' => ['body' => 'Ciao, avete posto?'], 'status' => 'received',
+    ]);
+    $anna->messages()->create([
+        'tenant_id' => $this->tenant->id,
+        'direction' => 'outbound', 'type' => 'text',
+        'content' => ['body' => 'Sì, quando preferisci?'], 'status' => 'delivered',
+    ]);
+
+    Livewire::test(Contacts::class)
+        ->call('showConversation', $anna->id)
+        ->assertSet('selectedId', $anna->id)
+        ->assertSee('Ciao, avete posto?')
+        ->assertSee('Sì, quando preferisci?');
+});
+
+it('mostra i messaggi in ordine cronologico', function () {
+    $this->actingAs($this->owner);
+
+    $anna = $this->tenant->contacts()->where('name', 'Anna')->first();
+    $old = $anna->messages()->create([
+        'tenant_id' => $this->tenant->id, 'direction' => 'inbound', 'type' => 'text',
+        'content' => ['body' => 'primo'], 'status' => 'received',
+    ]);
+    $old->forceFill(['created_at' => now()->subHour()])->save();
+    $anna->messages()->create([
+        'tenant_id' => $this->tenant->id, 'direction' => 'outbound', 'type' => 'text',
+        'content' => ['body' => 'secondo'], 'status' => 'sent',
+    ]);
+
+    $conversation = Livewire::test(Contacts::class)
+        ->call('showConversation', $anna->id)
+        ->get('conversation');
+
+    expect($conversation->pluck('content.body')->all())->toBe(['primo', 'secondo']);
+});
+
+it('non apre la conversazione di un contatto di un altro tenant', function () {
+    // Recupero l'id senza scope: da autenticato il TenantScope lo nasconderebbe.
+    $estraneoId = Contact::withoutGlobalScopes()->where('name', 'Estraneo')->value('id');
+
+    $this->actingAs($this->owner);
+
+    Livewire::test(Contacts::class)
+        ->call('showConversation', $estraneoId)
+        ->assertSet('selectedId', null);
+});
+
+it('chiude il pannello conversazione', function () {
+    $this->actingAs($this->owner);
+
+    $anna = $this->tenant->contacts()->where('name', 'Anna')->first();
+
+    Livewire::test(Contacts::class)
+        ->call('showConversation', $anna->id)
+        ->assertSet('selectedId', $anna->id)
+        ->call('closeConversation')
+        ->assertSet('selectedId', null);
+});
+
+it('rende leggibili i vari tipi di contenuto', function () {
+    $this->actingAs($this->owner);
+
+    $anna = $this->tenant->contacts()->where('name', 'Anna')->first();
+    $anna->messages()->create([
+        'tenant_id' => $this->tenant->id, 'direction' => 'outbound', 'type' => 'template',
+        'content' => ['template' => 'appointment_reminder'], 'status' => 'sent',
+    ]);
+    $anna->messages()->create([
+        'tenant_id' => $this->tenant->id, 'direction' => 'inbound', 'type' => 'button',
+        'content' => ['text' => 'Confermo'], 'status' => 'received',
+    ]);
+
+    Livewire::test(Contacts::class)
+        ->call('showConversation', $anna->id)
+        ->assertSee('Modello: appointment_reminder')
+        ->assertSee('Confermo');
 });
