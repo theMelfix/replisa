@@ -183,7 +183,10 @@
                         <p class="mt-1 text-sm text-gray-500">{{ $tag }}</p>
                         <p class="mt-4">
                             <span x-show="!annual"><span class="text-4xl font-bold text-gray-900">€{{ $prezzo }}</span><span class="text-gray-500">/mese</span></span>
-                            <span x-show="annual" x-cloak><span class="text-4xl font-bold text-gray-900">€{{ $prezzoAnnuo }}</span><span class="text-gray-500">/anno</span></span>
+                            <span x-show="annual" x-cloak>
+                                <span class="text-lg text-gray-400 line-through mr-1">€{{ $prezzo * 12 }}</span>
+                                <span class="text-4xl font-bold text-gray-900">€{{ $prezzoAnnuo }}</span><span class="text-gray-500">/anno</span>
+                            </span>
                         </p>
                         <ul class="mt-6 space-y-2 text-sm text-gray-600 flex-1">
                             @foreach ($features as $f)

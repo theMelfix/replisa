@@ -86,6 +86,7 @@
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ $plan['name'] }}</h3>
                     <p class="mt-4">
                         @if ($period === 'annual')
+                            <span class="text-lg text-gray-400 line-through mr-1">€{{ $plan['price'] * 12 }}</span>
                             <span class="text-4xl font-bold text-gray-900 dark:text-gray-100">€{{ $plan['price_annual'] }}</span>
                             <span class="text-gray-500 dark:text-gray-400">/anno</span>
                         @else
