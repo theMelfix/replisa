@@ -29,7 +29,9 @@ li esegue l'utente (no credenziali push/deploy lato AI — vedi [[no-git-push-cr
 
 ## 2. Migration da eseguire in prod
 
-Rispetto all'ultimo deploy applicativo, sono nuove (girano col deploy, o `php8.4 artisan migrate --force`):
+Sono **18 file di migration** datati dal 2026-06-17 in poi (dopo il rilascio dell'engine Sprint 2); girano
+col deploy, o `php8.4 artisan migrate --force`. `migrate:status` sul VPS resta la fonte autorevole su cosa
+è davvero `Pending`.
 
 - Auth/ruoli: `add_tenant_id_to_users`, tabelle permessi Spatie
 - Billing (Cashier): `customer_columns`, `subscriptions`, `subscription_items` (+ meter)
@@ -37,6 +39,8 @@ Rispetto all'ultimo deploy applicativo, sono nuove (girano col deploy, o `php8.4
 - `campaigns`, `deadlines`, `deadline_reminders`
 - `personal_access_tokens` (Sanctum, API v1)
 - `leads` (form contatto landing)
+- `tags` + `contact_tag` (segmentazione contatti, E3.4.3)
+- `add_tag_id_to_campaigns` (segmento della campagna, E3.4.3)
 
 **Seeder da lanciare una volta:** `RoleSeeder` (ruoli super-admin/owner/operator), `NationalDeadlinesSeeder`
 (scadenze fiscali 2026 — da verificare che le date siano ancora corrette).
