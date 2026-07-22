@@ -72,7 +72,7 @@ Rispetto all'ultimo deploy applicativo, sono nuove (girano col deploy, o `php8.4
 | Blocco | Impatto se manca | Chi/dove |
 |---|---|---|
 | **Prodotti + Price ID su Stripe** | Il checkout/abbonamenti non funzionano; `PlanLimits` cade sul default | `scripts/stripe-setup.sh` crea prodotti+prezzi e stampa il blocco `.env` (test di default, `--live` per la prod). Le chiavi `STRIPE_KEY/SECRET/WEBHOOK_SECRET` restano da copiare a mano dalla dashboard |
-| **Template Meta approvati** | `appointment_reminder` e `review_request` non partono (reminder/recensioni muti); campagne/scadenze idem finché non c'è almeno un template | WhatsApp Manager, per-WABA (ADR-003) — vedi `META-TEMPLATES.md` |
+| **Template Meta approvati** | `appointment_reminder` e `review_request` non partono (reminder/recensioni muti); campagne/scadenze idem finché non c'è almeno un template | WhatsApp Manager, per-WABA (ADR-003). Runbook: `META-TEMPLATES-SUBMISSION.md` (spec: `META-TEMPLATES.md`) |
 | **Revisione legale T&C/Privacy** | Rischio legale coi primi paganti | Le pagine legali sono bozze (E6.2.2) |
 | **Numero WhatsApp del cliente** | Nessun invio reale finché un tenant non collega il suo WABA | Form `/whatsapp` (onboarding) |
 

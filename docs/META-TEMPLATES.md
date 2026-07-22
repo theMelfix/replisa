@@ -188,6 +188,9 @@ Template di sistema preesistente di Meta, usato per il primo invio di prova in s
 
 ## Procedura di submission (per ogni WABA)
 
+> 📋 **Runbook operativo click-by-click:** `docs/META-TEMPLATES-SUBMISSION.md` (blocchi da copiare,
+> cause di rifiuto comuni, verifica post-approvazione). Qui sotto la versione sintetica.
+
 1. **WhatsApp Manager** → *Account WhatsApp Business* → WABA del tenant → **Modelli di messaggio** → *Crea modello*.
 2. Impostare **Categoria** e **Lingua** (`Italiano`) come da specifica sopra.
 3. Incollare il **Body** con i `{{n}}` nell'ordine indicato e fornire i **sample values**.
