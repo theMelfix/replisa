@@ -29,7 +29,7 @@ li esegue l'utente (no credenziali push/deploy lato AI — vedi [[no-git-push-cr
 
 ## 2. Migration da eseguire in prod
 
-Sono **18 file di migration** datati dal 2026-06-17 in poi (dopo il rilascio dell'engine Sprint 2); girano
+Sono **19 file di migration** datati dal 2026-06-17 in poi (dopo il rilascio dell'engine Sprint 2); girano
 col deploy, o `php8.4 artisan migrate --force`. `migrate:status` sul VPS resta la fonte autorevole su cosa
 è davvero `Pending`.
 
@@ -41,6 +41,7 @@ col deploy, o `php8.4 artisan migrate --force`. `migrate:status` sul VPS resta l
 - `leads` (form contatto landing)
 - `tags` + `contact_tag` (segmentazione contatti, E3.4.3)
 - `add_tag_id_to_campaigns` (segmento della campagna, E3.4.3)
+- `review_clicks` (short-link tracciati recensioni, E3.3.3)
 
 **Seeder da lanciare una volta:** `RoleSeeder` (ruoli super-admin/owner/operator), `NationalDeadlinesSeeder`
 (scadenze fiscali 2026 — da verificare che le date siano ancora corrette).

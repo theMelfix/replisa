@@ -426,3 +426,47 @@ it('il menu salvato dalla UI è quello che parte davvero su WhatsApp', function 
     expect($reply)->not->toBeNull()
         ->and($reply->content['body'])->toBe('Apriamo alle 9.');
 });
+
+it('salva la modalità tracciata con URL destinazione', function () {
+    $this->tenant->update(['reviews_addon' => true]);
+    activateReviewAutomation($this->tenant);
+    $this->actingAs($this->owner);
+
+    Livewire::test(Automations::class)
+        ->set('reviewUrlMode', 'tracked')
+        ->set('reviewDestinationUrl', 'https://g.page/r/ABC/review')
+        ->call('saveReviewSettings')
+        ->assertHasNoErrors()
+        ->assertDispatched('toast');
+
+    $config = Automation::withoutGlobalScopes()->where('type', Automation::TYPE_REVIEW_REQUEST)->first()->config;
+    expect($config['review_destination_url'])->toBe('https://g.page/r/ABC/review')
+        ->and($config['review_url_param'])->toBeNull();
+});
+
+it('la modalità tracciata richiede un URL valido', function () {
+    $this->tenant->update(['reviews_addon' => true]);
+    activateReviewAutomation($this->tenant);
+    $this->actingAs($this->owner);
+
+    Livewire::test(Automations::class)
+        ->set('reviewUrlMode', 'tracked')
+        ->set('reviewDestinationUrl', 'non-un-url')
+        ->call('saveReviewSettings')
+        ->assertHasErrors('reviewDestinationUrl');
+});
+
+it('passando da tracciato a statico azzera la destinazione', function () {
+    $this->tenant->update(['reviews_addon' => true]);
+    activateReviewAutomation($this->tenant, ['review_destination_url' => 'https://g.page/r/ABC/review']);
+    $this->actingAs($this->owner);
+
+    Livewire::test(Automations::class)
+        ->assertSet('reviewUrlMode', 'tracked')
+        ->set('reviewUrlMode', 'static')
+        ->call('saveReviewSettings');
+
+    $config = Automation::withoutGlobalScopes()->where('type', Automation::TYPE_REVIEW_REQUEST)->first()->config;
+    expect($config['review_destination_url'])->toBeNull()
+        ->and($config['review_url_param'])->toBeNull();
+});

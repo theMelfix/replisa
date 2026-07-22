@@ -103,4 +103,10 @@ class Tenant extends Model
     {
         return $this->hasMany(Appointment::class);
     }
+
+    /** @return HasMany<ReviewClick, $this> */
+    public function reviewClicks(): HasMany
+    {
+        return $this->hasMany(ReviewClick::class);
+    }
 }

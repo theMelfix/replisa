@@ -6,6 +6,7 @@ use App\Models\Appointment;
 use App\Models\Automation;
 use App\Models\Contact;
 use App\Models\Message;
+use App\Models\ReviewClick;
 use App\Models\Tenant;
 use App\Services\WhatsApp\WhatsAppApiException;
 use App\Services\WhatsApp\WhatsAppService;
@@ -101,16 +102,53 @@ class ReviewRequest
     {
         $config = $this->automation()?->config ?? [];
 
+        // Determina il parametro del button URL secondo la modalità configurata:
+        //  - tracciata (review_destination_url): short-link Replisa /r/{token};
+        //  - dinamica (review_url_param): suffisso fisso verso Google;
+        //  - statica: nessun parametro (URL già nel template).
+        $buttonParam = $this->buttonParam($appointment, $config);
+
         $message = WhatsAppService::for($this->tenant)->sendTemplate(
             $appointment->contact,
             $config['template'] ?? self::DEFAULT_TEMPLATE,
             $config['language'] ?? 'it',
-            $this->components($appointment, $config),
+            $this->components($appointment, $buttonParam),
         );
 
         $appointment->update(['review_requested' => true]);
 
         return $message;
+    }
+
+    /**
+     * Il valore da passare al `{{1}}` del button URL, o null in modalità statica.
+     * In modalità tracciata crea il record {@see ReviewClick} e ritorna il token.
+     *
+     * @param  array<string, mixed>  $config
+     */
+    private function buttonParam(Appointment $appointment, array $config): ?string
+    {
+        // Modalità tracciata: genera uno short-link univoco verso l'URL Google
+        // del tenant e passa il token; i click sono registrati da /r/{token}.
+        if (! empty($config['review_destination_url'])) {
+            $token = ReviewClick::generateToken();
+
+            $this->tenant->reviewClicks()->create([
+                'contact_id' => $appointment->contact_id,
+                'appointment_id' => $appointment->id,
+                'token' => $token,
+                'destination_url' => (string) $config['review_destination_url'],
+            ]);
+
+            return $token;
+        }
+
+        // Modalità dinamica: suffisso fisso configurato (es. place id Google).
+        if (! empty($config['review_url_param'])) {
+            return (string) $config['review_url_param'];
+        }
+
+        return null;
     }
 
     /** L'Automation `review_request` attiva del tenant, se presente. */
@@ -148,12 +186,11 @@ class ReviewRequest
 
     /**
      * Parametri del template (task 3.3.1): nome del contatto nel corpo e, se
-     * configurato, il segmento dinamico del button URL verso le recensioni Google.
+     * fornito, il parametro del button URL (`{{1}}`) — token tracciato o suffisso.
      *
-     * @param  array<string, mixed>  $config
      * @return array<int, array<string, mixed>>
      */
-    private function components(Appointment $appointment, array $config): array
+    private function components(Appointment $appointment, ?string $buttonParam): array
     {
         $components = [[
             'type' => 'body',
@@ -162,15 +199,13 @@ class ReviewRequest
             ],
         ]];
 
-        // Button URL dinamico: il template definisce la base (es. il place id
-        // Google), qui passiamo solo il suffisso configurato per il tenant.
-        if (! empty($config['review_url_param'])) {
+        if ($buttonParam !== null && $buttonParam !== '') {
             $components[] = [
                 'type' => 'button',
                 'sub_type' => 'url',
                 'index' => '0',
                 'parameters' => [
-                    ['type' => 'text', 'text' => (string) $config['review_url_param']],
+                    ['type' => 'text', 'text' => $buttonParam],
                 ],
             ];
         }
