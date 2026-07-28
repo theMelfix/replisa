@@ -32,5 +32,19 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <!-- Isolamento Stripe: i test non devono mai dipendere dal .env locale
+             né colpire l'API Stripe reale. Chiavi e Price ID azzerati. -->
+        <env name="STRIPE_KEY" value=""/>
+        <env name="STRIPE_SECRET" value=""/>
+        <env name="STRIPE_WEBHOOK_SECRET" value=""/>
+        <env name="STRIPE_PRICE_STARTER" value=""/>
+        <env name="STRIPE_PRICE_BASE" value=""/>
+        <env name="STRIPE_PRICE_PRO" value=""/>
+        <env name="STRIPE_PRICE_BUSINESS" value=""/>
+        <env name="STRIPE_PRICE_REVIEWS_ADDON" value=""/>
+        <env name="STRIPE_PRICE_STARTER_ANNUAL" value=""/>
+        <env name="STRIPE_PRICE_BASE_ANNUAL" value=""/>
+        <env name="STRIPE_PRICE_PRO_ANNUAL" value=""/>
+        <env name="STRIPE_PRICE_BUSINESS_ANNUAL" value=""/>
     </php>
 </phpunit>

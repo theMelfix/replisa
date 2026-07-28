@@ -7,7 +7,6 @@ use App\Models\Message;
 use App\Models\Tenant;
 use App\Support\PlanLimits;
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\RedirectResponse;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -33,7 +32,7 @@ class Billing extends Component
         }
     }
 
-    public function subscribe(string $plan): ?RedirectResponse
+    public function subscribe(string $plan): void
     {
         $config = config("plans.plans.$plan");
         $priceId = $this->period === 'annual'
@@ -43,7 +42,7 @@ class Billing extends Component
         if (! $config || empty($priceId)) {
             $this->dispatch('toast', type: 'error', message: 'Piano non disponibile al momento.');
 
-            return null;
+            return;
         }
 
         $tenant = $this->tenant();
@@ -51,41 +50,45 @@ class Billing extends Component
         if (! $tenant) {
             $this->dispatch('toast', type: 'error', message: 'Nessuna attività associata al tuo account.');
 
-            return null;
+            return;
         }
 
         try {
-            return $tenant->newSubscription('default', $priceId)
+            // NB: non usare Checkout::redirect() qui — in contesto Livewire il
+            // facade Redirect restituisce un Livewire\...\Redirector e viola il
+            // return-type `RedirectResponse` di Cashier (TypeError). Estraiamo
+            // l'URL della sessione (Checkout::__get → session->url) e usiamo il
+            // redirect di Livewire, che gestisce anche gli URL esterni.
+            $checkout = $tenant->newSubscription('default', $priceId)
                 ->checkout([
                     'success_url' => route('billing').'?checkout=success',
                     'cancel_url' => route('billing').'?checkout=cancelled',
-                ])
-                ->redirect();
+                ]);
+
+            $this->redirect($checkout->url);
         } catch (\Throwable $e) {
             report($e);
             $this->dispatch('toast', type: 'error', message: 'Impossibile avviare il pagamento. Riprova tra poco.');
-
-            return null;
         }
     }
 
-    public function manageBilling(): ?RedirectResponse
+    public function manageBilling(): void
     {
         $tenant = $this->tenant();
 
         if (! $tenant || ! $tenant->hasStripeId()) {
             $this->dispatch('toast', type: 'error', message: 'Nessun abbonamento da gestire.');
 
-            return null;
+            return;
         }
 
         try {
-            return $tenant->redirectToBillingPortal(route('billing'));
+            // Stesso motivo di subscribe(): redirectToBillingPortal() ritorna un
+            // RedirectResponse incompatibile col ciclo Livewire. Usiamo l'URL.
+            $this->redirect($tenant->billingPortalUrl(route('billing')));
         } catch (\Throwable $e) {
             report($e);
             $this->dispatch('toast', type: 'error', message: 'Impossibile aprire la gestione abbonamento. Riprova.');
-
-            return null;
         }
     }
 
