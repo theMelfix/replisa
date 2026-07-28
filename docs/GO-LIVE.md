@@ -1,6 +1,6 @@
 # Go-Live — stato produzione e residui
 
-> **Aggiornato:** 2026-07-27. **Replisa è LIVE su replisa.com dal ~2026-07-24.** Questo file era il
+> **Aggiornato:** 2026-07-28. **Replisa è LIVE su replisa.com dal ~2026-07-24.** Questo file era il
 > runbook pre-lancio; ora è la fotografia di *cosa è in produzione e verificato* e *cosa resta* prima di
 > vendere al primo cliente reale. Complementare a `deploy/README.md` (comandi VPS) e alla memoria
 > `prod-live-status`.
@@ -34,6 +34,11 @@ smoke test end-to-end è passato. Il gap residuo verso il **primo cliente pagant
   - **Promemoria appuntamenti** — template inviato → arrivo coi bottoni → tocco *Confermo* → webhook →
     appuntamento a `confirmed`.
 - **Template Meta:** **`appointment_reminder` APPROVATO** sulla Test WABA.
+- **Billing Stripe (modalità TEST) verificato e2e su prod (2026-07-28):** account + 4 prodotti piano + add-on
+  Recensioni + 9 prezzi (test), 9 Price ID nell'overlay, endpoint webhook prod (`we_1Ty7LC` → `/stripe/webhook`).
+  Checkout con carta test su replisa.com → `customer.subscription.created` consegnato (`pending_webhooks=0`) →
+  subscription sincronizzata (banner prova via) + Billing Portal ok. Fix del checkout Livewire deployato.
+  Dettaglio in memoria `stripe-billing-status`.
 
 > Nota: i flussi sono stati accesi **via tinker** sul tenant Sandbox (id 1), che non ha owner. In esercizio
 > reale i flussi si configurano da `/automations` (per-owner). Vedi `prod-live-status` in memoria.
@@ -45,7 +50,7 @@ smoke test end-to-end è passato. Il gap residuo verso il **primo cliente pagant
 | Residuo | Impatto se manca | Chi/dove |
 |---|---|---|
 | **Onboarding tenant reale** | Finora tutto verificato solo su Sandbox: nessun cliente vero collegato | `docs/ONBOARDING-CHECKLIST.md` (6 fasi) |
-| **Prodotti + Price ID Stripe (live)** | Checkout/abbonamenti non funzionano; `PlanLimits` cade sul default | `scripts/stripe-setup.sh --live` (stampa il blocco `.env`); chiavi `STRIPE_*` a mano dalla dashboard |
+| **Stripe LIVE** (billing reale) | Finora è tutto in **test**: nessun incasso reale | Attivare l'account, ricreare prodotti/prezzi in **live** (Price ID diversi), chiavi `pk_live`/`sk_live` + webhook endpoint live → overlay + `dploy deploy main`. **Regime forfettario: nessuna IVA** → prezzi as-is, niente Stripe Tax, `tax_behavior` va bene com'è. Fattura elettronica (dicitura forfettario) **fuori da Stripe**. |
 | **SMTP reale nell'overlay** | Inviti clienti e notifiche lead dal form landing **non partono** (in locale è `log`) | `~/.dploy/overlays/.env` → `MAIL_*` + `config:clear` ([[dploy-env-overlay]]) |
 | **Template `review_request`** | La Richiesta recensione (add-on) non parte | WhatsApp Manager, per-WABA. Runbook: `META-TEMPLATES-SUBMISSION.md` |
 | **Template sulla WABA del cliente** | `appointment_reminder` è approvato solo sulla *Test* WABA: va rifatto per ogni WABA reale (ADR-003) | Idem, per ogni cliente |
@@ -61,15 +66,16 @@ smoke test end-to-end è passato. Il gap residuo verso il **primo cliente pagant
 - `APP_LOCALE=it`
 - **SMTP** (`MAIL_MAILER=smtp` + host/port/user/pass/from) — vedi residui
 - `CONTACT_NOTIFY_EMAIL` — destinatario richieste demo dal form landing
-- `STRIPE_KEY`, `STRIPE_SECRET`, `STRIPE_WEBHOOK_SECRET`, `CASHIER_CURRENCY=eur`, `CASHIER_CURRENCY_LOCALE=it_IT`
-- I **9 Price ID**: `STRIPE_PRICE_{STARTER,BASE,PRO,BUSINESS}` + `_ANNUAL` + `STRIPE_PRICE_REVIEWS_ADDON`
+- `STRIPE_KEY`, `STRIPE_SECRET`, `STRIPE_WEBHOOK_SECRET`, `CASHIER_CURRENCY=eur`, `CASHIER_CURRENCY_LOCALE=it_IT` — **impostati in TEST** nell'overlay; per il live vanno sostituiti con `pk_live`/`sk_live` + `whsec` dell'endpoint live
+- I **9 Price ID**: `STRIPE_PRICE_{STARTER,BASE,PRO,BUSINESS}` + `_ANNUAL` + `STRIPE_PRICE_REVIEWS_ADDON` — **valorizzati (test)**; in live cambiano
+- ⚠️ Il `.env` di prod è un **file copiato al deploy** (non symlink): l'overlay si applica solo con `dploy deploy main`, non col solo `config:clear`
 - Token Meta permanente valido (System User, scope messaging+management) — verificare non sia scaduto
 
 ---
 
 ## Sequenza per il primo cliente reale
 
-1. Setup Stripe **live** (prodotti + Price ID) → overlay `.env` → `config:clear`.
+1. Setup Stripe **live** (attiva account forfettario, ricrea prodotti + Price ID in live, chiavi/webhook live) → overlay → **`dploy deploy main`** (l'overlay si applica solo col redeploy).
 2. SMTP nell'overlay (inviti + notifiche lead) → `config:clear`.
 3. Crea il tenant del cliente (`/admin/tenants` o registrazione self-service) — settore obbligatorio.
 4. Collega la WABA del cliente in `/whatsapp` + Verifica connessione.
