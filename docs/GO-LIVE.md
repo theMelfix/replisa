@@ -40,6 +40,20 @@ smoke test end-to-end è passato. Il gap residuo verso il **primo cliente pagant
   subscription sincronizzata (banner prova via) + Billing Portal ok. Fix del checkout Livewire deployato.
   Dettaglio in memoria `stripe-billing-status`.
 
+- **Stripe in modalità LIVE su prod (2026-07-29):** account attivato, prodotti copiati in live, **9 Price ID
+  live** nell'overlay + chiavi `pk_live`/`sk_live`, endpoint webhook creato in **live mode**. Verificato sul VPS
+  con `php artisan replisa:stripe-check`: *"Chiave Stripe in uso: LIVE"* e `ok (LIVE)` su tutte e 9 le voci
+  (importo, intervallo, valuta, prezzo e prodotto attivi coerenti con `config/plans.php`).
+- **`APP_DEBUG=false` in produzione:** `GET /stripe/webhook` restituisce una 405 generica senza stack trace,
+  versioni o percorsi (prima esponeva la pagina di debug Laravel). `POST` senza firma → `403`: validazione
+  della firma attiva.
+
+> ⚠️ **Non ancora verificato** (2026-07-29): che il `STRIPE_WEBHOOK_SECRET` dell'overlay corrisponda
+> all'endpoint live — il `403` su POST non firmato prova solo che il controllo è **acceso**, una chiave
+> sbagliata darebbe lo stesso esito. Serve un *Send test event* dal dashboard con esito **200**. E soprattutto
+> manca un **checkout reale con carta vera** (importo piccolo, poi rimborso) + la conferma che l'**IBAN di
+> payout** sia configurato: Stripe può incassare senza poterti bonificare.
+
 > Nota: i flussi sono stati accesi **via tinker** sul tenant Sandbox (id 1), che non ha owner. In esercizio
 > reale i flussi si configurano da `/automations` (per-owner). Vedi `prod-live-status` in memoria.
 
@@ -50,7 +64,7 @@ smoke test end-to-end è passato. Il gap residuo verso il **primo cliente pagant
 | Residuo | Impatto se manca | Chi/dove |
 |---|---|---|
 | **Onboarding tenant reale** | Finora tutto verificato solo su Sandbox: nessun cliente vero collegato | `docs/ONBOARDING-CHECKLIST.md` (6 fasi) |
-| **Stripe LIVE** (billing reale) | Finora è tutto in **test**: nessun incasso reale | Attivare l'account, ricreare prodotti/prezzi in **live** (Price ID diversi) — `scripts/stripe-setup.sh --live` è **pronto e allineato** (2026-07-29: `tax_behavior=unspecified`, niente dipendenza da `jq`) — poi chiavi `pk_live`/`sk_live` + webhook endpoint live → overlay + `dploy deploy main`. **Regime forfettario: nessuna IVA** → prezzi as-is, niente Stripe Tax. Fattura elettronica (dicitura forfettario) **fuori da Stripe**. |
+| ~~**Stripe LIVE**~~ → **quasi chiuso** | Configurazione live in prod **fatta e verificata** (vedi sopra). Restano due prove: *Send test event* → `200` (conferma il `whsec`) e un **checkout reale** con rimborso. Verificare anche l'**IBAN di payout**. **Regime forfettario: nessuna IVA** → prezzi as-is, niente Stripe Tax; fattura elettronica **fuori da Stripe**. |
 | **SMTP reale nell'overlay** | Inviti clienti e notifiche lead dal form landing **non partono** (in locale è `log`) | `~/.dploy/overlays/.env` → `MAIL_*` + `config:clear` ([[dploy-env-overlay]]) |
 | **Template `review_request`** | La Richiesta recensione (add-on) non parte | WhatsApp Manager, per-WABA. Runbook: `META-TEMPLATES-SUBMISSION.md` |
 | **Template sulla WABA del cliente** | `appointment_reminder` è approvato solo sulla *Test* WABA: va rifatto per ogni WABA reale (ADR-003) | Idem, per ogni cliente |
