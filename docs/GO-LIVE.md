@@ -9,10 +9,12 @@
 
 ## Verdetto in una riga
 
-L'app è **deployata e funzionante in produzione**: push → deploy → migration → infra sono **fatti** e lo
-smoke test end-to-end è passato. Il gap residuo verso il **primo cliente pagante** è tutto **esterno/manuale**
-(Stripe live, template Meta della WABA cliente, SMTP, revisione legale) più l'**onboarding di un tenant reale**
-— finora tutto è stato verificato solo sul tenant *Sandbox*. Push/deploy li esegue l'utente
+L'app è **deployata e funzionante in produzione** e il **billing è in modalità LIVE** (2026-07-29): push →
+deploy → migration → infra sono **fatti**, lo smoke test end-to-end è passato, i 9 prezzi live e la firma dei
+webhook sono verificati. Il gap residuo verso il **primo cliente pagante** è tutto **esterno/manuale**
+(template Meta della WABA cliente, SMTP, revisione legale) più l'**onboarding di un tenant reale** e la
+**prova d'acquisto reale**, che l'utente esegue offline — finora tutto è stato verificato solo sul tenant
+*Sandbox*. Push/deploy li esegue l'utente
 ([[no-git-push-credentials]]); il deploy ora parte dalla **dploy-dashboard** ([[prod-deploy-cloudpanel-dploy]]).
 
 > ⚠️ **`push ≠ deploy` vale ancora per le modifiche future.** Il codice pushato non è in prod finché non fai
@@ -72,7 +74,7 @@ smoke test end-to-end è passato. Il gap residuo verso il **primo cliente pagant
 | Residuo | Impatto se manca | Chi/dove |
 |---|---|---|
 | **Onboarding tenant reale** | Finora tutto verificato solo su Sandbox: nessun cliente vero collegato | `docs/ONBOARDING-CHECKLIST.md` (6 fasi) |
-| ~~**Stripe LIVE**~~ → **quasi chiuso** | Configurazione live in prod **fatta e verificata** (vedi sopra). Restano due prove: *Send test event* → `200` (conferma il `whsec`) e un **checkout reale** con rimborso. Verificare anche l'**IBAN di payout**. **Regime forfettario: nessuna IVA** → prezzi as-is, niente Stripe Tax; fattura elettronica **fuori da Stripe**. |
+| **Prova d'acquisto reale** (ultimo residuo Stripe) | La catena incasso → `customer.subscription.created` → subscription sincronizzata non è mai stata percorsa con denaro vero: config e firma sono verificate, la logica di business no | **A carico dell'utente, offline.** Checkout con carta vera su un piano piccolo → verificare il piano attivo in `/billing` → rimborsare dal dashboard. Controllare nella stessa occasione l'**IBAN di payout** (*Impostazioni → Pagamenti*): Stripe può incassare senza poterti bonificare. **Regime forfettario: nessuna IVA** → prezzi as-is, niente Stripe Tax; fattura elettronica **fuori da Stripe** (SdI). |
 | **SMTP reale nell'overlay** | Inviti clienti e notifiche lead dal form landing **non partono** (in locale è `log`) | `~/.dploy/overlays/.env` → `MAIL_*` + `config:clear` ([[dploy-env-overlay]]) |
 | **Template `review_request`** | La Richiesta recensione (add-on) non parte | WhatsApp Manager, per-WABA. Runbook: `META-TEMPLATES-SUBMISSION.md` |
 | **Template sulla WABA del cliente** | `appointment_reminder` è approvato solo sulla *Test* WABA: va rifatto per ogni WABA reale (ADR-003) | Idem, per ogni cliente |
@@ -88,8 +90,10 @@ smoke test end-to-end è passato. Il gap residuo verso il **primo cliente pagant
 - `APP_LOCALE=it`
 - **SMTP** (`MAIL_MAILER=smtp` + host/port/user/pass/from) — vedi residui
 - `CONTACT_NOTIFY_EMAIL` — destinatario richieste demo dal form landing
-- `STRIPE_KEY`, `STRIPE_SECRET`, `STRIPE_WEBHOOK_SECRET`, `CASHIER_CURRENCY=eur`, `CASHIER_CURRENCY_LOCALE=it_IT` — **impostati in TEST** nell'overlay; per il live vanno sostituiti con `pk_live`/`sk_live` + `whsec` dell'endpoint live
-- I **9 Price ID**: `STRIPE_PRICE_{STARTER,BASE,PRO,BUSINESS}` + `_ANNUAL` + `STRIPE_PRICE_REVIEWS_ADDON` — **valorizzati (test)**; in live cambiano
+- `APP_DEBUG=false` + `APP_ENV=production` — **impostati**; da riverificare a ogni modifica dell'overlay (il default di `.env.example` è `true`)
+- `STRIPE_KEY`, `STRIPE_SECRET`, `STRIPE_WEBHOOK_SECRET`, `CASHIER_CURRENCY=eur`, `CASHIER_CURRENCY_LOCALE=it_IT` — **in LIVE** nell'overlay (`pk_live`/`sk_live` + `whsec` dell'endpoint live, verificato con un `200`)
+- I **9 Price ID**: `STRIPE_PRICE_{STARTER,BASE,PRO,BUSINESS}` + `_ANNUAL` + `STRIPE_PRICE_REVIEWS_ADDON` — **valorizzati con gli ID live**, tutti e 9 verificati sul VPS con `php artisan replisa:stripe-check`
+- ⚠️ Il `.env` **locale resta in TEST** di proposito: è la configurazione giusta per sviluppare. La CLI Stripe locale è autenticata a una **Sandbox**, un account **diverso** da quello live
 - ⚠️ Il `.env` di prod è un **file copiato al deploy** (non symlink): l'overlay si applica solo con `dploy deploy main`, non col solo `config:clear`
 - Token Meta permanente valido (System User, scope messaging+management) — verificare non sia scaduto
 
@@ -97,11 +101,12 @@ smoke test end-to-end è passato. Il gap residuo verso il **primo cliente pagant
 
 ## Sequenza per il primo cliente reale
 
-1. Setup Stripe **live** (attiva account forfettario, ricrea prodotti + Price ID in live, chiavi/webhook live) → overlay → **`dploy deploy main`** (l'overlay si applica solo col redeploy).
-   ⚠️ Copiando i prodotti in live dal dashboard, **i Price ID cambiano**: vanno sostituiti tutti e 9 nel `.env`/overlay,
-   altrimenti il checkout fallisce con *"No such price"*. Verifica con **`php artisan replisa:stripe-check`**
-   (locale e poi sul VPS): controlla esistenza, modalità live/test, importo, intervallo, valuta e stato
-   di ogni prezzo contro `config/plans.php`, e segnala le configurazioni **miste** live+test.
+1. ~~Setup Stripe **live**~~ — **fatto e verificato** (2026-07-29). Resta solo la **prova d'acquisto reale**,
+   che l'utente fa offline. Se un giorno servisse rifare i prezzi: copiando i prodotti in live dal dashboard
+   **i Price ID cambiano** e vanno sostituiti tutti e 9 nell'overlay, altrimenti il checkout dà *"No such price"*;
+   dopo ogni modifica **`dploy deploy main`** (l'overlay si applica solo col redeploy) e poi
+   **`php artisan replisa:stripe-check`** sul VPS, che verifica modalità, importo, intervallo, valuta e stato
+   dei 9 prezzi contro `config/plans.php` e segnala le configurazioni **miste** live+test.
 2. SMTP nell'overlay (inviti + notifiche lead) → `config:clear`.
 3. Crea il tenant del cliente (`/admin/tenants` o registrazione self-service) — settore obbligatorio.
 4. Collega la WABA del cliente in `/whatsapp` + Verifica connessione.
