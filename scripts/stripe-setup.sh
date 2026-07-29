@@ -10,7 +10,7 @@
 #
 # Prerequisiti:
 #   - Stripe CLI  → https://stripe.com/docs/stripe-cli   (`stripe login`)
-#   - jq
+#   - jq **oppure** python3 (per leggere l'id dalla risposta JSON)
 #
 # Uso:
 #   ./scripts/stripe-setup.sh            # MODALITÀ TEST (default, sicura)
@@ -31,7 +31,16 @@ fi
 
 # --- Controlli prerequisiti ---------------------------------------------------
 command -v stripe >/dev/null || { echo "❌ Stripe CLI non trovato. Installa: https://stripe.com/docs/stripe-cli"; exit 1; }
-command -v jq     >/dev/null || { echo "❌ jq non trovato. Installa jq e riprova."; exit 1; }
+
+# Estrae .id dal JSON su stdin. Usa jq se c'è, altrimenti python3 (su questa
+# macchina jq non è installato) — così lo script gira senza dipendenze extra.
+if command -v jq >/dev/null; then
+    json_id() { jq -r '.id'; }
+elif command -v python3 >/dev/null; then
+    json_id() { python3 -c 'import json,sys; print(json.load(sys.stdin)["id"])'; }
+else
+    echo "❌ Serve jq oppure python3 per leggere la risposta JSON di Stripe."; exit 1
+fi
 
 echo "▶ Creazione prodotti/prezzi Stripe in modalità: $MODE"
 if [[ -n "$LIVE_FLAG" ]]; then
@@ -46,19 +55,23 @@ CURRENCY="eur"
 create_product() {
     stripe products create $LIVE_FLAG \
         --name "$1" \
-        --description "$2" | jq -r '.id'
+        --description "$2" | json_id
 }
 
 # create_price PRODUCT_ID AMOUNT_CENTS INTERVAL LOOKUP_KEY → stampa l'id prezzo
-#   INTERVAL = month | year. tax_behavior=exclusive perché i prezzi sono IVA esclusa.
+#   INTERVAL = month | year.
+#   tax_behavior=unspecified: l'esercente è in **regime forfettario** (nessuna IVA
+#   da esporre) → niente Stripe Tax, il prezzo mostrato è quello incassato.
+#   Allineato ai prezzi già creati a mano in test. La fattura elettronica con la
+#   dicitura forfettario si gestisce fuori da Stripe (SdI).
 create_price() {
     stripe prices create $LIVE_FLAG \
         --product "$1" \
         --currency "$CURRENCY" \
         --unit-amount "$2" \
-        -d "tax_behavior=exclusive" \
+        -d "tax_behavior=unspecified" \
         -d "recurring[interval]=$3" \
-        -d "lookup_key=$4" | jq -r '.id'
+        -d "lookup_key=$4" | json_id
 }
 
 echo "→ Creo i prodotti…"
@@ -85,7 +98,10 @@ PRICE_REVIEWS=$(create_price "$P_REVIEWS" 1900 month "replisa_reviews_addon_mont
 cat <<ENV
 
 ✅ Fatto ($MODE). Incolla questo nell'overlay .env di prod (~/.dploy/overlays/.env),
-   poi: php8.4 artisan config:clear
+   poi lancia un **redeploy**: dploy deploy main
+
+   ⚠️  Il .env di prod è un file COPIATO al deploy (non un symlink): modificare
+       l'overlay non basta, e nemmeno il solo config:clear — serve il redeploy.
 
 # --- Stripe Price ID (generati $(date +%Y-%m-%d), modalità $MODE) ---
 STRIPE_PRICE_STARTER=$PRICE_STARTER

@@ -50,7 +50,7 @@ smoke test end-to-end è passato. Il gap residuo verso il **primo cliente pagant
 | Residuo | Impatto se manca | Chi/dove |
 |---|---|---|
 | **Onboarding tenant reale** | Finora tutto verificato solo su Sandbox: nessun cliente vero collegato | `docs/ONBOARDING-CHECKLIST.md` (6 fasi) |
-| **Stripe LIVE** (billing reale) | Finora è tutto in **test**: nessun incasso reale | Attivare l'account, ricreare prodotti/prezzi in **live** (Price ID diversi), chiavi `pk_live`/`sk_live` + webhook endpoint live → overlay + `dploy deploy main`. **Regime forfettario: nessuna IVA** → prezzi as-is, niente Stripe Tax, `tax_behavior` va bene com'è. Fattura elettronica (dicitura forfettario) **fuori da Stripe**. |
+| **Stripe LIVE** (billing reale) | Finora è tutto in **test**: nessun incasso reale | Attivare l'account, ricreare prodotti/prezzi in **live** (Price ID diversi) — `scripts/stripe-setup.sh --live` è **pronto e allineato** (2026-07-29: `tax_behavior=unspecified`, niente dipendenza da `jq`) — poi chiavi `pk_live`/`sk_live` + webhook endpoint live → overlay + `dploy deploy main`. **Regime forfettario: nessuna IVA** → prezzi as-is, niente Stripe Tax. Fattura elettronica (dicitura forfettario) **fuori da Stripe**. |
 | **SMTP reale nell'overlay** | Inviti clienti e notifiche lead dal form landing **non partono** (in locale è `log`) | `~/.dploy/overlays/.env` → `MAIL_*` + `config:clear` ([[dploy-env-overlay]]) |
 | **Template `review_request`** | La Richiesta recensione (add-on) non parte | WhatsApp Manager, per-WABA. Runbook: `META-TEMPLATES-SUBMISSION.md` |
 | **Template sulla WABA del cliente** | `appointment_reminder` è approvato solo sulla *Test* WABA: va rifatto per ogni WABA reale (ADR-003) | Idem, per ogni cliente |
