@@ -76,6 +76,10 @@ smoke test end-to-end è passato. Il gap residuo verso il **primo cliente pagant
 ## Sequenza per il primo cliente reale
 
 1. Setup Stripe **live** (attiva account forfettario, ricrea prodotti + Price ID in live, chiavi/webhook live) → overlay → **`dploy deploy main`** (l'overlay si applica solo col redeploy).
+   ⚠️ Copiando i prodotti in live dal dashboard, **i Price ID cambiano**: vanno sostituiti tutti e 9 nel `.env`/overlay,
+   altrimenti il checkout fallisce con *"No such price"*. Verifica con **`php artisan replisa:stripe-check`**
+   (locale e poi sul VPS): controlla esistenza, modalità live/test, importo, intervallo, valuta e stato
+   di ogni prezzo contro `config/plans.php`, e segnala le configurazioni **miste** live+test.
 2. SMTP nell'overlay (inviti + notifiche lead) → `config:clear`.
 3. Crea il tenant del cliente (`/admin/tenants` o registrazione self-service) — settore obbligatorio.
 4. Collega la WABA del cliente in `/whatsapp` + Verifica connessione.
