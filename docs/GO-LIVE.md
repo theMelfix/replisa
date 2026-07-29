@@ -48,11 +48,19 @@ smoke test end-to-end è passato. Il gap residuo verso il **primo cliente pagant
   versioni o percorsi (prima esponeva la pagina di debug Laravel). `POST` senza firma → `403`: validazione
   della firma attiva.
 
-> ⚠️ **Non ancora verificato** (2026-07-29): che il `STRIPE_WEBHOOK_SECRET` dell'overlay corrisponda
-> all'endpoint live — il `403` su POST non firmato prova solo che il controllo è **acceso**, una chiave
-> sbagliata darebbe lo stesso esito. Serve un *Send test event* dal dashboard con esito **200**. E soprattutto
-> manca un **checkout reale con carta vera** (importo piccolo, poi rimborso) + la conferma che l'**IBAN di
-> payout** sia configurato: Stripe può incassare senza poterti bonificare.
+- **Webhook live verificato (2026-07-29):** evento reale `customer.updated` (`evt_1TybLk…`) consegnato con
+  **`200 OK`** a `https://replisa.com/stripe/webhook` → il `STRIPE_WEBHOOK_SECRET` dell'overlay è quello
+  dell'endpoint live, firma validata end-to-end.
+  **Come rifare la prova senza spendere:** in live mode gli eventi *fittizi* non si possono inviare (è una
+  funzione della sola modalità test), ma basta creare un cliente dal dashboard, **modificarlo** (→ `customer.updated`,
+  che è fra gli 8 eventi sottoscritti) e cancellarlo: evento reale, zero denaro. Cashier non trova un tenant con
+  quello `stripe_id` e risponde comunque `200` — è corretto, il test riguarda la firma.
+
+> ⚠️ **Non ancora verificato** (2026-07-29): un **checkout reale con carta vera** (importo piccolo, poi rimborso),
+> che è l'unica prova della catena completa incasso → `customer.subscription.created` → subscription
+> sincronizzata in DB. Il `200` qui sopra certifica **solo la firma**: Cashier risponde `200` anche agli eventi
+> che non gestisce (`missingMethod()` ritorna una Response vuota), quindi non dice nulla sulla logica di
+> business. Da confermare anche l'**IBAN di payout**: Stripe può incassare senza poterti bonificare.
 
 > Nota: i flussi sono stati accesi **via tinker** sul tenant Sandbox (id 1), che non ha owner. In esercizio
 > reale i flussi si configurano da `/automations` (per-owner). Vedi `prod-live-status` in memoria.
