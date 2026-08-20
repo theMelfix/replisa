@@ -76,6 +76,7 @@ it('mostra al super-admin solo la navigazione di piattaforma', function () {
     $this->get('/admin/tenants')
         ->assertOk()
         ->assertSee('Amministrazione')
+        ->assertSee(route('admin.overview'))
         ->assertSee(route('admin.tenants'))
         ->assertSee(route('admin.leads'))
         ->assertSee(route('admin.deadlines'));
@@ -97,7 +98,7 @@ it('non mostra al super-admin le voci del cliente', function () {
 it('porta il super-admin dalla dashboard cliente alla sua area', function () {
     $this->actingAs(backofficeAdmin());
 
-    $this->get('/dashboard')->assertRedirect(route('admin.tenants'));
+    $this->get('/dashboard')->assertRedirect(route('admin.overview'));
 });
 
 it('espone i comandi per aprire e chiudere la sidebar su mobile', function () {

@@ -33,7 +33,7 @@ class Dashboard extends Component
     public function mount(): void
     {
         if (auth()->user()->isSuperAdmin()) {
-            $this->redirect(route('admin.tenants'), navigate: true);
+            $this->redirect(route('admin.overview'), navigate: true);
         }
     }
 
