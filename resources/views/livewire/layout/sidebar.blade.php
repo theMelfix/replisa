@@ -60,6 +60,7 @@ new class extends Component
     {
         return [
             ['label' => null, 'items' => [
+                ['label' => 'Panoramica', 'route' => 'admin.overview', 'icon' => 'home'],
                 // `match`: la voce resta accesa anche sulla scheda del singolo cliente.
                 ['label' => 'Clienti', 'route' => 'admin.tenants', 'icon' => 'building', 'match' => 'admin.tenants*'],
                 ['label' => 'Richieste demo', 'route' => 'admin.leads', 'icon' => 'inbox'],
@@ -80,7 +81,7 @@ new class extends Component
             // Sotto il logo: chi sei e dove sei. Per il cliente è il nome
             // dell'attività, per l'admin l'area in cui si trova.
             'contextLabel' => $isAdmin ? 'Amministrazione' : ($user->tenant?->name ?? '—'),
-            'homeRoute' => $isAdmin ? route('admin.tenants') : route('dashboard'),
+            'homeRoute' => $isAdmin ? route('admin.overview') : route('dashboard'),
         ];
     }
 }; ?>

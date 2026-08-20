@@ -85,4 +85,43 @@ class Message extends Model
             default => '—',
         };
     }
+
+    /**
+     * Motivo leggibile del fallimento, per la Panoramica admin.
+     *
+     * La colonna `error` arriva da tre strade diverse e con tre forme diverse:
+     * un errore di connessione scritto da `WhatsAppService`
+     * (`['type' => 'connection', 'message' => ...]`), l'oggetto errore di Meta
+     * sulla risposta di invio, e la **lista** di errori che il webhook consegna
+     * negli status update. Qui le si normalizza in una riga sola.
+     */
+    public function errorSummary(): ?string
+    {
+        $error = $this->error;
+
+        if (blank($error)) {
+            return null;
+        }
+
+        // Il webhook consegna una lista; l'invio diretto un singolo oggetto.
+        $first = array_is_list($error) ? ($error[0] ?? null) : $error;
+
+        if (! is_array($first)) {
+            return is_string($first) ? $first : null;
+        }
+
+        // `error_data.details` è di solito la spiegazione più specifica di Meta
+        // ("more than 24 hours have passed..."); `message` e `title` sono più generici.
+        $text = data_get($first, 'error_data.details')
+            ?? ($first['message'] ?? null)
+            ?? ($first['title'] ?? null);
+
+        if (blank($text)) {
+            return null;
+        }
+
+        $code = $first['code'] ?? null;
+
+        return $code ? "[{$code}] {$text}" : (string) $text;
+    }
 }
