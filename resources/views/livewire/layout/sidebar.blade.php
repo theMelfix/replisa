@@ -25,7 +25,7 @@ new class extends Component
     /**
      * Voci di menu del cliente, raggruppate per area.
      *
-     * @return array<int, array{label: ?string, items: array<int, array{label: string, route: string, icon: string}>}>
+     * @return array<int, array{label: ?string, items: array<int, array{label: string, route: string, icon: string, match?: string}>}>
      */
     protected function tenantSections(): array
     {
@@ -54,13 +54,14 @@ new class extends Component
     /**
      * Voci di menu del super-admin: solo le rotte di piattaforma esistenti.
      *
-     * @return array<int, array{label: ?string, items: array<int, array{label: string, route: string, icon: string}>}>
+     * @return array<int, array{label: ?string, items: array<int, array{label: string, route: string, icon: string, match?: string}>}>
      */
     protected function adminSections(): array
     {
         return [
             ['label' => null, 'items' => [
-                ['label' => 'Clienti', 'route' => 'admin.tenants', 'icon' => 'building'],
+                // `match`: la voce resta accesa anche sulla scheda del singolo cliente.
+                ['label' => 'Clienti', 'route' => 'admin.tenants', 'icon' => 'building', 'match' => 'admin.tenants*'],
                 ['label' => 'Richieste demo', 'route' => 'admin.leads', 'icon' => 'inbox'],
                 ['label' => 'Scadenze nazionali', 'route' => 'admin.deadlines', 'icon' => 'calendar-days'],
             ]],
@@ -125,7 +126,7 @@ new class extends Component
                 @foreach ($section['items'] as $item)
                     <x-backoffice.nav-item :href="route($item['route'])"
                                            :icon="$item['icon']"
-                                           :active="request()->routeIs($item['route'])"
+                                           :active="request()->routeIs($item['match'] ?? $item['route'])"
                                            @click="open = false">
                         {{ $item['label'] }}
                     </x-backoffice.nav-item>

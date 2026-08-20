@@ -4,6 +4,7 @@ use App\Http\Controllers\ReviewRedirectController;
 use App\Livewire\AcceptInvitation;
 use App\Livewire\Admin\Deadlines as AdminDeadlines;
 use App\Livewire\Admin\Leads as AdminLeads;
+use App\Livewire\Admin\TenantDetail;
 use App\Livewire\Admin\Tenants;
 use App\Livewire\ApiTokens;
 use App\Livewire\Appointments;
@@ -94,6 +95,7 @@ Route::middleware(['auth', 'role:'.User::ROLE_SUPER_ADMIN])
     ->prefix('admin')
     ->group(function () {
         Route::get('tenants', Tenants::class)->name('admin.tenants');
+        Route::get('tenants/{tenant}', TenantDetail::class)->name('admin.tenants.show');
         Route::get('deadlines', AdminDeadlines::class)->name('admin.deadlines');
         Route::get('leads', AdminLeads::class)->name('admin.leads');
     });

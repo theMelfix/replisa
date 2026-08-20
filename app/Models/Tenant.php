@@ -74,6 +74,12 @@ class Tenant extends Model
         return filled($this->phone_number_id) && filled($this->access_token);
     }
 
+    /** @return HasMany<User, $this> */
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class);
+    }
+
     /** @return HasMany<Contact, $this> */
     public function contacts(): HasMany
     {

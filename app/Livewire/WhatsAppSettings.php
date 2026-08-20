@@ -3,8 +3,8 @@
 namespace App\Livewire;
 
 use App\Models\Tenant;
+use App\Services\WhatsApp\ConnectionCheck;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Http;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -67,39 +67,16 @@ class WhatsAppSettings extends Component
      * Verifica live le credenziali interrogando la Graph API di Meta
      * (info del numero), senza salvare nulla.
      */
-    public function verify(): void
+    public function verify(ConnectionCheck $check): void
     {
         $tenant = $this->tenant();
-        $token = filled($this->access_token) ? $this->access_token : $tenant?->access_token;
-        $phoneNumberId = $this->phone_number_id ?: $tenant?->phone_number_id;
 
-        if (! $token || ! $phoneNumberId) {
-            $this->dispatch('toast', type: 'error', message: 'Inserisci Phone Number ID e Access Token prima di verificare.');
+        $result = $check->run(
+            $this->phone_number_id ?: $tenant?->phone_number_id,
+            filled($this->access_token) ? $this->access_token : $tenant?->access_token,
+        );
 
-            return;
-        }
-
-        $version = config('services.meta.graph_version');
-
-        try {
-            $response = Http::withToken($token)
-                ->get("https://graph.facebook.com/{$version}/{$phoneNumberId}", [
-                    'fields' => 'display_phone_number,verified_name',
-                ]);
-
-            if ($response->successful()) {
-                $number = $response->json('display_phone_number', $phoneNumberId);
-                $this->dispatch('toast', type: 'success', message: "Connessione riuscita: {$number}.");
-
-                return;
-            }
-
-            $metaError = $response->json('error.message', 'credenziali non valide');
-            $this->dispatch('toast', type: 'error', message: "Verifica fallita: {$metaError}");
-        } catch (\Throwable $e) {
-            report($e);
-            $this->dispatch('toast', type: 'error', message: 'Impossibile contattare Meta. Riprova tra poco.');
-        }
+        $this->dispatch('toast', type: $result['ok'] ? 'success' : 'error', message: $result['message']);
     }
 
     protected function tenant(): ?Tenant
