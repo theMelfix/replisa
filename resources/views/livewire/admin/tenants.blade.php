@@ -93,7 +93,10 @@
                         <tr class="border-b dark:border-gray-700 align-top" wire:key="tenant-{{ $tenant->id }}">
                             {{-- Attività + dati fiscali --}}
                             <td class="py-3 px-4">
-                                <div class="font-medium text-gray-900 dark:text-gray-100">{{ $tenant->name }}</div>
+                                <a href="{{ route('admin.tenants.show', $tenant) }}" wire:navigate
+                                   class="font-medium text-gray-900 hover:text-green-700 hover:underline dark:text-gray-100 dark:hover:text-green-400">
+                                    {{ $tenant->name }}
+                                </a>
                                 @if ($tenant->vat_number)
                                     <div class="text-xs text-gray-500 flex items-center gap-1">
                                         P.IVA {{ $tenant->vat_number }}
@@ -170,7 +173,9 @@
                                     <button wire:click="toggle({{ $tenant->id }})" class="font-medium {{ $tenant->active ? 'text-red-600 hover:text-red-800' : 'text-green-700 hover:text-green-900' }}">
                                         {{ $tenant->active ? 'Blocca' : 'Sblocca' }}
                                     </button>
-                                    <button wire:click="cancelSubscription({{ $tenant->id }})" class="text-gray-600 hover:text-gray-900 dark:text-gray-300">Disdici Stripe</button>
+                                    <button wire:click="cancelSubscription({{ $tenant->id }})"
+                                            wire:confirm="Disdire subito l'abbonamento di {{ $tenant->name }}? La disdetta è immediata e non si annulla."
+                                            class="text-gray-600 hover:text-gray-900 dark:text-gray-300">Disdici Stripe</button>
                                     <button wire:click="refundLast({{ $tenant->id }})"
                                             wire:confirm="Rimborsare l'ultimo pagamento di {{ $tenant->name }}?"
                                             class="text-gray-600 hover:text-gray-900 dark:text-gray-300">Rimborsa</button>

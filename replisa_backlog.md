@@ -8,7 +8,7 @@
 > **Pricing:** Starter €14 | Base €39 | Pro €79 | Business €149 /mese
 > **PM / Scrum Master:** Claude (AI) · **Dev / Product Owner:** Giovanni Melfi
 > **Data inizio progetto:** 14/05/2026
-> **Ultimo aggiornamento:** 19/08/2026 — backoffice con sidebar: navigazioni separate per super-admin e cliente (su `develop`)
+> **Ultimo aggiornamento:** 19/08/2026 — backoffice con sidebar + scheda cliente per l'admin (su `develop`)
 
 ---
 
