@@ -14,11 +14,16 @@
     <meta property="og:url" content="{{ url('/') }}">
     <meta property="og:site_name" content="Replisa">
     <meta property="og:locale" content="it_IT">
-    <meta property="og:image" content="{{ url('/apple-touch-icon.png') }}">
-    <meta name="twitter:card" content="summary">
+    {{-- Card sociale 1200×630: prima qui c'era l'icona da 180 px, e la condivisione
+         su WhatsApp o LinkedIn usciva come un quadratino invece che come un'anteprima. --}}
+    <meta property="og:image" content="{{ url('/og-image.png') }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Replisa — Automazione WhatsApp per le piccole imprese">
+    <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Replisa — Automazione WhatsApp per PMI">
     <meta name="twitter:description" content="Benvenuti automatici, promemoria appuntamenti e richieste di recensione su WhatsApp.">
-    <meta name="twitter:image" content="{{ url('/apple-touch-icon.png') }}">
+    <meta name="twitter:image" content="{{ url('/og-image.png') }}">
 
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -50,7 +55,7 @@
                     '@id' => $home.'#organization',
                     'name' => 'Replisa',
                     'url' => $home,
-                    'logo' => url('/apple-touch-icon.png'),
+                    'logo' => url('/android-chrome-512x512.png'),
                     'email' => config('services.contact.notify_email'),
                     'founder' => ['@type' => 'Person', 'name' => 'Giovanni Melfi'],
                     'sameAs' => ['https://giovannimelfi.com'],
