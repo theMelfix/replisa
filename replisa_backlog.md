@@ -8,7 +8,7 @@
 > **Pricing:** Starter €14 | Base €39 | Pro €79 | Business €149 /mese
 > **PM / Scrum Master:** Claude (AI) · **Dev / Product Owner:** Giovanni Melfi
 > **Data inizio progetto:** 14/05/2026
-> **Ultimo aggiornamento:** 22/07/2026 — E3.3.3 completa: tracking click recensioni via short-link (su `develop`)
+> **Ultimo aggiornamento:** 19/08/2026 — backoffice con sidebar: navigazioni separate per super-admin e cliente (su `develop`)
 
 ---
 

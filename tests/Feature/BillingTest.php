@@ -81,8 +81,10 @@ it('non mostra il link abbonamento al super-admin', function () {
     ]);
     $admin->assignRole(User::ROLE_SUPER_ADMIN);
 
+    // Il super-admin non ha un tenant da abbonare: la sua area è /admin,
+    // dove la sidebar non espone le voci del cliente.
     $this->actingAs($admin)
-        ->get('/dashboard')
+        ->get('/admin/tenants')
         ->assertOk()
         ->assertDontSee(route('billing'));
 });

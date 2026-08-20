@@ -24,6 +24,19 @@ class Dashboard extends Component
     /** Giorni coperti dal grafico andamento messaggi. */
     public const TREND_DAYS = 14;
 
+    /**
+     * Il super-admin non appartiene ad alcun tenant e il {@see TenantScope} per
+     * lui è un no-op: questa dashboard gli mostrerebbe i totali di *tutti* i
+     * tenant sommati, un numero che non descrive niente. La sua home è l'area
+     * di piattaforma.
+     */
+    public function mount(): void
+    {
+        if (auth()->user()->isSuperAdmin()) {
+            $this->redirect(route('admin.tenants'), navigate: true);
+        }
+    }
+
     public function render(): View
     {
         $trend = $this->messageTrend();
